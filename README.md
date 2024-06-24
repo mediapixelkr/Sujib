@@ -178,10 +178,10 @@ Contributions are welcome! Please fork this repository and submit a pull request
 
 ## License
 
-Distributed under the GNU General Public License v3.0. See `LICENSE` for more information.
+Distributed under the GNU General Public License v3.0.
 
 ## Contact
 
-Your Name - [contact.mediapixel@gmail.com](mailto:contact.mediapixel@gmail.com)
+Mick - [contact.mediapixel@gmail.com](mailto:contact.mediapixel@gmail.com)
 
 Project Link: [https://github.com/mediapixel/Sujib](https://github.com/mediapixel/Sujib)
