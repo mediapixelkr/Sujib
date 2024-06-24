@@ -163,6 +163,15 @@ This application was created on Linux Debian and requires the following utilitie
 3. **Drag and drop a YouTube video URL into the designated area or use the form. The link should not contain anything else than https://www.youtube.com/watch?v=[ID]**
 4. **The video will be downloaded using `yt-dlp` and saved to your specified directory.**
 
+## TODO
+
+- Automatic renaming
+- Directories management for each profile
+- Example profiles, like vertical videos
+- Improved functions for multiple downloads at the same
+- Choice of thumbnail quality, export options and MP4 embed
+- Your suggestions
+
 ## Contributing
 
 Contributions are welcome! Please fork this repository and submit a pull request for any features, bug fixes, or enhancements.
