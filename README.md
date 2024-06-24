@@ -12,6 +12,8 @@
 - Download YouTube videos in various quality profiles.
 - Simple drag-and-drop interface for URLs.
 - Uses daily updated `yt-dlp` for robust downloading capabilities.
+- Get informations about downloaded videos
+- Download subtitles as external files or embed into MP4/MKV videos.
 - Built with PHP for server-side processing and jQuery for a dynamic user interface.
 - Local SQLite database for storing video information and download history.
 
@@ -134,7 +136,22 @@ This application was created on Linux Debian and requires the following utilitie
     }
     ```
 
-8. **Access the application via your browser:**
+8. **Update yt-dlp with cron (recommended):**
+    ```sh
+    sudo crontab -e
+    ```
+    
+    At the end of the file, add (for a default Aptitude install):   
+    ```sh
+    0 4 * * * /usr/local/bin/yt-dlp --update >/dev/null 2>&1
+    ```
+
+    or adapt (for a pip install):   
+    ```sh
+    0 4 * * * python3 -m pip install -U yt-dlp[default] >/dev/null 2>&1
+    ```
+
+9. **Access the application via your browser:**
     ```
     http://host/sujib
     ```
