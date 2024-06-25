@@ -6,7 +6,6 @@ if (!file_exists('db.sqlite')) {
     exit();
 }
 
-// Database connection
 $database = new SQLite3('db.sqlite');
 
 if (isset($_GET["submit"])) {
@@ -69,7 +68,6 @@ if (isset($_GET['add_profile'])) {
 
 if (isset($_GET['reset_profiles'])) {
     $database->exec("DELETE FROM profiles");
-    // Add initial profiles if necessary
     exit();
 }
 

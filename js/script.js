@@ -1,6 +1,19 @@
 $(document).ready(function() {
     var num = 0;
 
+    $.modal.defaults = {
+        overlay: "#000",        // Overlay color
+        opacity: 0.75,          // Overlay opacity
+        zIndex: 1,              // Overlay z-index.
+        escapeClose: false,      // Allows the user to close the modal by pressing `ESC`
+        clickClose: false,       // Allows the user to close the modal by clicking the overlay
+        closeText: 'Close',     // Text content for the close <a> tag.
+        showClose: false,        // Shows a (X) icon/link in the top-right corner
+        modalClass: "modal",    // CSS class added to the element being displayed in the modal.
+        spinnerHtml: null,      // HTML appended to the default spinner during AJAX requests.
+        showSpinner: true       // Enable/disable the default spinner during AJAX requests.
+      };
+
     function animateDownload() {
         $('#queue ul li').each(function(index) {
             $(this).css('animation', 'PushDown 1s ease-out');
@@ -119,6 +132,16 @@ $(document).ready(function() {
             var container = $(this).find('select[name="container"]').val();
             var max_res = $(this).find('input[name="max_res"]').val();
             var min_res = $(this).find('input[name="min_res"]').val();
+            
+            // Validate max_res and min_res
+            if (!max_res && !min_res) {
+                min_res = '1080'; // Default to 1080 if neither is provided
+            }
+
+            // Validate max_res and min_res
+            if (!name) {
+                name = 'Experimental'; // Default name
+            }
 
             profiles.push({
                 id: id,

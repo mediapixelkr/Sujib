@@ -2,13 +2,13 @@
 
 // Custom error and exception handling functions
 function handleException($exception) {
-    error_log("Exception: " . $exception->getMessage());
+    //error_log("Exception: " . $exception->getMessage());
     echo json_encode(['error' => 'An error occurred. Please try again later.']);
     exit();
 }
 
 function handleError($errno, $errstr, $errfile, $errline) {
-    error_log("Error: [$errno] $errstr - $errfile:$errline");
+    //error_log("Error: [$errno] $errstr - $errfile:$errline");
     echo json_encode(['error' => 'An error occurred. Please try again later.']);
     exit();
 }
@@ -161,17 +161,26 @@ function fetchProfile($database, $pid) {
 }
 
 function determineQuality($profile) {
-    if (isset($profile['min_res'])) {
-        return '-f "bv*[height>='. $profile['min_res'] .']+ba/b[height>='. $profile['min_res'] .'] / wv*+ba/w"';
-    } elseif (isset($profile['max_res'])) {
-        return '-f "bv*[height<='. $profile['max_res'] .']+ba/b[height<='. $profile['max_res'] .'] / wv*+ba/w"';
+    if (isset($profile['min_res']) && !empty($profile['min_res']) && is_numeric($profile['min_res'])) {
+        $quality = '-f "bv*[height>=' . intval($profile['min_res']) . ']+ba/b[height>=' . intval($profile['min_res']) . '] / wv*+ba/w"';
+    } elseif (isset($profile['max_res']) && !empty($profile['max_res']) && is_numeric($profile['max_res'])) {
+        $quality = '-f "bv*[height<=' . intval($profile['max_res']) . ']+ba/b[height<=' . intval($profile['max_res']) . '] / wv*+ba/w"';
     } else {
-        return '-f "bv*[height<=1080]+ba/b[height<=1080] / wv*+ba/w"';
+        $quality = '-f "bv*[height<=1080]+ba/b[height<=1080] / wv*+ba/w"';
     }
+    //error_log("Determined quality: " . $quality); // Log the generated command
+    return $quality;
 }
 
+
+
 function executeCommand($cmd) {
-    exec($cmd . ' 2>&1', $output, $return);
+    $output = [];
+    exec($cmd, $output, $return_var);
+    if ($return_var !== 0) {
+        //error_log("Command Error: $cmd");
+        return ['N/A'];
+    }
     return $output;
 }
 
@@ -194,11 +203,13 @@ function fetchMediaInfo($file_dl) {
     $mediainfo = [];
     foreach ($mediainfo_cmds as $key => $cmd) {
         $output = executeCommand($cmd);
-        $mediainfo[$key] = isset($output[0]) ? SQLite3::escapeString($output[0]) : 'N/A';
+        //error_log("$key output: " . json_encode($output)); // Log output
+        $mediainfo[$key] = !empty($output) && !empty($output[0]) ? SQLite3::escapeString($output[0]) : 'N/A';
     }
 
     return $mediainfo;
 }
+
 
 function insertIntoDownloaded($database, $video_id, $mediainfo, $filename, $date, $temprowid) {
     $stmt = $database->prepare("INSERT INTO 'downloaded' 
@@ -219,12 +230,13 @@ function insertIntoDownloaded($database, $video_id, $mediainfo, $filename, $date
 
     $result = $stmt->execute();
     if (!$result) {
-        error_log("Database Insert Error: " . $database->lastErrorMsg());
+        //error_log("Database Insert Error: " . $database->lastErrorMsg());
         throw new Exception("Database Insert Error: " . $database->lastErrorMsg());
     }
 
     return $database->lastInsertRowid();
 }
+
 
 function removeFromQueue($database, $temprowid) {
     $database->exec("DELETE FROM queue WHERE id = $temprowid");

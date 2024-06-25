@@ -80,7 +80,7 @@ if (isset($_POST["url"])) {
     $download_command .= ' -o ' . escapeshellarg($final_filename) . ' --merge-output-format ' . $profile['container'] . ' ' . $profile['cache'] . ' ' . $quality . ' --quiet';
 
     // Log the command
-    error_log("Download command: " . $download_command);
+    //error_log("Download command: " . $download_command);
 
     // Execute the download command
     exec($download_command . ' 2>&1', $output, $return_var);
