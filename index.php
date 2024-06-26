@@ -80,7 +80,7 @@ try {
 $locale = 'fr_FR.UTF-8';
 setlocale(LC_ALL, $locale);
 putenv('LC_ALL=' . $locale);
-$footer = "M. SERAPHIN © 2018-2024";
+$footer = "By Mick S. - mediapixel.kr © 2018-2024";
 
 include 'thumbnails.php';
 

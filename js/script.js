@@ -1,18 +1,20 @@
 $(document).ready(function() {
     var num = 0;
+    var downloadQueue = [];
+    var isDownloading = false;
 
     $.modal.defaults = {
-        overlay: "#000",        // Overlay color
-        opacity: 0.75,          // Overlay opacity
-        zIndex: 1,              // Overlay z-index.
-        escapeClose: false,      // Allows the user to close the modal by pressing `ESC`
-        clickClose: false,       // Allows the user to close the modal by clicking the overlay
-        closeText: 'Close',     // Text content for the close <a> tag.
-        showClose: false,        // Shows a (X) icon/link in the top-right corner
-        modalClass: "modal",    // CSS class added to the element being displayed in the modal.
-        spinnerHtml: null,      // HTML appended to the default spinner during AJAX requests.
-        showSpinner: true       // Enable/disable the default spinner during AJAX requests.
-      };
+        overlay: "#000",
+        opacity: 0.75,
+        zIndex: 1,
+        escapeClose: false,
+        clickClose: false,
+        closeText: 'Close',
+        showClose: false,
+        modalClass: "modal",
+        spinnerHtml: null,
+        showSpinner: true
+    };
 
     function animateDownload() {
         $('#queue ul li').each(function(index) {
@@ -26,12 +28,13 @@ $(document).ready(function() {
     $(".submit-download").click(function(e) {
         e.preventDefault();
 
-        animateDownload();
-
         var downloadLink = $('.input-link').val();
         var quality = $('.quality-select').val();
 
-        download(downloadLink, quality);
+        if (downloadLink) {
+            downloadQueue.push({ link: downloadLink, quality: quality });
+            processDownloadQueue();
+        }
 
         $('.input-link').val('');
     });
@@ -40,6 +43,121 @@ $(document).ready(function() {
         theme: "flat",
         minimumResultsForSearch: Infinity
     });
+
+    function processDownloadQueue() {
+        if (isDownloading || downloadQueue.length === 0) {
+            return;
+        }
+
+        isDownloading = true;
+        var downloadItem = downloadQueue.shift();
+
+        animateDownload();
+
+        download(downloadItem.link, downloadItem.quality)
+            .then(() => {
+                isDownloading = false;
+                processDownloadQueue();
+            })
+            .catch((error) => {
+                console.error('Download failed:', error);
+                isDownloading = false;
+                processDownloadQueue();
+            });
+    }
+
+    function download(url, params) {
+        return new Promise((resolve, reject) => {
+            $.post("thumbnails.php", { url: url }, function(data, status) {
+                $('#queue ul').find('.loader-container-temp').remove();
+
+                var thisdownload = data + num;
+                num++;
+                var htmlContent = `
+                <li id="${thisdownload}" class="${thisdownload}" style="background: rgb(240, 231, 161);"><img src="cache/${data}_default.jpg"><img src="cache/${data}_1.jpg"><img src="cache/${data}_2.jpg"><div class="text-bloc">
+                  <div class="loader" id="loader${thisdownload}"></div></div>
+                <div class="options opt${thisdownload}">
+                  <button type="button" class="btn link" id="${thisdownload}">
+                    <i class="fab fa-youtube fa-lg"></i> Launch Youtube
+                  </button>
+                </div>
+              </li>`;
+                $("#queue ul").prepend(htmlContent);
+                $(".opt" + thisdownload).hide();
+
+                $("#queue ul").find("li:first-child").each(function() {
+                    $(this).click(function(e) {
+                        if ($(this).hasClass("li_old_download_clicked")) {
+                            $(this).removeClass("li_old_download_clicked");
+                        } else {
+                            $(this).addClass("li_old_download_clicked");
+                        }
+                        $(this).find(".options").slideToggle(50);
+                    }).find(".options").click(function(e) {
+                        return false;
+                    });
+
+                    $(this).find(".link").click(function(e) {
+                        e.preventDefault();
+                        window.open('https://www.youtube.com/watch?v=' + $(this).attr('id'));
+                    });
+                });
+
+                setTimeout(function() {
+                    var loaderSelector = "#loader" + thisdownload;
+                    if ($(loaderSelector).length > 0) {
+                        $.post("download.php", { url: url, id: params }, function(status2) {
+                            status2 = jQuery.parseJSON(status2);
+                            $(loaderSelector).replaceWith('<div class="text-bloc">' + status2.table + '</div>');
+                            $("#queue ul").find("." + thisdownload).css({
+                                background: '#CDD7E7'
+                            }).attr("id", status2.id);
+
+                            var newrenbutton = $("#queue ul").find("." + thisdownload).find(".options").append('<button type="button" class="btn rename" id="' + status2.id + '"><i class="fas fa-edit fa-sm"></i> Rename</button>');
+                            var newdelbutton = $("#queue ul").find("." + thisdownload).find(".options").append('<button type="button" class="btn delete" id="' + status2.id + '"><i class="fas fa-trash-alt fa-sm"></i> Delete file</button>');
+
+                            $(newrenbutton).find(".rename").on("click", function(e) {
+                                e.preventDefault();
+                                this.blur();
+                                var renid = $(this).attr('id');
+                                $.get('rename.php?id=' + renid, function(html) {
+                                    $('#rename-form').html('');
+                                    $(html.toString()).appendTo('#rename-form');
+                                    $('#rename-form').modal({
+                                        modalClass: "modal-rename"
+                                    });
+                                });
+                            });
+
+                            $(newdelbutton).find(".delete").on("click", function(e) {
+                                e.preventDefault();
+                                this.blur();
+                                var delid = $(this).attr('id');
+                                $.get('delete.php?id=' + delid, function(html) {
+                                    $('#delete-form').html('');
+                                    $(html.toString()).appendTo('#delete-form');
+                                    $('#delete-form').modal({
+                                        modalClass: "modal-delete"
+                                    });
+                                });
+                            });
+
+                            resolve();
+                        }).fail(function() {
+                            console.error("Download failed.");
+                            reject();
+                        });
+                    } else {
+                        console.error("Loader element not found for replacement");
+                        reject();
+                    }
+                }, 500); // Delay to ensure element is inserted
+            }).fail(function() {
+                console.error("Thumbnail request failed.");
+                reject();
+            });
+        });
+    }
 
     function saveOptions() {
         var show_last = $("#show_last").val();
@@ -61,19 +179,16 @@ $(document).ready(function() {
         });
     }
 
-    // Attach the beforeClose event to the modal
     $(document).on('modal:before-close', '#options-form', function(event, modal) {
         saveOptions();
     });
 
-    // Attach event listener for the close button
     $(document).on('click', '.btn.close', function(e) {
         e.preventDefault();
         saveOptions();
         $.modal.close();
     });
 
-    // Function to escape HTML special characters
     function htmlspecialchars(str) {
         if (typeof str !== "string") {
             return str;
@@ -85,7 +200,6 @@ $(document).ready(function() {
                   .replace(/'/g, '&#039;');
     }
 
-    // Function to load profiles
     function loadProfiles() {
         $.getJSON('profiles.php?get_profiles', function(profiles) {
             var profilesHtml = '';
@@ -112,7 +226,6 @@ $(document).ready(function() {
             });
             $('#profiles-list').html(profilesHtml);
 
-            // Make profiles sortable
             $('#profiles-list').sortable({
                 update: function(event, ui) {
                     saveProfileOrder();
@@ -123,7 +236,6 @@ $(document).ready(function() {
         });
     }
 
-    // Function to save profiles
     function saveProfiles(callback) {
         var profiles = [];
         $('.profile-item').each(function() {
@@ -133,14 +245,12 @@ $(document).ready(function() {
             var max_res = $(this).find('input[name="max_res"]').val();
             var min_res = $(this).find('input[name="min_res"]').val();
             
-            // Validate max_res and min_res
             if (!max_res && !min_res) {
-                min_res = '1080'; // Default to 1080 if neither is provided
+                min_res = '1080'; 
             }
 
-            // Validate max_res and min_res
             if (!name) {
-                name = 'Experimental'; // Default name
+                name = 'Experimental';
             }
 
             profiles.push({
@@ -166,7 +276,6 @@ $(document).ready(function() {
         });
     }
 
-    // Function to save profile order
     function saveProfileOrder() {
         var profiles = [];
         $('.profile-item').each(function(index) {
@@ -190,12 +299,10 @@ $(document).ready(function() {
         });
     }
 
-    // Load profiles when the Profiles modal is opened
     $(document).on('modal:open', '#profiles-form', function(event, modal) {
         loadProfiles();
     });
 
-    // Add profile
     $('#add_profile').click(function() {
         $.post('profiles.php', { add_profile: true }, function(response) {
             if (response.status === 'success') {
@@ -208,7 +315,6 @@ $(document).ready(function() {
         });
     });
 
-    // Reset profiles with confirmation
     $('#reset_profiles').click(function() {
         if (confirm('Are you sure you want to delete the current profiles and go back to default?')) {
             $.post('profiles.php', { reset_profiles: true }, function(response) {
@@ -223,7 +329,6 @@ $(document).ready(function() {
         }
     });
 
-    // Delete profile
     $(document).on('click', '.delete-profile', function() {
         var id = $(this).data('id');
         if (confirm('Are you sure you want to delete this profile?')) {
@@ -239,102 +344,11 @@ $(document).ready(function() {
         }
     });
 
-    // Save profiles before closing the modal
     $(document).on('modal:before-close', '#profiles-form', function(event, modal) {
         saveProfiles(function() {
-            location.reload(); // Reload the page to reflect changes
+            location.reload();
         });
     });
-
-    function download(url, params) {
-        $.post("thumbnails.php", { url: url }, function(data, status) {
-            $('#queue ul').find('.loader-container-temp').remove();
-
-            var thisdownload = data + num;
-            num++;
-            var htmlContent = `
-            <li id="${thisdownload}" class="${thisdownload}" style="background: rgb(240, 231, 161);"><img src="cache/${data}_default.jpg"><img src="cache/${data}_1.jpg"><img src="cache/${data}_2.jpg"><div class="text-bloc">
-              <div class="loader" id="loader${thisdownload}"></div></div>
-            <div class="options opt${thisdownload}">
-              <button type="button" class="btn link" id="${thisdownload}">
-                <i class="fab fa-youtube fa-lg"></i> Launch Youtube
-              </button>
-            </div>
-          </li>`;
-            $("#queue ul").prepend(htmlContent);
-            $(".opt" + thisdownload).hide();
-
-            $("#queue ul").find("li:first-child").each(function() {
-                $(this).click(function(e) {
-                    if ($(this).hasClass("li_old_download_clicked")) {
-                        $(this).removeClass("li_old_download_clicked");
-                    } else {
-                        $(this).addClass("li_old_download_clicked");
-                    }
-                    $(this).find(".options").slideToggle(50);
-                }).find(".options").click(function(e) {
-                    return false;
-                });
-
-                $(this).find(".link").click(function(e) {
-                    e.preventDefault();
-                    window.open('https://www.youtube.com/watch?v=' + $(this).attr('id'));
-                });
-            });
-
-            setTimeout(function() {
-                var loaderSelector = "#loader" + thisdownload;
-                console.log("Loader selector: ", loaderSelector);
-                console.log("Loader element exists: ", $(loaderSelector).length > 0);
-
-                if ($(loaderSelector).length > 0) {
-                    $.post("download.php", { url: url, id: params }, function(status2) {
-                        status2 = jQuery.parseJSON(status2);
-                        console.log("Response from download.php: ", status2);
-
-                        $(loaderSelector).replaceWith('<div class="text-bloc">' + status2.table + '</div>');
-                        console.log("Replaced loader with text-bloc");
-
-                        $("#queue ul").find("." + thisdownload).css({
-                            background: '#CDD7E7'
-                        }).attr("id", status2.id);
-
-                        var newrenbutton = $("#queue ul").find("." + thisdownload).find(".options").append('<button type="button" class="btn rename" id="' + status2.id + '"><i class="fas fa-edit fa-sm"></i> Rename</button>');
-                        var newdelbutton = $("#queue ul").find("." + thisdownload).find(".options").append('<button type="button" class="btn delete" id="' + status2.id + '"><i class="fas fa-trash-alt fa-sm"></i> Delete file</button>');
-
-                        $(newrenbutton).find(".rename").on("click", function(e) {
-                            e.preventDefault();
-                            this.blur();
-                            var renid = $(this).attr('id');
-                            $.get('rename.php?id=' + renid, function(html) {
-                                $('#rename-form').html('');
-                                $(html.toString()).appendTo('#rename-form');
-                                $('#rename-form').modal({
-                                    modalClass: "modal-rename"
-                                });
-                            });
-                        });
-
-                        $(newdelbutton).find(".delete").on("click", function(e) {
-                            e.preventDefault();
-                            this.blur();
-                            var delid = $(this).attr('id');
-                            $.get('delete.php?id=' + delid, function(html) {
-                                $('#delete-form').html('');
-                                $(html.toString()).appendTo('#delete-form');
-                                $('#delete-form').modal({
-                                    modalClass: "modal-delete"
-                                });
-                            });
-                        });
-                        
-                    });
-                } else {
-                    console.error("Loader element not found for replacement");
-                }
-            }, 500); // Délai pour s'assurer que l'élément est inséré
-        });
-    }
 
     $('.drop').each(function() {
         $(this).on('dragenter', function() {
@@ -416,27 +430,24 @@ $(document).ready(function() {
             });
         });
 
-
-        // Handle terminate button click
         $(this).find(".terminate").click(function(e) {
             e.preventDefault();
             this.blur();
-            console.log("Terminate button clicked"); // Debugging statement
+            console.log("Terminate button clicked");
 
             var terminateId = $(this).attr('id');
-            console.log("Terminate ID: " + terminateId); // Debugging statement
+            console.log("Terminate ID: " + terminateId);
 
             $.get('delete.php?terminate=true&id=' + terminateId, function(response) {
-                console.log("Response received: ", response); // Debugging statement
+                console.log("Response received: ", response);
 
                 var jsonResponse = JSON.parse(response);
 
                 if (jsonResponse.status === "success") {
-                    console.log("Success message found, reloading page"); // Debugging statement
-                    location.reload(); // Refresh the page
+                    console.log("Success message found, reloading page");
+                    location.reload();
                 } else {
-                    console.log("Handling error or other response"); // Debugging statement
-                    // Optionally, handle error messages
+                    console.log("Handling error or other response");
                     $('#delete-form').html('');
                     $('<div>').html(jsonResponse.message).appendTo('#delete-form');
                     $('#delete-form').modal({
@@ -445,8 +456,6 @@ $(document).ready(function() {
                 }
             });
         });
-
-
     });
 
     $(document).on("click", "div.hide a", function(e) {
