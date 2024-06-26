@@ -168,8 +168,8 @@ This application was created on Linux Debian and requires the following utilitie
 - Automatic renaming
 - Directories management for each profile
 - Example profiles, like vertical videos
-- Improved functions for multiple downloads at the same
 - Choice of thumbnail quality, export options and MP4 embed
+- Multiple languages for subtitles
 - Your suggestions
 
 ## Contributing

@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </select>
             </div><br>
             <div class="form-group">
-                <label for="download_dir">Download Directory (must already exist, max 255 characters):</label><br>
+                <label for="download_dir">Base Download Directory (must already exist, max 255 characters):</label><br>
                 <input type="text" name="download_dir" id="download_dir" value="<?php echo $script_path; ?>" maxlength="255" required class="form-control">
             </div><br>
             <div class="form-group">
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <select name="subtitles" id="subtitles" class="quality-select form-control">
                     <option value="0" selected>None</option>
                     <option value="1">External .srt file</option>
-                    <option value="2">Embed (Not yet available)</option>
+                    <option value="2">Embed</option>
                 </select>
             </div><br>
             <div class="form-group">
@@ -104,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $(document).ready(function() {
         $('.quality-select').select2({
             theme: 'flat',
+            minimumResultsForSearch: Infinity,
             width: 'resolve' // ensures Select2 dropdown matches input width
         });
     });

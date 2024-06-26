@@ -3,6 +3,12 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Redirect to install.php if the database does not exist
+if (!file_exists('db.sqlite')) {
+  header("Location: install.php");
+  exit();
+}
+
 $showNav = true;
 require_once 'functions.php';
 require_once 'header.php';
@@ -15,40 +21,6 @@ $options = fetchOptions($database);
 $options_show_last = $options['show_last'] ?? '';
 $options_subtitles = $options['subtitles'] ?? 0;
 $options_sub_lang = $options['sub_lang'] ?? 'en'; // Default to 'en' if not set
-
-// Function to check if the database is configured
-function isDatabaseConfigured() {
-    $dbPath = __DIR__ . '/db.sqlite';
-    
-    if (!file_exists($dbPath)) {
-        return false;
-    }
-
-    $database = new SQLite3($dbPath);
-    
-    // Check if the 'options' table exists and has the required entries
-    $result = $database->query("SELECT count(*) as count FROM sqlite_master WHERE type='table' AND name='options'");
-    $tableExists = $result->fetchArray(SQLITE3_ASSOC)['count'];
-    
-    if ($tableExists == 0) {
-        return false;
-    }
-
-    // Check if the 'profiles' table exists and has the required entries
-    $result = $database->query("SELECT count(*) as count FROM sqlite_master WHERE type='table' AND name='profiles'");
-    $tableExists = $result->fetchArray(SQLITE3_ASSOC)['count'];
-    
-    if ($tableExists == 0) {
-        return false;
-    }
-
-    return true;
-}
-
-if (!isDatabaseConfigured()) {
-    header("Location: install.php");
-    exit();
-}
 
 // Fetch profiles (with error handling)
 function fetchProfiles($database) {

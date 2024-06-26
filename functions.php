@@ -67,7 +67,9 @@ function createTables($database) {
             min_res TEXT,
             audio TEXT,
             video TEXT,
-            cache TEXT
+            cache TEXT,
+            directory_id INTEGER,
+            FOREIGN KEY(directory_id) REFERENCES directories(id)
         )",
         'options' => "CREATE TABLE IF NOT EXISTS options (
             id INTEGER PRIMARY KEY,
@@ -97,11 +99,16 @@ function createTables($database) {
             size TEXT,
             date TEXT,
             tid INTEGER
+        )",
+        'directories' => "CREATE TABLE IF NOT EXISTS directories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            path TEXT NOT NULL,
+            description TEXT
         )"
     ];
 
-    foreach ($tables as $createQuery) {
-        $database->exec($createQuery);
+    foreach ($tables as $name => $sql) {
+        $database->exec($sql);
     }
 }
 

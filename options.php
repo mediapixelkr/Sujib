@@ -1,11 +1,5 @@
 <?php
 
-// Redirect to install.php if the database does not exist
-if (!file_exists('db.sqlite')) {
-    header("Location: install.php");
-    exit();
-}
-
 $database = new SQLite3('db.sqlite');
 
 if (isset($_GET["submit"])) {
