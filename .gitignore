@@ -1,0 +1,19 @@
+# Ignore local SQLite database
+/db.sqlite
+
+# Ignore cache directories and thumbnail caches
+/cache/
+
+# Ignore log files
+*.log
+
+# Ignore temporary files
+*.tmp
+*.temp
+/tmp/
+/temp/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
