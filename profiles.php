@@ -1,7 +1,8 @@
 <?php
+require_once 'functions.php';
 
 // Database connection
-$database = new SQLite3('db.sqlite');
+$database = new SQLite3(DB_PATH);
 
 // Get profiles
 if (isset($_GET['get_profiles'])) {

@@ -3,15 +3,15 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+require_once 'functions.php';
+
 // Redirect to install.php if the database does not exist
-// Use an absolute path to avoid issues with the current working directory
-if (!file_exists(__DIR__ . '/db.sqlite')) {
+if (!file_exists(DB_PATH)) {
   header("Location: install.php");
   exit();
 }
 
 $showNav = true;
-require_once 'functions.php';
 require_once 'header.php';
 
 // Initialize database
