@@ -3,22 +3,6 @@ require_once 'functions.php';
 
 if (isset($_POST["url"])) {
 
-    // Function to validate and extract video ID from a YouTube URL
-    function extract_video_id($url) {
-        // Sanitize URL
-        $url = filter_var($url, FILTER_SANITIZE_URL);
-        
-        // Validate URL
-        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
-            return false;
-        }
-
-        // Extract video ID
-        preg_match('#(?<=(?:v|i)=)[a-zA-Z0-9-]+(?=&)|(?<=(?:v|i)\/)[^&\n]+|(?<=embed\/)[^"&\n]+|(?<=(?:v|i)=)[^&\n]+|(?<=youtu.be\/)[^&\n]+#', $url, $matches);
-        
-        return $matches[0] ?? false;
-    }
-
     $video_id = extract_video_id($_POST['url']);
 
     if (!$video_id) {
