@@ -335,6 +335,8 @@ $(document).ready(function() {
             $.post('profiles.php', { delete_profile: true, id: id }, function(response) {
                 if (response.status === 'success') {
                     loadProfiles();
+                    $('.drop#' + id).remove();
+                    $('#quality option[value="' + id + '"]').remove();
                 } else {
                     alert('Failed to delete profile. Please try again.');
                 }
