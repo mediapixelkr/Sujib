@@ -3,11 +3,12 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>Simple Youtube PHP Downloader</title>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="icon" href="favicon.png" type="image/png">
-    <link rel="icon" sizes="32x32" href="favicon-32.png" type="image/png">
-    <link rel="icon" sizes="64x64" href="favicon-64.png" type="image/png">
-    <link rel="icon" sizes="96x96" href="favicon-96.png" type="image/png"> 
+    <?php $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/').'/'; ?>
+    <link rel="shortcut icon" href="<?php echo $basePath; ?>favicon.ico" type="image/x-icon">
+    <link rel="icon" href="<?php echo $basePath; ?>favicon.png" type="image/png">
+    <link rel="icon" sizes="32x32" href="<?php echo $basePath; ?>favicon-32.png" type="image/png">
+    <link rel="icon" sizes="64x64" href="<?php echo $basePath; ?>favicon-64.png" type="image/png">
+    <link rel="icon" sizes="96x96" href="<?php echo $basePath; ?>favicon-96.png" type="image/png">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> 
     <link href="https://fonts.googleapis.com/css?family=Exo" rel="stylesheet"> 
