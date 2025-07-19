@@ -8,17 +8,23 @@ if (isset($_GET["submit"])) {
     try {
         if (isset($_POST["showlast"])) {
             $showlast = (int)$_POST["showlast"];
-            $database->exec("UPDATE options SET show_last=$showlast");
+            $stmt = $database->prepare('UPDATE options SET show_last = :show_last');
+            $stmt->bindValue(':show_last', $showlast, SQLITE3_INTEGER);
+            $stmt->execute();
         }
 
         if (isset($_POST["subtitles"])) {
             $subtitles = (int)$_POST["subtitles"];
-            $database->exec("UPDATE options SET subtitles=$subtitles");
+            $stmt = $database->prepare('UPDATE options SET subtitles = :subtitles');
+            $stmt->bindValue(':subtitles', $subtitles, SQLITE3_INTEGER);
+            $stmt->execute();
         }
 
         if (isset($_POST["sub_lang"])) {
             $sub_lang = substr($_POST["sub_lang"], 0, 2); // Ensure it's at most 2 characters
-            $database->exec("UPDATE options SET sub_lang='$sub_lang'");
+            $stmt = $database->prepare('UPDATE options SET sub_lang = :sub_lang');
+            $stmt->bindValue(':sub_lang', $sub_lang, SQLITE3_TEXT);
+            $stmt->execute();
         }
 
         // Respond with a success message
@@ -67,12 +73,20 @@ if (isset($_GET['reset_profiles'])) {
 
 if (isset($_GET['update_profile'])) {
     $id = (int)$_POST['id'];
-    $name = $database->escapeString($_POST['name']);
-    $destination = $database->escapeString($_POST['destination']);
-    $container = $database->escapeString($_POST['container']);
-    $max_res = $database->escapeString($_POST['max_res']);
-    $min_res = $database->escapeString($_POST['min_res']);
-    $database->exec("UPDATE profiles SET name='$name', destination='$destination', container='$container', max_res='$max_res', min_res='$min_res' WHERE id=$id");
+    $name = $_POST['name'];
+    $destination = $_POST['destination'];
+    $container = $_POST['container'];
+    $max_res = $_POST['max_res'];
+    $min_res = $_POST['min_res'];
+
+    $stmt = $database->prepare('UPDATE profiles SET name = :name, destination = :destination, container = :container, max_res = :max_res, min_res = :min_res WHERE id = :id');
+    $stmt->bindValue(':name', $name, SQLITE3_TEXT);
+    $stmt->bindValue(':destination', $destination, SQLITE3_TEXT);
+    $stmt->bindValue(':container', $container, SQLITE3_TEXT);
+    $stmt->bindValue(':max_res', $max_res, SQLITE3_TEXT);
+    $stmt->bindValue(':min_res', $min_res, SQLITE3_TEXT);
+    $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+    $stmt->execute();
     exit();
 }
 
