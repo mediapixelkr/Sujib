@@ -36,6 +36,9 @@ if (isset($_POST["url"])) {
         exit();
     }
 
+    $profile_command = sanitizeShellInput($profile['command_line']);
+    $profile_cache   = sanitizeShellInput($profile['cache']);
+
     // Fetch global options
     $options = fetchOptions($database);
     if (empty($options['download_dir'])) {
@@ -52,7 +55,7 @@ if (isset($_POST["url"])) {
     $temp_filename = $options['download_dir'] . '/' . $profile['destination'];
 
     // Final filename
-    $get_filename_command = 'yt-dlp ' . escapeshellarg($url) . ' --get-filename -o ' . escapeshellarg($temp_filename) . ' --merge-output-format ' . $profile['container'] . ' ' . $profile['command_line'] . ' ' . $profile['cache'];
+    $get_filename_command = 'yt-dlp ' . escapeshellarg($url) . ' --get-filename -o ' . escapeshellarg($temp_filename) . ' --merge-output-format ' . $profile['container'] . ' ' . $profile_command . ' ' . $profile_cache;
     $filename = executeCommand($get_filename_command);
 
     if (!isset($filename[0]) || strpos($filename[0], "WARNING") === 0) {
@@ -67,7 +70,7 @@ if (isset($_POST["url"])) {
     $temprowid = insertIntoQueue($database, $video_id[0], $filesql);
 
     // Construct the download command based on subtitle options
-    $download_command = 'yt-dlp ' . escapeshellarg($url) . ' --ignore-config --prefer-ffmpeg ' . $profile['command_line'];
+    $download_command = 'yt-dlp ' . escapeshellarg($url) . ' --ignore-config --prefer-ffmpeg ' . $profile_command;
 
     if ($options_subtitles == 1) {
         // Add subtitle options for external subtitles
@@ -77,7 +80,7 @@ if (isset($_POST["url"])) {
         $download_command .= ' --write-subs --write-auto-subs --embed-subs --compat-options no-keep-subs --sub-lang ' . $options_sub_lang . '.*';
     }
 
-    $download_command .= ' -o ' . escapeshellarg($final_filename) . ' --merge-output-format ' . $profile['container'] . ' ' . $profile['cache'] . ' ' . $quality . ' --quiet';
+    $download_command .= ' -o ' . escapeshellarg($final_filename) . ' --merge-output-format ' . $profile['container'] . ' ' . $profile_cache . ' ' . $quality . ' --quiet';
 
     // Log the command
     //error_log("Download command: " . $download_command);

@@ -468,4 +468,9 @@ function saveOptions($database, $show_last, $subtitles, $sub_lang) {
     }
 }
 
+function sanitizeShellInput($input) {
+    $pattern = '/^[\w\s\-\/\.=:]+$/';
+    return preg_match($pattern, $input) ? $input : '';
+}
+
 ?>
