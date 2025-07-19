@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Update the profiles table with the selected container and download_dir as destination_dir
     $destination = '%(title)s.%(ext)s';
     $update_profiles_query = [
-        "UPDATE profiles SET container = '$container', destination = '$destination' WHERE id IN (1, 2, 3, 4)"
+        "UPDATE profiles SET container = '$container', destination = '$destination' WHERE id IN (1, 2, 3, 4, 5)"
     ];
     foreach ($update_profiles_query as $query) {
         if (!$database->exec($query)) {
