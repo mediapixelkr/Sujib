@@ -1,6 +1,7 @@
 <?php
+require_once 'functions.php';
 
-$database = new SQLite3('db.sqlite');
+$database = new SQLite3(DB_PATH);
 
 if (isset($_GET["submit"])) {
     header('Content-Type: application/json');
