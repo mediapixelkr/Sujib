@@ -1,8 +1,9 @@
 # Ignore local SQLite database
 /db.sqlite
 
-# Ignore cache directories and thumbnail caches
-/cache/
+# Ignore cached thumbnails but keep the directory
+cache/*
+!cache/.gitkeep
 
 # Composer dependencies
 vendor/
