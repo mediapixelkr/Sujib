@@ -163,6 +163,18 @@ This application was created on Linux Debian and requires the following utilitie
 3. **Drag and drop a YouTube video URL into the designated area or use the form. The link should not contain anything else than https://www.youtube.com/watch?v=[ID]**
 4. **The video will be downloaded using `yt-dlp` and saved to your specified directory.**
 
+## Example Profiles
+
+During the first setup, Sujib creates a few sample profiles that you can use as a starting point. Each profile defines the maximum or minimum resolution passed to `yt-dlp`.
+
+| Profile Name | Resolution |
+|--------------|------------|
+| video-highest (4K) | >=1080p |
+| video-1440p (1440P) | up to 1440p |
+| video-1080p (1080P) | up to 1080p |
+| video-720p (720P) | up to 720p |
+| SD | up to 480p |
+
 ## TODO
 
 - Automatic renaming
