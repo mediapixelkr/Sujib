@@ -20,7 +20,6 @@ set_exception_handler('customException');
 
 $showNav = false;
 require_once 'functions.php';
-require_once 'header.php';
 
 $script_path = realpath(dirname(__FILE__));
 
@@ -55,6 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     header("Location: index.php");
     exit();
 }
+
+require_once 'header.php';
 ?>
 
 <main class="install-main">
