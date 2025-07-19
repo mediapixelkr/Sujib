@@ -226,35 +226,42 @@ $(document).ready(function() {
         $codec_a = $last['codec_a'] ?? "N/A";
         $bitrate_a = $last['bitrate_a'] ?? "N/A";
 
-        echo '<li id="'.$last['id'].'" class="li_old_download '.$last['video_id'].'" style=""><img src="thumbnail.php?id='.$last['video_id'].'&type=default"><img src="thumbnail.php?id='.$last['video_id'].'&type=1"><img src="thumbnail.php?id='.$last['video_id'].'&type=2"><div class="text-bloc">'
-    <table>
-      <tr>
-        <td colspan="4" class="table_title" style="padding-bottom:5px">
-            '.htmlspecialchars(basename($filename)).'
-        </td>
-      </tr>
-      <tr>
-        <td width="50%" colspan="2"><i class="far fa-clock"></i> <b>Duration :</b> '.$duration.'</td>
-        <td width="50%" colspan="2"><i class="fas fa-desktop"></i> <b>Resolution :</b> '.$resolution.'</td>
-      </tr>
-      <tr>
-        <td colspan="4">
-            <table>
-              <tr>
-                <td width="50%" colspan="2"><i class="fas fa-film"></i> <b>Video :</b> '.$codec_v.' @ '.$bitrate_v.'</td>
-                <td width="50%" colspan="2"><i class="fas fa-volume-up"></i> <b>Audio :</b> '.$codec_a.' @ '.$bitrate_a.'</td>
-              </tr>
-            </table>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2"><i class="far fa-calendar"></i> <b>Date :</b> '.$dl_date.'</td>
-            <td colspan="2"><i class="far fa-hdd"></i> <b>Size :</b> '.$size.'</td></tr>
-    </table>
-    <div class="hide"><a id="'.$last['id'].'" title="Hide this download"><i class="fas fa-times-circle fa-lg"></i></a></div>
-    </div><div class="options"><button type="button" class="btn link" id="'.$last['video_id'].'"><i class="fab fa-youtube fa-lg"></i> Launch Youtube</button>
-    <button type="button" class="btn rename" id="'.$last['id'].'"><i class="fas fa-edit fa-sm"></i> Rename</button>
-    <button type="button" class="btn delete" id="'.$last['id'].'"><i class="fas fa-trash-alt fa-sm"></i> Delete file</button></div></li>';
+        echo '<li id="' . $last['id'] . '" class="li_old_download ' . $last['video_id'] . '" style="">'
+            . '<img src="thumbnail.php?id=' . $last['video_id'] . '&type=default">'
+            . '<img src="thumbnail.php?id=' . $last['video_id'] . '&type=1">'
+            . '<img src="thumbnail.php?id=' . $last['video_id'] . '&type=2">'
+            . '<div class="text-bloc">'
+            . '<table>'
+            . '<tr>'
+            . '<td colspan="4" class="table_title" style="padding-bottom:5px">'
+            . htmlspecialchars(basename($filename))
+            . '</td>'
+            . '</tr>'
+            . '<tr>'
+            . '<td width="50%" colspan="2"><i class="far fa-clock"></i> <b>Duration :</b> ' . $duration . '</td>'
+            . '<td width="50%" colspan="2"><i class="fas fa-desktop"></i> <b>Resolution :</b> ' . $resolution . '</td>'
+            . '</tr>'
+            . '<tr>'
+            . '<td colspan="4">'
+            . '<table>'
+            . '<tr>'
+            . '<td width="50%" colspan="2"><i class="fas fa-film"></i> <b>Video :</b> ' . $codec_v . ' @ ' . $bitrate_v . '</td>'
+            . '<td width="50%" colspan="2"><i class="fas fa-volume-up"></i> <b>Audio :</b> ' . $codec_a . ' @ ' . $bitrate_a . '</td>'
+            . '</tr>'
+            . '</table>'
+            . '</td>'
+            . '</tr>'
+            . '<tr>'
+            . '<td colspan="2"><i class="far fa-calendar"></i> <b>Date :</b> ' . $dl_date . '</td>'
+            . '<td colspan="2"><i class="far fa-hdd"></i> <b>Size :</b> ' . $size . '</td>'
+            . '</tr>'
+            . '</table>'
+            . '<div class="hide"><a id="' . $last['id'] . '" title="Hide this download"><i class="fas fa-times-circle fa-lg"></i></a></div>'
+            . '</div><div class="options">'
+            . '<button type="button" class="btn link" id="' . $last['video_id'] . '"><i class="fab fa-youtube fa-lg"></i> Launch Youtube</button>'
+            . '<button type="button" class="btn rename" id="' . $last['id'] . '"><i class="fas fa-edit fa-sm"></i> Rename</button>'
+            . '<button type="button" class="btn delete" id="' . $last['id'] . '"><i class="fas fa-trash-alt fa-sm"></i> Delete file</button>'
+            . '</div></li>';
     }
     echo '</ul></div>';
 }
