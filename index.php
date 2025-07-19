@@ -75,9 +75,9 @@ if (isset($_GET["download"])) {
     <?php
     preg_match('#(?<=(?:v|i)=)[a-zA-Z0-9-]+(?=&)|(?<=(?:v|i)\/)[^&\n]+|(?<=embed\/)[^"&\n]+|(?<=(?:v|i)=)[^&\n]+|(?<=youtu.be\/)[^&\n]+#', $_POST['link'], $video_id);
     cache_img($video_id[0]);
-    echo "<img src=\"cache/".$video_id[0]."_hqdefault.jpg\" /><br>";
-    echo "<img src=\"cache/".$video_id[0]."_1.jpg\" />
-    <img src=\"cache/".$video_id[0]."_2.jpg\" />";
+    echo "<img src=\"thumbnail.php?id={$video_id[0]}&type=hqdefault\" /><br>";
+    echo "<img src=\"thumbnail.php?id={$video_id[0]}&type=1\" />
+    <img src=\"thumbnail.php?id={$video_id[0]}&type=2\" />";
     ?>
     <form id="video_link" action="?add" method="post"> 
         <p><input type="text" name="vid" size="12" value="<?php echo $video_id[0]; ?>" hidden />
@@ -137,9 +137,9 @@ if (isset($_GET["download"])) {
 
     while ($queue = $queue_result->fetchArray()) {
         echo '<li id="' . $queue['id'] . '" class="' . $queue['video_id'] . '">
-                <img src="cache/' . $queue['video_id'] . '_default.jpg">
-                <img src="cache/' . $queue['video_id'] . '_1.jpg">
-                <img src="cache/' . $queue['video_id'] . '_2.jpg">
+                <img src="thumbnail.php?id=' . $queue['video_id'] . '&type=default">
+                <img src="thumbnail.php?id=' . $queue['video_id'] . '&type=1">
+                <img src="thumbnail.php?id=' . $queue['video_id'] . '&type=2">
                 <div class="loader" id="loader' . $queue['id'] . '"></div>
                 <div class="options opt' . $queue['video_id'] . '">
                     <button type="button" class="btn link" id="' . $queue['video_id'] . '"><i class="fab fa-youtube fa-lg"></i> Launch Youtube</button>
@@ -226,7 +226,7 @@ $(document).ready(function() {
         $codec_a = $last['codec_a'] ?? "N/A";
         $bitrate_a = $last['bitrate_a'] ?? "N/A";
 
-        echo '<li id="'.$last['id'].'" class="li_old_download '.$last['video_id'].'" style=""><img src="cache/'.$last['video_id'].'_default.jpg"><img src="cache/'.$last['video_id'].'_1.jpg"><img src="cache/'.$last['video_id'].'_2.jpg"><div class="text-bloc">
+        echo '<li id="'.$last['id'].'" class="li_old_download '.$last['video_id'].'" style=""><img src="thumbnail.php?id='.$last['video_id'].'&type=default"><img src="thumbnail.php?id='.$last['video_id'].'&type=1"><img src="thumbnail.php?id='.$last['video_id'].'&type=2"><div class="text-bloc">'
     <table>
       <tr>
         <td colspan="4" class="table_title" style="padding-bottom:5px">

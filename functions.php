@@ -26,6 +26,15 @@ if (!defined('DB_PATH')) {
     define('DB_PATH', $defaultPath);
 }
 
+// Define a constant for the cache directory. Fallback to /tmp if not writable
+if (!defined('CACHE_DIR')) {
+    $defaultCache = __DIR__ . '/cache';
+    if (!is_writable(dirname($defaultCache))) {
+        $defaultCache = sys_get_temp_dir() . '/sujib_cache';
+    }
+    define('CACHE_DIR', $defaultCache);
+}
+
 function truncate($string, $length=50, $append="&hellip;") {
     $string = trim($string);
     if (strlen($string) > $length) {
@@ -154,7 +163,7 @@ function insertDefaultValues($database) {
     $profileRow = $profileResult->fetchArray(SQLITE3_ASSOC);
 
     if ($profileRow['count'] == 0) {
-        $cache_dir = __DIR__ . '/cache/';
+        $cache_dir = rtrim(CACHE_DIR, '/') . '/';
         $destination = '%(title)s.%(ext)s';
         $default_profiles = [
             "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (1, '1', '-w --encoding UTF-8 --no-progress', 'video-highest (4K)', '$destination', 'mkv', NULL, '1080', 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",

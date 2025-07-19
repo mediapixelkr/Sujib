@@ -90,7 +90,7 @@ $(document).ready(function() {
                 var thisdownload = videoId + num;
                 num++;
                 var htmlContent = `
-                <li id="${thisdownload}" class="${thisdownload}" style="background: rgb(240, 231, 161);"><img src="cache/${videoId}_default.jpg"><img src="cache/${videoId}_1.jpg"><img src="cache/${videoId}_2.jpg"><div class="text-bloc">
+                <li id="${thisdownload}" class="${thisdownload}" style="background: rgb(240, 231, 161);"><img src="thumbnail.php?id=${videoId}&type=default"><img src="thumbnail.php?id=${videoId}&type=1"><img src="thumbnail.php?id=${videoId}&type=2"><div class="text-bloc">
                   <div class="loader" id="loader${thisdownload}"></div></div>
                 <div class="options opt${thisdownload}">
                   <button type="button" class="btn link" id="${thisdownload}">
