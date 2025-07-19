@@ -1,4 +1,5 @@
 <?php
+require_once 'functions.php';
 
 if (isset($_POST["url"])) {
 
@@ -27,9 +28,9 @@ if (isset($_POST["url"])) {
     }
 
     // Ensure the cache directory exists
-    $cache_dir = 'cache';
-    if (!file_exists($cache_dir) && !mkdir($cache_dir, 0777, true) && !is_dir($cache_dir)) {
-        error_log("Failed to create cache directory");
+    $cache_dir = CACHE_DIR;
+    if (!is_dir($cache_dir) && !mkdir($cache_dir, 0777, true)) {
+        error_log("Failed to create cache directory at $cache_dir");
         echo json_encode(['error' => 'Failed to create cache directory']);
         exit();
     }
@@ -71,7 +72,7 @@ if (isset($_POST["url"])) {
 
     $errors = [];
     foreach ($thumbnails as $key => $url) {
-        $save_path = "cache/{$video_id}_{$key}.jpg";
+        $save_path = rtrim($cache_dir, '/') . "/{$video_id}_{$key}.jpg";
         if (!download_image($url, $save_path)) {
             $errors[] = $key;
         }
