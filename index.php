@@ -4,7 +4,8 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Redirect to install.php if the database does not exist
-if (!file_exists('db.sqlite')) {
+// Use an absolute path to avoid issues with the current working directory
+if (!file_exists(__DIR__ . '/db.sqlite')) {
   header("Location: install.php");
   exit();
 }
