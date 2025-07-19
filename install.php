@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-<main>
+<main class="install-main">
     <div class="content-blue">
         <h1>Installation</h1>
         <form method="POST" class="install-form">
