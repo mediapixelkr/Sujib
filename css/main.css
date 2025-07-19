@@ -166,11 +166,25 @@ main {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.install-form h1 {
+/* Center the installation page content */
+.install-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 70px);
+}
+
+.install-form {
+  width: 100%;
+}
+
+.install-main h1 {
   font-family: 'Exo', sans-serif;
   color: #0d47a1;
   margin-bottom: 20px;
 }
+
 
 .install-form .form-group {
   margin-bottom: 20px;
