@@ -12,16 +12,16 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> 
     <link href="https://fonts.googleapis.com/css?family=Exo" rel="stylesheet"> 
     <link rel="stylesheet" href="css/main.css">
-    <!-- Utiliser les versions CDN de jQuery, jQuery UI et jQuery Modal -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- Use local versions of jQuery and jQuery UI -->
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="css/jquery-ui.min.css">
+    <script src="js/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-    <!-- Utiliser les versions CDN de Select2 -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Use local version of Select2 -->
+    <link href="css/select2.min.css" rel="stylesheet" />
     <link href="css/select2-flat-theme.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="js/select2.min.js"></script>
     <link href="css/jquery.modal.css" rel="stylesheet" />
 </head>
 <body>
