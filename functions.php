@@ -27,6 +27,18 @@ function truncate($string, $length=50, $append="&hellip;") {
     return $string;
 }
 
+// Validate a YouTube URL and extract the video ID. Returns false on failure.
+function extract_video_id($url) {
+    $url = filter_var($url, FILTER_SANITIZE_URL);
+    if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+        return false;
+    }
+
+    preg_match('#(?<=(?:v|i)=)[a-zA-Z0-9-]+(?=&)|(?<=(?:v|i)/)[^&\n]+|(?<=embed/)[^"&\n]+|(?<=(?:v|i)=)[^&\n]+|(?<=youtu.be/)[^&\n]+#', $url, $matches);
+
+    return $matches[0] ?? false;
+}
+
 function initializeDatabase() {
     $dbPath = __DIR__ . '/db.sqlite';
 
