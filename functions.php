@@ -17,6 +17,15 @@ function handleError($errno, $errstr, $errfile, $errline) {
 set_exception_handler('handleException');
 set_error_handler('handleError');
 
+// Define a constant for the database path so all scripts use the same absolute path
+if (!defined('DB_PATH')) {
+    $defaultPath = __DIR__ . '/db.sqlite';
+    if (!is_writable(dirname($defaultPath))) {
+        $defaultPath = sys_get_temp_dir() . '/sujib_db.sqlite';
+    }
+    define('DB_PATH', $defaultPath);
+}
+
 function truncate($string, $length=50, $append="&hellip;") {
     $string = trim($string);
     if (strlen($string) > $length) {
@@ -40,7 +49,12 @@ function extract_video_id($url) {
 }
 
 function initializeDatabase() {
-    $dbPath = __DIR__ . '/db.sqlite';
+    $dbPath = DB_PATH;
+
+    $dir = dirname($dbPath);
+    if (!is_dir($dir) && !mkdir($dir, 0777, true)) {
+        throw new Exception("Unable to create directory for database: $dir");
+    }
 
     if (!file_exists($dbPath)) {
         if (!touch($dbPath)) {
@@ -63,7 +77,7 @@ function initializeDatabase() {
 }
 
 function connectDatabase() {
-    return new SQLite3(__DIR__ . '/db.sqlite');
+    return new SQLite3(DB_PATH);
 }
 
 function createTables($database) {
