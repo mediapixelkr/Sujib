@@ -4,6 +4,12 @@
 # Ignore cache directories and thumbnail caches
 /cache/
 
+# Composer dependencies
+vendor/
+
+# PHPUnit cache
+.phpunit.result.cache
+
 # Ignore log files
 *.log
 
