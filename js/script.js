@@ -71,10 +71,26 @@ $(document).ready(function() {
             $.post("thumbnails.php", { url: url }, function(data, status) {
                 $('#queue ul').find('.loader-container-temp').remove();
 
-                var thisdownload = data + num;
+                var videoId = (typeof data === 'string') ? data.trim() : '';
+
+                // If the server responded with JSON, parse and handle errors
+                if (videoId.startsWith('{')) {
+                    try {
+                        var json = JSON.parse(videoId);
+                        if (json.error) {
+                            alert(json.error);
+                            reject(json.error);
+                            return;
+                        }
+                    } catch (e) {
+                        // If parsing fails, continue with raw data
+                    }
+                }
+
+                var thisdownload = videoId + num;
                 num++;
                 var htmlContent = `
-                <li id="${thisdownload}" class="${thisdownload}" style="background: rgb(240, 231, 161);"><img src="cache/${data}_default.jpg"><img src="cache/${data}_1.jpg"><img src="cache/${data}_2.jpg"><div class="text-bloc">
+                <li id="${thisdownload}" class="${thisdownload}" style="background: rgb(240, 231, 161);"><img src="thumbnail.php?id=${videoId}&type=default"><img src="thumbnail.php?id=${videoId}&type=1"><img src="thumbnail.php?id=${videoId}&type=2"><div class="text-bloc">
                   <div class="loader" id="loader${thisdownload}"></div></div>
                 <div class="options opt${thisdownload}">
                   <button type="button" class="btn link" id="${thisdownload}">
@@ -335,6 +351,8 @@ $(document).ready(function() {
             $.post('profiles.php', { delete_profile: true, id: id }, function(response) {
                 if (response.status === 'success') {
                     loadProfiles();
+                    $('.drop#' + id).remove();
+                    $('#quality option[value="' + id + '"]').remove();
                 } else {
                     alert('Failed to delete profile. Please try again.');
                 }
