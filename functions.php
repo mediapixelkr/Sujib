@@ -476,6 +476,7 @@ function generateDeleteForm($filename, $extension, $id) {
                 if (status == \'done\') {
                     $(\'.tabs #\' + delid).remove();
                     $.modal.close();
+                    location.reload();
                 }
             });
         });
