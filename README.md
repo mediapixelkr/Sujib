@@ -164,6 +164,18 @@ This application was created on Linux Debian and requires the following utilitie
 3. **Drag and drop a YouTube video URL into the designated area or use the form. The link should not contain anything else than https://www.youtube.com/watch?v=[ID]**
 4. **The video will be downloaded using `yt-dlp` and saved to your specified directory.**
 
+### Rename Rules Syntax
+
+Sujib supports automatic renaming through regular expression rules. Open the **Options** modal from the navigation bar to edit the *Rename Regex* field. Each line follows a `pattern||replacement` format where the pattern is a PHP regex and the replacement defines how matched text is transformed.
+
+Example rules:
+
+```text
+/["']/||               # remove single or double quotes
+/\s+/||-               # replace spaces with hyphens
+/Performance Video/||_Performance Video  # insert underscore before "Performance Video"
+```
+
 ## Example Profiles
 
 During the first setup, Sujib creates a few sample profiles that you can use as a starting point. Each profile defines the maximum or minimum resolution passed to `yt-dlp`.
