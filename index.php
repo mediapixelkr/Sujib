@@ -303,7 +303,7 @@ $(document).ready(function() {
     </p>
     <p>
       <label style="position: relative;">Rename Regex (pattern||replacement): </label>
-      <input type="text" id="rename_regex" name="rename_regex" value="<?php echo htmlspecialchars($options_rename_regex); ?>" placeholder="/pattern/||replacement">
+      <textarea id="rename_regex" name="rename_regex" rows="2" placeholder="/pattern/||replacement - separate rules with newline or ;;"><?php echo htmlspecialchars($options_rename_regex); ?></textarea>
     </p>
   </form>
   <p>
