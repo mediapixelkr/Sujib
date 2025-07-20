@@ -16,6 +16,7 @@
 - Download subtitles as external files or embed into MP4/MKV videos.
 - Built with PHP for server-side processing and jQuery for a dynamic user interface.
 - Local SQLite database for storing video information and download history.
+- Automatic renaming using customizable regex patterns.
 
 ## Screenshots
 
@@ -177,7 +178,6 @@ During the first setup, Sujib creates a few sample profiles that you can use as 
 
 ## TODO
 
-- Automatic renaming
 - Directories management for each profile
 - Example profiles, like vertical videos
 - Choice of thumbnail quality, export options and MP4 embed
