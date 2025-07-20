@@ -36,7 +36,10 @@ if (isset($_GET["submit"])) {
         }
 
         if (isset($_POST["rename_regex"])) {
-            $rename_regex = $_POST["rename_regex"];
+            $rename_regex = trim($_POST["rename_regex"]);
+            if (strlen($rename_regex) > 1000) {
+                $rename_regex = substr($rename_regex, 0, 1000);
+            }
             $stmt = $database->prepare('UPDATE options SET rename_regex = :rename_regex');
             $stmt->bindValue(':rename_regex', $rename_regex, SQLITE3_TEXT);
             $stmt->execute();

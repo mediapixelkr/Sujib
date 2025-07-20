@@ -96,22 +96,36 @@ if (isset($_POST["url"])) {
     if (file_exists($final_filename)) {
         if (!empty($options_rename_regex)) {
             $dir = dirname($final_filename);
-            $base = basename($final_filename);
+            $currentPath = $final_filename;
+            $rules = preg_split('/\r?\n|;;/', $options_rename_regex);
 
-            $pattern = $options_rename_regex;
-            $replacement = '';
+            foreach ($rules as $rule) {
+                $rule = trim($rule);
+                if ($rule === '') {
+                    continue;
+                }
 
-            if (strpos($options_rename_regex, '||') !== false) {
-                list($pattern, $replacement) = explode('||', $options_rename_regex, 2);
-            }
+                $pattern = $rule;
+                $replacement = '';
 
-            $newBase = preg_replace($pattern, $replacement, $base);
-            if ($newBase && $newBase !== $base) {
-                $newPath = $dir . '/' . $newBase;
-                if (@rename($final_filename, $newPath)) {
-                    $final_filename = $newPath;
+                if (strpos($rule, '||') !== false) {
+                    list($pattern, $replacement) = explode('||', $rule, 2);
+                }
+
+                if (@preg_match($pattern, '') === false) {
+                    continue;
+                }
+
+                $base = basename($currentPath);
+                $newBase = preg_replace($pattern, $replacement, $base);
+                if ($newBase && $newBase !== $base) {
+                    $newPath = $dir . '/' . $newBase;
+                    if (@rename($currentPath, $newPath)) {
+                        $currentPath = $newPath;
+                    }
                 }
             }
+            $final_filename = $currentPath;
         }
         // Fetch media info
         $mediainfo = fetchMediaInfo($final_filename);
