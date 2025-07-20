@@ -513,6 +513,32 @@ function saveOptions($database, $download_dir, $rename_regex, $show_last, $subti
     }
 }
 
+function applyRenameRules($filename, $rules) {
+    $expressions = preg_split('/\r?\n/', $rules);
+    $base = $filename;
+    foreach ($expressions as $expr) {
+        $expr = trim($expr);
+        if ($expr === '') {
+            continue;
+        }
+
+        $pattern = $expr;
+        $replacement = '';
+        if (strpos($expr, '||') !== false) {
+            list($pattern, $replacement) = explode('||', $expr, 2);
+        }
+
+        $result = @preg_replace($pattern, $replacement, $base);
+        if ($result === null || preg_last_error() !== PREG_NO_ERROR) {
+            return ['filename' => $filename, 'error' => "Invalid rename regex: $pattern"];
+        }
+
+        $base = $result;
+    }
+
+    return ['filename' => $base, 'error' => null];
+}
+
 function sanitizeShellInput($input) {
     $pattern = '/^[\w\s\-\/\.=:]+$/';
     return preg_match($pattern, $input) ? $input : '';

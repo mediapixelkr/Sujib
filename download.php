@@ -123,7 +123,7 @@ if (isset($_POST["url"])) {
                 $newPath = $dir . '/' . $base;
                 if (@rename($final_filename, $newPath)) {
                     $final_filename = $newPath;
-                }
+               }
             }
         }
         // Fetch media info
