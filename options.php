@@ -28,6 +28,20 @@ if (isset($_GET["submit"])) {
             $stmt->execute();
         }
 
+        if (isset($_POST["download_dir"])) {
+            $download_dir = rtrim($_POST["download_dir"], '/');
+            $stmt = $database->prepare('UPDATE options SET download_dir = :download_dir');
+            $stmt->bindValue(':download_dir', $download_dir, SQLITE3_TEXT);
+            $stmt->execute();
+        }
+
+        if (isset($_POST["rename_regex"])) {
+            $rename_regex = $_POST["rename_regex"];
+            $stmt = $database->prepare('UPDATE options SET rename_regex = :rename_regex');
+            $stmt->bindValue(':rename_regex', $rename_regex, SQLITE3_TEXT);
+            $stmt->execute();
+        }
+
         // Respond with a success message
         echo json_encode(['status' => 'success']);
     } catch (Exception $e) {

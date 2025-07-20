@@ -45,6 +45,7 @@ if (isset($_POST["url"])) {
         echo json_encode(['error' => 'Download directory not set']);
         exit();
     }
+    $options_rename_regex = $options['rename_regex'] ?? '';
 
     $options_subtitles = $options['subtitles'] ?? 0;
     $options_sub_lang = $options['sub_lang'] ?? 'en'; // Default to 'en' if not set
@@ -93,6 +94,17 @@ if (isset($_POST["url"])) {
 
     // Verify the file existence
     if (file_exists($final_filename)) {
+        if (!empty($options_rename_regex)) {
+            $dir = dirname($final_filename);
+            $base = basename($final_filename);
+            $newBase = preg_replace($options_rename_regex, '', $base);
+            if ($newBase && $newBase !== $base) {
+                $newPath = $dir . '/' . $newBase;
+                if (@rename($final_filename, $newPath)) {
+                    $final_filename = $newPath;
+                }
+            }
+        }
         // Fetch media info
         $mediainfo = fetchMediaInfo($final_filename);
         

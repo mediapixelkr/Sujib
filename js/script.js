@@ -179,11 +179,15 @@ $(document).ready(function() {
         var show_last = $("#show_last").val();
         var subtitles = $("#subtitles").val();
         var sub_lang = $("#sub_lang").val();
+        var download_dir = $("#download_dir").val();
+        var rename_regex = $("#rename_regex").val();
 
         $.post("options.php?submit", {
             showlast: show_last,
             subtitles: subtitles,
-            sub_lang: sub_lang
+            sub_lang: sub_lang,
+            download_dir: download_dir,
+            rename_regex: rename_regex
         }, function(response) {
             if (response.status === 'success') {
                 console.log('Options saved successfully!');
