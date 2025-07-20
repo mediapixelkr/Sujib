@@ -302,8 +302,8 @@ $(document).ready(function() {
       <input type="text" id="download_dir" name="download_dir" value="<?php echo htmlspecialchars($options_download_dir); ?>">
     </p>
     <p>
-      <label style="position: relative;">Rename Regex: </label>
-      <input type="text" id="rename_regex" name="rename_regex" value="<?php echo htmlspecialchars($options_rename_regex); ?>">
+      <label style="position: relative;">Rename Regex (pattern||replacement): </label>
+      <input type="text" id="rename_regex" name="rename_regex" value="<?php echo htmlspecialchars($options_rename_regex); ?>" placeholder="/pattern/||replacement">
     </p>
   </form>
   <p>

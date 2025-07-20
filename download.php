@@ -97,7 +97,15 @@ if (isset($_POST["url"])) {
         if (!empty($options_rename_regex)) {
             $dir = dirname($final_filename);
             $base = basename($final_filename);
-            $newBase = preg_replace($options_rename_regex, '', $base);
+
+            $pattern = $options_rename_regex;
+            $replacement = '';
+
+            if (strpos($options_rename_regex, '||') !== false) {
+                list($pattern, $replacement) = explode('||', $options_rename_regex, 2);
+            }
+
+            $newBase = preg_replace($pattern, $replacement, $base);
             if ($newBase && $newBase !== $base) {
                 $newPath = $dir . '/' . $newBase;
                 if (@rename($final_filename, $newPath)) {

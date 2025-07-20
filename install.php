@@ -75,8 +75,8 @@ require_once 'header.php';
                 <input type="text" name="download_dir" id="download_dir" value="<?php echo $script_path; ?>" maxlength="255" required class="form-control">
             </div><br>
             <div class="form-group">
-                <label for="rename_regex">Rename Regex (optional):</label><br>
-                <input type="text" name="rename_regex" id="rename_regex" value="" class="form-control">
+                <label for="rename_regex">Rename Regex (pattern||replacement, optional):</label><br>
+                <input type="text" name="rename_regex" id="rename_regex" value="" class="form-control" placeholder="/pattern/||replacement">
             </div><br>
             <div class="form-group">
                 <label for="show_last">Number of Last Downloads to Display:</label><br>
