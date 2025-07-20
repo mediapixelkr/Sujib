@@ -26,10 +26,7 @@ $script_path = realpath(dirname(__FILE__));
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $container = $_POST['container'];
     $download_dir = rtrim($_POST['download_dir'], '/'); // Remove trailing slash
-    $rename_regex = isset($_POST['rename_regex']) ? trim($_POST['rename_regex']) : '';
-    if (strlen($rename_regex) > 1000) {
-        $rename_regex = substr($rename_regex, 0, 1000);
-    }
+    $rename_regex = isset($_POST['rename_regex']) ? $_POST['rename_regex'] : '';
     $show_last = $_POST['show_last'] === 'none' ? 0 : (int)$_POST['show_last'];
     $subtitles = (int)$_POST['subtitles'];
     $sub_lang = substr($_POST['sub_lang'], 0, 2); // Limit to two characters
@@ -78,8 +75,8 @@ require_once 'header.php';
                 <input type="text" name="download_dir" id="download_dir" value="<?php echo $script_path; ?>" maxlength="255" required class="form-control">
             </div><br>
             <div class="form-group">
-                <label for="rename_regex">Rename Regex (pattern||replacement pairs, optional):</label><br>
-                <textarea name="rename_regex" id="rename_regex" class="form-control" rows="2" placeholder="/pattern/||replacement - separate rules with newline or ;;"></textarea>
+                <label for="rename_regex">Rename Regex (pattern||replacement per line, optional):</label><br>
+                <textarea name="rename_regex" id="rename_regex" rows="3" class="form-control" placeholder="/pattern/||replacement&#10;/another/||replace"></textarea>
             </div><br>
             <div class="form-group">
                 <label for="show_last">Number of Last Downloads to Display:</label><br>

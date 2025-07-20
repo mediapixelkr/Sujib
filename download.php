@@ -96,36 +96,32 @@ if (isset($_POST["url"])) {
     if (file_exists($final_filename)) {
         if (!empty($options_rename_regex)) {
             $dir = dirname($final_filename);
-            $currentPath = $final_filename;
-            $rules = preg_split('/\r?\n|;;/', $options_rename_regex);
+            $base = basename($final_filename);
 
-            foreach ($rules as $rule) {
-                $rule = trim($rule);
-                if ($rule === '') {
-                    continue;
-                }
-
-                $pattern = $rule;
+            // Support multiple pattern||replacement lines
+            $expressions = preg_split('/\r?\n/', $options_rename_regex);
+            foreach ($expressions as $expr) {
+                $expr = trim($expr);
+                if ($expr === '') continue;
+                $pattern = $expr;
                 $replacement = '';
 
-                if (strpos($rule, '||') !== false) {
-                    list($pattern, $replacement) = explode('||', $rule, 2);
+                if (strpos($expr, '||') !== false) {
+                    list($pattern, $replacement) = explode('||', $expr, 2);
                 }
 
-                if (@preg_match($pattern, '') === false) {
-                    continue;
-                }
-
-                $base = basename($currentPath);
-                $newBase = preg_replace($pattern, $replacement, $base);
-                if ($newBase && $newBase !== $base) {
-                    $newPath = $dir . '/' . $newBase;
-                    if (@rename($currentPath, $newPath)) {
-                        $currentPath = $newPath;
-                    }
+                $result = preg_replace($pattern, $replacement, $base);
+                if ($result !== null) {
+                    $base = $result;
                 }
             }
-            $final_filename = $currentPath;
+
+            if ($base !== basename($final_filename)) {
+                $newPath = $dir . '/' . $base;
+                if (@rename($final_filename, $newPath)) {
+                    $final_filename = $newPath;
+                }
+            }
         }
         // Fetch media info
         $mediainfo = fetchMediaInfo($final_filename);
