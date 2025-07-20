@@ -109,6 +109,7 @@ function createTables($database) {
         'options' => "CREATE TABLE IF NOT EXISTS options (
             id INTEGER PRIMARY KEY,
             download_dir TEXT,
+            rename_regex TEXT,
             show_last INTEGER DEFAULT 20,
             subtitles INTEGER DEFAULT 0,
             sub_lang TEXT DEFAULT 'en'
@@ -153,7 +154,7 @@ function insertDefaultValues($database) {
 
     if ($row['count'] == 0) {
         $script_path = realpath(dirname(__FILE__));
-        $insert_default_values_query = "INSERT INTO options (id, download_dir, show_last, subtitles, sub_lang) VALUES (1, '$script_path', 20, 0, 'en')";
+        $insert_default_values_query = "INSERT INTO options (id, download_dir, rename_regex, show_last, subtitles, sub_lang) VALUES (1, '$script_path', '', 20, 0, 'en')";
         if (!$database->exec($insert_default_values_query)) {
             throw new Exception("Error inserting options: " . $database->lastErrorMsg());
         }
@@ -181,10 +182,11 @@ function insertDefaultValues($database) {
 }
 
 function fetchOptions($database) {
-    $result = $database->query("SELECT download_dir, show_last, subtitles, sub_lang FROM options WHERE id = 1");
+    $result = $database->query("SELECT download_dir, rename_regex, show_last, subtitles, sub_lang FROM options WHERE id = 1");
     if ($row = $result->fetchArray(SQLITE3_ASSOC)) {
         return [
             'download_dir' => $row['download_dir'],
+            'rename_regex' => $row['rename_regex'],
             'show_last' => $row['show_last'],
             'subtitles' => $row['subtitles'],
             'sub_lang' => $row['sub_lang'],
@@ -193,6 +195,7 @@ function fetchOptions($database) {
 
     return [
         'download_dir' => '',
+        'rename_regex' => '',
         'show_last' => 20,
         'subtitles' => 0,
         'sub_lang' => 'en',
@@ -496,8 +499,10 @@ function handleFileNotFound($filename, $extension) {
     </script>";
 }
 
-function saveOptions($database, $show_last, $subtitles, $sub_lang) {
-    $update = $database->prepare('UPDATE options SET show_last = :show_last, subtitles = :subtitles, sub_lang = :sub_lang WHERE id = 1');
+function saveOptions($database, $download_dir, $rename_regex, $show_last, $subtitles, $sub_lang) {
+    $update = $database->prepare('UPDATE options SET download_dir = :download_dir, rename_regex = :rename_regex, show_last = :show_last, subtitles = :subtitles, sub_lang = :sub_lang WHERE id = 1');
+    $update->bindParam(':download_dir', $download_dir, SQLITE3_TEXT);
+    $update->bindParam(':rename_regex', $rename_regex, SQLITE3_TEXT);
     $update->bindParam(':show_last', $show_last, SQLITE3_INTEGER);
     $update->bindParam(':subtitles', $subtitles, SQLITE3_INTEGER);
     $update->bindParam(':sub_lang', $sub_lang, SQLITE3_TEXT);
