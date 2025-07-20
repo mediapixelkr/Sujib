@@ -95,31 +95,19 @@ if (isset($_POST["url"])) {
     // Verify the file existence
     if (file_exists($final_filename)) {
         if (!empty($options_rename_regex)) {
-            $dir = dirname($final_filename);
+            $dir  = dirname($final_filename);
             $base = basename($final_filename);
 
-            // Support multiple pattern||replacement lines
-            $expressions = preg_split('/\r?\n/', $options_rename_regex);
-            foreach ($expressions as $expr) {
-                $expr = trim($expr);
-                if ($expr === '') continue;
-                $pattern = $expr;
-                $replacement = '';
-
-                if (strpos($expr, '||') !== false) {
-                    list($pattern, $replacement) = explode('||', $expr, 2);
-                }
-
-                $result = preg_replace($pattern, $replacement, $base);
-                if ($result !== null) {
-                    $base = $result;
-                }
-            }
-
-            if ($base !== basename($final_filename)) {
-                $newPath = $dir . '/' . $base;
-                if (@rename($final_filename, $newPath)) {
-                    $final_filename = $newPath;
+            $rename = applyRenameRules($base, $options_rename_regex);
+            if ($rename['error']) {
+                error_log($rename['error']);
+            } else {
+                $base = $rename['filename'];
+                if ($base !== basename($final_filename)) {
+                    $newPath = $dir . '/' . $base;
+                    if (@rename($final_filename, $newPath)) {
+                        $final_filename = $newPath;
+                    }
                 }
             }
         }
