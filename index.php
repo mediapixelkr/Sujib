@@ -22,6 +22,8 @@ $options = fetchOptions($database);
 $options_show_last = $options['show_last'] ?? '';
 $options_subtitles = $options['subtitles'] ?? 0;
 $options_sub_lang = $options['sub_lang'] ?? 'en'; // Default to 'en' if not set
+$options_download_dir = $options['download_dir'] ?? '';
+$options_rename_regex = $options['rename_regex'] ?? '';
 
 // Fetch profiles (with error handling)
 function fetchProfiles($database) {
@@ -294,6 +296,14 @@ $(document).ready(function() {
     <p>
       <label style="position: relative;">Subtitle Language (2 letters): </label>
       <input type="text" id="sub_lang" name="sub_lang" maxlength="2" value="<?php echo htmlspecialchars($options_sub_lang ?? ''); ?>">
+    </p>
+    <p>
+      <label style="position: relative;">Download Directory: </label>
+      <input type="text" id="download_dir" name="download_dir" value="<?php echo htmlspecialchars($options_download_dir); ?>">
+    </p>
+    <p>
+      <label style="position: relative;">Rename Regex: </label>
+      <input type="text" id="rename_regex" name="rename_regex" value="<?php echo htmlspecialchars($options_rename_regex); ?>">
     </p>
   </form>
   <p>
