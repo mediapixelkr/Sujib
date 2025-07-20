@@ -26,6 +26,7 @@ $script_path = realpath(dirname(__FILE__));
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $container = $_POST['container'];
     $download_dir = rtrim($_POST['download_dir'], '/'); // Remove trailing slash
+    $rename_regex = isset($_POST['rename_regex']) ? $_POST['rename_regex'] : '';
     $show_last = $_POST['show_last'] === 'none' ? 0 : (int)$_POST['show_last'];
     $subtitles = (int)$_POST['subtitles'];
     $sub_lang = substr($_POST['sub_lang'], 0, 2); // Limit to two characters
@@ -34,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $database = initializeDatabase();
 
     // Update the options table with the selected values
-    $update_options_query = "UPDATE options SET download_dir = '$download_dir', show_last = $show_last, subtitles = $subtitles, sub_lang = '$sub_lang' WHERE id = 1";
+    $update_options_query = "UPDATE options SET download_dir = '$download_dir', rename_regex = '" . SQLite3::escapeString($rename_regex) . "', show_last = $show_last, subtitles = $subtitles, sub_lang = '$sub_lang' WHERE id = 1";
     if (!$database->exec($update_options_query)) {
         throw new Exception("Error updating options: " . $database->lastErrorMsg());
     }
@@ -72,6 +73,10 @@ require_once 'header.php';
             <div class="form-group">
                 <label for="download_dir">Base Download Directory (must already exist, max 255 characters):</label><br>
                 <input type="text" name="download_dir" id="download_dir" value="<?php echo $script_path; ?>" maxlength="255" required class="form-control">
+            </div><br>
+            <div class="form-group">
+                <label for="rename_regex">Rename Regex (pattern||replacement, optional):</label><br>
+                <input type="text" name="rename_regex" id="rename_regex" value="" class="form-control" placeholder="/pattern/||replacement">
             </div><br>
             <div class="form-group">
                 <label for="show_last">Number of Last Downloads to Display:</label><br>
