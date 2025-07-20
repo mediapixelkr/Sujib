@@ -3,6 +3,12 @@ use PHPUnit\Framework\TestCase;
 
 class FunctionsTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        set_error_handler(null);
+        set_exception_handler(null);
+    }
+
     public function testExtractVideoIdValid()
     {
         $url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
@@ -45,4 +51,22 @@ class FunctionsTest extends TestCase
         $expected = '-f "bv*[height<=1080]+ba/b[height<=1080] / wv*+ba/w"';
         $this->assertSame($expected, determineQuality($profile));
     }
+    public function testApplyRenameRulesMultipleLines()
+    {
+        $filename = 'My Video File.mp4';
+        $rules = "/\\s+/||_\n/Video/||Clip";
+        $result = applyRenameRules($filename, $rules);
+        $this->assertSame('My_Clip_File.mp4', $result['filename']);
+        $this->assertNull($result['error']);
+    }
+
+    public function testApplyRenameRulesInvalidRegex()
+    {
+        $filename = 'test.mp4';
+        $rules = '/foo(/||bar';
+        $result = applyRenameRules($filename, $rules);
+        $this->assertSame('test.mp4', $result['filename']);
+        $this->assertStringContainsString('Invalid rename regex', $result['error']);
+    }
+
 }
