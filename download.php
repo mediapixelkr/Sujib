@@ -54,6 +54,7 @@ if (isset($_POST["url"])) {
     $quality = determineQuality($profile);
 
     $temp_filename = $options['download_dir'] . '/' . $profile['destination'];
+    $dest_path = isset($profile['dest_path']) ? rtrim($profile['dest_path'], '/') : '';
 
     // Final filename
     $get_filename_command = 'yt-dlp ' . escapeshellarg($url) . ' --get-filename -o ' . escapeshellarg($temp_filename) . ' --merge-output-format ' . $profile['container'] . ' ' . $profile_command . ' ' . $profile_cache;
@@ -123,7 +124,17 @@ if (isset($_POST["url"])) {
                 $newPath = $dir . '/' . $base;
                 if (@rename($final_filename, $newPath)) {
                     $final_filename = $newPath;
-               }
+                }
+            }
+        }
+
+        if (!empty($dest_path)) {
+            if (!is_dir($dest_path)) {
+                @mkdir($dest_path, 0777, true);
+            }
+            $moved = rtrim($dest_path, '/') . '/' . basename($final_filename);
+            if (@rename($final_filename, $moved)) {
+                $final_filename = $moved;
             }
         }
         // Fetch media info
