@@ -764,8 +764,8 @@ ul li:hover .hide {
   min-width: 850px;
 }
 
-#profiles-form {
-  display: none;
+#profiles_form {
+  display: flex;
   flex-direction: column;
   max-height: 90vh;
   overflow-y: hidden;
