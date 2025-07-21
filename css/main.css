@@ -697,9 +697,15 @@ tbody:before {
   margin-right: 50px;
 }
 
+
 .button-container {
   text-align: center;
   margin-top: 20px;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding: 10px 0;
+  border-top: 1px solid #ddd;
 }
 
 .button-container .btn {
@@ -709,6 +715,11 @@ tbody:before {
 .btn-container {
   text-align: center;
   margin-top: 20px;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding: 10px 0;
+  border-top: 1px solid #ddd;
 }
 
 .modal .btn.close {
