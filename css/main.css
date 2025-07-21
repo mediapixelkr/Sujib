@@ -300,6 +300,8 @@ main {
 #profiles-list {
   display: flex;
   flex-wrap: wrap;
+  overflow-y: auto;
+  flex: 1 1 auto;
 }
 
 .profile-item {
@@ -621,6 +623,8 @@ tbody:before {
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .profile-item {
@@ -695,9 +699,12 @@ tbody:before {
   margin-right: 50px;
 }
 
+
 .button-container {
   text-align: center;
   margin-top: 20px;
+  padding: 10px 0;
+  border-top: 1px solid #ddd;
 }
 
 .button-container .btn {
@@ -707,6 +714,8 @@ tbody:before {
 .btn-container {
   text-align: center;
   margin-top: 20px;
+  padding: 10px 0;
+  border-top: 1px solid #ddd;
 }
 
 .modal .btn.close {
@@ -753,6 +762,13 @@ ul li:hover .hide {
 
 #delete-form, #rename-form, #profiles-form {
   min-width: 850px;
+}
+
+#profiles_form {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: hidden;
 }
 
 #submit-delete, #submit-rename {
