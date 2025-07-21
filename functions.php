@@ -97,6 +97,7 @@ function createTables($database) {
             command_line TEXT,
             name TEXT,
             destination TEXT,
+            dest_path TEXT,
             container TEXT,
             max_res TEXT,
             min_res TEXT,
@@ -167,10 +168,10 @@ function insertDefaultValues($database) {
         $cache_dir = rtrim(CACHE_DIR, '/') . '/';
         $destination = '%(title)s.%(ext)s';
         $default_profiles = [
-            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (1, '1', '-w --encoding UTF-8 --no-progress', 'video-highest (4K)', '$destination', 'mkv', NULL, '1080', 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
-            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (2, '2', '-w --encoding UTF-8 --no-progress', 'video-1080p (1080P)', '$destination', 'mkv', '1080', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
-            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (4, '4', '-w --encoding UTF-8 --no-progress', 'video-1440p (1440P)', '$destination', 'mkv', '1440', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
-            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (5, '5', '-w --encoding UTF-8 --no-progress', 'video-720p (720P)', '$destination', 'mkv', '720', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')"
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, dest_path, container, max_res, min_res, audio, video, cache) VALUES (1, '1', '-w --encoding UTF-8 --no-progress', 'video-highest (4K)', '$destination', '', 'mkv', NULL, '1080', 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, dest_path, container, max_res, min_res, audio, video, cache) VALUES (2, '2', '-w --encoding UTF-8 --no-progress', 'video-1080p (1080P)', '$destination', '', 'mkv', '1080', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, dest_path, container, max_res, min_res, audio, video, cache) VALUES (4, '4', '-w --encoding UTF-8 --no-progress', 'video-1440p (1440P)', '$destination', '', 'mkv', '1440', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, dest_path, container, max_res, min_res, audio, video, cache) VALUES (5, '5', '-w --encoding UTF-8 --no-progress', 'video-720p (720P)', '$destination', '', 'mkv', '720', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')"
         ];
 
         foreach ($default_profiles as $profile) {
