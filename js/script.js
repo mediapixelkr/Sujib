@@ -357,9 +357,6 @@ $(document).ready(function() {
         }
     });
 
-    $('#save_profiles').click(function() {
-        saveProfiles();
-    });
 
     $(document).on('click', '.delete-profile', function() {
         var id = $(this).data('id');
