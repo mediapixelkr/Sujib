@@ -703,6 +703,9 @@ tbody:before {
 .button-container {
   text-align: center;
   margin-top: 20px;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
   padding: 10px 0;
   border-top: 1px solid #ddd;
   position: sticky;
@@ -717,6 +720,9 @@ tbody:before {
 .btn-container {
   text-align: center;
   margin-top: 20px;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
   padding: 10px 0;
   border-top: 1px solid #ddd;
   position: sticky;
@@ -777,6 +783,7 @@ ul li:hover .hide {
 #profiles_form {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   max-height: 90vh;
   overflow-y: auto;
 }
