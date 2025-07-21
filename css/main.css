@@ -300,6 +300,8 @@ main {
 #profiles-list {
   display: flex;
   flex-wrap: wrap;
+  overflow-y: auto;
+  flex: 1 1 auto;
 }
 
 .profile-item {
@@ -766,6 +768,12 @@ ul li:hover .hide {
 
 #delete-form, #rename-form, #profiles-form {
   min-width: 850px;
+}
+
+#profiles-form {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
 }
 
 #submit-delete, #submit-rename {
