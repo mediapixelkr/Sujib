@@ -760,15 +760,19 @@ ul li:hover .hide {
   animation: load8 1.1s infinite linear;
 }
 
-#delete-form, #rename-form, #profiles-form {
-  min-width: 850px;
+#delete-form, #rename-form, #profiles-form, #profiles_form {
+  max-width: 850px;
+  width: 100%;
+}
+
+#profiles-form {
 }
 
 #profiles_form {
   display: flex;
   flex-direction: column;
   max-height: 90vh;
-  overflow-y: hidden;
+  overflow-y: auto;
 }
 
 #submit-delete, #submit-rename {
