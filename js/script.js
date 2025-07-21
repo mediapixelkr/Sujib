@@ -203,7 +203,7 @@ $(document).ready(function() {
         saveOptions();
     });
 
-    $(document).on('click', '.btn.close', function(e) {
+    $(document).on('click', '#options-form .btn.close', function(e) {
         e.preventDefault();
         saveOptions();
         $.modal.close();
@@ -378,11 +378,7 @@ $(document).ready(function() {
         }
     });
 
-    $(document).on('modal:before-close', '#profiles-form', function(event, modal) {
-        saveProfiles(function() {
-            location.reload();
-        });
-    });
+    // Let users close the Manage Profiles modal without automatically saving
 
     $('.drop').each(function() {
         $(this).on('dragenter', function() {

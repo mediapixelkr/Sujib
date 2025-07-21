@@ -353,7 +353,7 @@ $(document).ready(function() {
     </div>
   </form>
   <div class="btn-container">
-    <button type="button" class="btn close" rel="modal:close"><i class="fas fa-window-close fa-sm"></i> Close</button>
+    <button type="button" class="btn close" rel="modal:close"><i class="fas fa-window-close fa-sm"></i> Cancel</button>
   </div>
 </div>
 
