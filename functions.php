@@ -147,6 +147,19 @@ function createTables($database) {
     foreach ($tables as $name => $sql) {
         $database->exec($sql);
     }
+
+    // Ensure dest_path column exists for backward compatibility
+    $columns = $database->query('PRAGMA table_info(profiles)');
+    $destPathExists = false;
+    while ($col = $columns->fetchArray(SQLITE3_ASSOC)) {
+        if ($col['name'] === 'dest_path') {
+            $destPathExists = true;
+            break;
+        }
+    }
+    if (!$destPathExists) {
+        $database->exec('ALTER TABLE profiles ADD COLUMN dest_path TEXT');
+    }
 }
 
 function insertDefaultValues($database) {
