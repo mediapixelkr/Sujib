@@ -229,6 +229,10 @@ $(document).ready(function() {
                         <input type="hidden" class="profile-input" name="id" value="${profile.id}" />
                         <label>Profile Name:</label>
                         <input type="text" class="profile-name-input" name="name" maxlength="45" value="${htmlspecialchars(profile.name ? profile.name : '')}" />
+                        <label>Destination:</label>
+                        <input type="text" class="profile-input" name="destination" value="${htmlspecialchars(profile.destination ? profile.destination : '')}" />
+                        <label>Dest. Path:</label>
+                        <input type="text" class="profile-input" name="dest_path" value="${htmlspecialchars(profile.dest_path ? profile.dest_path : '')}" />
                         <label>Container:</label>
                         <select class="profile-input" name="container">
                             <option value="mkv" ${profile.container == 'mkv' ? 'selected' : ''}>MKV</option>
@@ -261,6 +265,8 @@ $(document).ready(function() {
         $('.profile-item').each(function() {
             var id = $(this).find('input[name="id"]').val();
             var name = $(this).find('input[name="name"]').val();
+            var destination = $(this).find('input[name="destination"]').val();
+            var dest_path = $(this).find('input[name="dest_path"]').val();
             var container = $(this).find('select[name="container"]').val();
             var max_res = $(this).find('input[name="max_res"]').val();
             var min_res = $(this).find('input[name="min_res"]').val();
@@ -276,6 +282,8 @@ $(document).ready(function() {
             profiles.push({
                 id: id,
                 name: name,
+                destination: destination,
+                dest_path: dest_path,
                 container: container,
                 max_res: max_res,
                 min_res: min_res
@@ -347,6 +355,10 @@ $(document).ready(function() {
                 alert('Failed to reset profiles. Please try again.');
             });
         }
+    });
+
+    $('#save_profiles').click(function() {
+        saveProfiles();
     });
 
     $(document).on('click', '.delete-profile', function() {

@@ -31,6 +31,20 @@ class FunctionsTest extends TestCase
         }
     }
 
+    public function testCreateTablesAddsDestPath()
+    {
+        $db = new SQLite3(':memory:');
+        // simulate older schema without dest_path
+        $db->exec("CREATE TABLE profiles (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)");
+        createTables($db);
+        $cols = [];
+        $result = $db->query('PRAGMA table_info(profiles)');
+        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+            $cols[] = $row['name'];
+        }
+        $this->assertContains('dest_path', $cols);
+    }
+
     public function testDetermineQualityMin()
     {
         $profile = ['min_res' => '720'];
