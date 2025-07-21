@@ -348,6 +348,7 @@ $(document).ready(function() {
     <div class="button-container">
       <button type="button" class="btn" id="add_profile">Add Profile</button>
       <button type="button" class="btn" id="reset_profiles">Reset Profiles</button>
+      <button type="button" class="btn" id="save_profiles">Save Profiles</button>
     </div>
   </form>
   <div class="btn-container">

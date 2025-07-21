@@ -357,6 +357,10 @@ $(document).ready(function() {
         }
     });
 
+    $('#save_profiles').click(function() {
+        saveProfiles();
+    });
+
     $(document).on('click', '.delete-profile', function() {
         var id = $(this).data('id');
         if (confirm('Are you sure you want to delete this profile?')) {
