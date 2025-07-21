@@ -43,6 +43,7 @@ function fetchProfiles($database) {
     return $profiles;
 }
 
+$profiles = [];
 try {
     $profiles = fetchProfiles($database);
 } catch (Exception $e) {
@@ -326,6 +327,10 @@ $(document).ready(function() {
           <input type="hidden" class="profile-input" name="id" value="<?php echo $profile['id']; ?>" />
           <label>Profile Name:</label>
           <input type="text" class="profile-name-input" name="name" maxlength="45" value="<?php echo isset($profile['name']) ? htmlspecialchars($profile['name']) : ''; ?>" />
+          <label>Destination:</label>
+          <input type="text" class="profile-input" name="destination" value="<?php echo htmlspecialchars($profile['destination']); ?>" />
+          <label>Dest. Path:</label>
+          <input type="text" class="profile-input" name="dest_path" value="<?php echo htmlspecialchars($profile['dest_path']); ?>" />
           <label>Container:</label>
           <select class="profile-input" name="container">
             <option value="mkv" <?php if ($profile['container'] == 'mkv') echo 'selected'; ?>>MKV</option>
@@ -344,10 +349,11 @@ $(document).ready(function() {
     <div class="button-container">
       <button type="button" class="btn" id="add_profile">Add Profile</button>
       <button type="button" class="btn" id="reset_profiles">Reset Profiles</button>
+      <button type="button" class="btn" id="save_profiles">Save Profiles</button>
     </div>
   </form>
   <div class="btn-container">
-    <button type="button" class="btn close" rel="modal:close"><i class="fas fa-window-close fa-sm"></i> Close</button>
+    <button type="button" class="btn close" rel="modal:close"><i class="fas fa-window-close fa-sm"></i> Cancel</button>
   </div>
 </div>
 
