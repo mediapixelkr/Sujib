@@ -65,6 +65,7 @@ if (isset($_GET['get_profiles'])) {
         echo '<input type="hidden" class="profile-input" name="id" value="'.$profile['id'].'" />';
         echo '<input type="text" class="profile-input" name="name" value="'.htmlspecialchars($profile['name']).'" />';
         echo '<input type="text" class="profile-input" name="destination" value="'.htmlspecialchars($profile['destination']).'" />';
+        echo '<input type="text" class="profile-input" name="dest_path" value="'.htmlspecialchars($profile['dest_path']).'" />';
         echo '<select class="select2 profile-input" name="container">';
         echo '<option value="mkv" '.($profile['container'] == 'mkv' ? 'selected' : '').'>MKV</option>';
         echo '<option value="mp4" '.($profile['container'] == 'mp4' ? 'selected' : '').'>MP4</option>';
@@ -77,7 +78,7 @@ if (isset($_GET['get_profiles'])) {
 }
 
 if (isset($_GET['add_profile'])) {
-    $database->exec("INSERT INTO profiles (reorder, name, destination, container, max_res, min_res) VALUES (0, '', '', 'mkv', '', '')");
+    $database->exec("INSERT INTO profiles (reorder, name, destination, dest_path, container, max_res, min_res) VALUES (0, '', '', '', 'mkv', '', '')");
     exit();
 }
 
@@ -90,13 +91,15 @@ if (isset($_GET['update_profile'])) {
     $id = (int)$_POST['id'];
     $name = $_POST['name'];
     $destination = $_POST['destination'];
+    $dest_path = $_POST['dest_path'];
     $container = $_POST['container'];
     $max_res = $_POST['max_res'];
     $min_res = $_POST['min_res'];
 
-    $stmt = $database->prepare('UPDATE profiles SET name = :name, destination = :destination, container = :container, max_res = :max_res, min_res = :min_res WHERE id = :id');
+    $stmt = $database->prepare('UPDATE profiles SET name = :name, destination = :destination, dest_path = :dest_path, container = :container, max_res = :max_res, min_res = :min_res WHERE id = :id');
     $stmt->bindValue(':name', $name, SQLITE3_TEXT);
     $stmt->bindValue(':destination', $destination, SQLITE3_TEXT);
+    $stmt->bindValue(':dest_path', $dest_path, SQLITE3_TEXT);
     $stmt->bindValue(':container', $container, SQLITE3_TEXT);
     $stmt->bindValue(':max_res', $max_res, SQLITE3_TEXT);
     $stmt->bindValue(':min_res', $min_res, SQLITE3_TEXT);
