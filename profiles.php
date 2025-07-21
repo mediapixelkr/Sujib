@@ -30,12 +30,14 @@ if (isset($_POST['reset_profiles'])) {
     header('Content-Type: application/json');
     try {
         $database->exec("DELETE FROM profiles");
-        // Add initial profiles
+        // Add initial profiles matching installation defaults
+        $cache_dir = rtrim(CACHE_DIR, '/') . '/';
+        $destination = '%(title)s.%(ext)s';
         $default_profiles = [
-            "INSERT OR IGNORE INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (1, '1', '-w --encoding UTF-8 --no-progress', 'video-highest (4K)', '%(title)s.%(ext)s', 'mkv', NULL, '1080', 'bestaudio', 'bestvideo', '--cache-dir /var/www/html/youtube2/cache/')",
-            "INSERT OR IGNORE INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (2, '2', '-w --encoding UTF-8 --no-progress', 'video-1080p (1080P)', '%(title)s.%(ext)s', 'mkv', '1080', NULL, 'bestaudio', 'bestvideo', '--cache-dir /var/www/html/youtube2/cache/')",
-            "INSERT OR IGNORE INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (3, '3', '-w --encoding UTF-8 --no-progress', 'SD', '%(title)s.%(ext)s', 'mkv', '480', NULL, 'bestaudio', 'bestvideo', '--cache-dir /var/www/html/youtube2/cache/')",
-            "INSERT OR IGNORE INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (4, '4', '-w --encoding UTF-8 --no-progress', 'video-1440p (1440P)', '%(title)s.%(ext)s', 'mkv', '1440', NULL, 'bestaudio', 'bestvideo', '--cache-dir /var/www/html/youtube2/cache/')"
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (1, '1', '-w --encoding UTF-8 --no-progress', 'video-highest (4K)', '$destination', 'mkv', NULL, '1080', 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (2, '2', '-w --encoding UTF-8 --no-progress', 'video-1080p (1080P)', '$destination', 'mkv', '1080', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (4, '4', '-w --encoding UTF-8 --no-progress', 'video-1440p (1440P)', '$destination', 'mkv', '1440', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (5, '5', '-w --encoding UTF-8 --no-progress', 'video-720p (720P)', '$destination', 'mkv', '720', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')"
         ];
         foreach ($default_profiles as $profile) {
             $database->exec($profile);
