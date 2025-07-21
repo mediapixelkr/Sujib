@@ -775,6 +775,10 @@ ul li:hover .hide {
   display: none;
 }
 
+#profiles-form {
+  display: none;
+}
+
 #profiles_form {
   display: flex;
   flex-direction: column;
