@@ -328,6 +328,7 @@ $(document).ready(function() {
     }
 
     $(document).on('modal:open', '#profiles-form', function(event, modal) {
+        $(this).css('display', 'flex');
         loadProfiles();
     });
 
