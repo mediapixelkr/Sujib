@@ -43,6 +43,7 @@ function fetchProfiles($database) {
     return $profiles;
 }
 
+$profiles = [];
 try {
     $profiles = fetchProfiles($database);
 } catch (Exception $e) {
