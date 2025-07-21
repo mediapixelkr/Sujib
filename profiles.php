@@ -20,7 +20,7 @@ if (isset($_GET['get_profiles'])) {
 // Add profile
 if (isset($_POST['add_profile'])) {
     header('Content-Type: application/json');
-    $database->exec("INSERT INTO profiles (reorder, name, destination, container, max_res, min_res) VALUES (0, '', '', 'mkv', '', '')");
+    $database->exec("INSERT INTO profiles (reorder, name, destination, dest_path, container, max_res, min_res) VALUES (0, '', '', '', 'mkv', '', '')");
     echo json_encode(['status' => 'success']);
     exit();
 }
@@ -34,10 +34,10 @@ if (isset($_POST['reset_profiles'])) {
         $cache_dir = rtrim(CACHE_DIR, '/') . '/';
         $destination = '%(title)s.%(ext)s';
         $default_profiles = [
-            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (1, '1', '-w --encoding UTF-8 --no-progress', 'video-highest (4K)', '$destination', 'mkv', NULL, '1080', 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
-            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (2, '2', '-w --encoding UTF-8 --no-progress', 'video-1080p (1080P)', '$destination', 'mkv', '1080', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
-            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (4, '4', '-w --encoding UTF-8 --no-progress', 'video-1440p (1440P)', '$destination', 'mkv', '1440', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
-            "INSERT INTO profiles (id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache) VALUES (5, '5', '-w --encoding UTF-8 --no-progress', 'video-720p (720P)', '$destination', 'mkv', '720', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')"
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, dest_path, container, max_res, min_res, audio, video, cache) VALUES (1, '1', '-w --encoding UTF-8 --no-progress', 'video-highest (4K)', '$destination', '', 'mkv', NULL, '1080', 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, dest_path, container, max_res, min_res, audio, video, cache) VALUES (2, '2', '-w --encoding UTF-8 --no-progress', 'video-1080p (1080P)', '$destination', '', 'mkv', '1080', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, dest_path, container, max_res, min_res, audio, video, cache) VALUES (4, '4', '-w --encoding UTF-8 --no-progress', 'video-1440p (1440P)', '$destination', '', 'mkv', '1440', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')",
+            "INSERT INTO profiles (id, reorder, command_line, name, destination, dest_path, container, max_res, min_res, audio, video, cache) VALUES (5, '5', '-w --encoding UTF-8 --no-progress', 'video-720p (720P)', '$destination', '', 'mkv', '720', NULL, 'bestaudio', 'bestvideo', '--cache-dir $cache_dir')"
         ];
         foreach ($default_profiles as $profile) {
             $database->exec($profile);
@@ -58,9 +58,11 @@ if (isset($_POST['update_profiles'])) {
             $id = $database->escapeString($profile['id']);
             $name = $database->escapeString($profile['name']);
             $container = $database->escapeString($profile['container']);
+            $dest_path = $database->escapeString($profile['dest_path']);
+            $destination = $database->escapeString($profile['destination']);
             $max_res = $database->escapeString($profile['max_res']);
             $min_res = $database->escapeString($profile['min_res']);
-            $database->exec("UPDATE profiles SET name='$name', container='$container', max_res='$max_res', min_res='$min_res' WHERE id=$id");
+            $database->exec("UPDATE profiles SET name='$name', destination='$destination', dest_path='$dest_path', container='$container', max_res='$max_res', min_res='$min_res' WHERE id=$id");
         }
         echo json_encode(['status' => 'success']);
     } catch (Exception $e) {
