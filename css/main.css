@@ -771,16 +771,6 @@ ul li:hover .hide {
 }
 
 #profiles-form {
-  /* hidden by jquery.modal.css */
-  display: flex;
-  flex-direction: column;
-  max-height: 90vh;
-}
-
-#profiles_form {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
   max-height: 90vh;
   overflow-y: auto;
 }
