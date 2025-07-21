@@ -768,7 +768,7 @@ ul li:hover .hide {
   display: flex;
   flex-direction: column;
   max-height: 90vh;
-  overflow-y: hidden;
+  overflow-y: auto;
 }
 
 #submit-delete, #submit-rename {
