@@ -759,7 +759,11 @@ ul li:hover .hide {
   width: 100%;
 }
 
-#profiles-form {
+#profiles_form {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 #submit-delete, #submit-rename {
