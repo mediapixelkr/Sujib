@@ -357,16 +357,12 @@ $(document).ready(function() {
         }
     });
 
-    // Close the Manage Profiles modal when the Close button is clicked
+    // Save profiles and close the modal when the Save and Close button is clicked
     $(document).on('click', '#profiles-form .btn.close', function(e) {
         e.preventDefault();
-        $.modal.close();
-    });
-
-    // Close the Manage Profiles modal when the Close button is clicked
-    $(document).on('click', '#profiles-form .btn.close', function(e) {
-        e.preventDefault();
-        $.modal.close();
+        saveProfiles(function() {
+            $.modal.close();
+        });
     });
 
 
