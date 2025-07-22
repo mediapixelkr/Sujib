@@ -124,6 +124,13 @@ $(document).ready(function() {
                     if ($(loaderSelector).length > 0) {
                         $.post("download.php", { url: url, id: params }, function(status2) {
                             status2 = jQuery.parseJSON(status2);
+
+                            if (status2.error) {
+                                $(loaderSelector).replaceWith('<div class="text-bloc">' + status2.error + '</div>');
+                                resolve();
+                                return;
+                            }
+
                             $(loaderSelector).replaceWith('<div class="text-bloc">' + status2.table + '</div>');
                             $("#queue ul").find("." + thisdownload).css({
                                 background: '#CDD7E7'
