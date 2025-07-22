@@ -123,7 +123,15 @@ $(document).ready(function() {
                     var loaderSelector = "#loader" + thisdownload;
                     if ($(loaderSelector).length > 0) {
                         $.post("download.php", { url: url, id: params }, function(status2) {
-                            status2 = jQuery.parseJSON(status2);
+                            if (typeof status2 === 'string') {
+                                try {
+                                    status2 = jQuery.parseJSON(status2);
+                                } catch (e) {
+                                    $(loaderSelector).replaceWith('<div class="text-bloc">' + status2 + '</div>');
+                                    resolve();
+                                    return;
+                                }
+                            }
 
                             if (status2.error) {
                                 $(loaderSelector).replaceWith('<div class="text-bloc">' + status2.error + '</div>');
@@ -166,9 +174,10 @@ $(document).ready(function() {
                             });
 
                             resolve();
-                        }).fail(function() {
-                            console.error("Download failed.");
-                            reject();
+                        }).fail(function(jqXHR) {
+                            var errText = jqXHR.responseText ? jqXHR.responseText.trim() : 'Download failed';
+                            $(loaderSelector).replaceWith('<div class="text-bloc">' + errText + '</div>');
+                            resolve();
                         });
                     } else {
                         console.error("Loader element not found for replacement");
