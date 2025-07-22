@@ -64,6 +64,27 @@ function safeMove($source, $dest) {
     return false;
 }
 
+// Attempt to move a file even if the destination is on a different filesystem
+function safeMove($source, $dest) {
+    if (@rename($source, $dest)) {
+        return true;
+    }
+
+    $error = error_get_last();
+    if ($error) {
+        error_log('Rename failed: ' . $error['message'] . PHP_EOL, 3, LOG_FILE);
+    }
+
+    if (@copy($source, $dest)) {
+        if (@unlink($source)) {
+            return true;
+        }
+        error_log('Unable to remove original file after copy: ' . $source . PHP_EOL, 3, LOG_FILE);
+    }
+
+    return false;
+}
+
 // Set custom error and exception handlers
 set_exception_handler('handleException');
 set_error_handler('handleError');
@@ -75,6 +96,15 @@ if (!defined('DB_PATH')) {
         $defaultPath = sys_get_temp_dir() . '/sujib_db.sqlite';
     }
     define('DB_PATH', $defaultPath);
+}
+
+// Path for error logging
+if (!defined('LOG_FILE')) {
+    $defaultLog = __DIR__ . '/error.log';
+    if (!is_writable(dirname($defaultLog))) {
+        $defaultLog = sys_get_temp_dir() . '/sujib_error.log';
+    }
+    define('LOG_FILE', $defaultLog);
 }
 
 // Define a constant for the cache directory. Fallback to /tmp if not writable
