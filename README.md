@@ -203,6 +203,9 @@ filesystem or lacks the proper permissions. When that happens the application
 logs the rename error and leaves the file in the download directory, so be sure
 to inspect the log to determine the cause.
 
+Warnings such as a failed `rename()` are logged but no longer stop the script,
+so the operation may continue using a fallback copy.
+
 
 ## Example Profiles
 
