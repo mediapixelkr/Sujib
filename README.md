@@ -185,6 +185,19 @@ must explicitly include these characters and enable Unicode mode:
 /[‘’](.+)[‘’]/u||$1
 ```
 
+## Error Log
+
+When the application encounters an error or exception, it returns a short JSON message to the browser and writes the full details to a file defined by the `LOG_FILE` constant in `functions.php`.
+By default this file is `error.log` located in the same directory as the application code. If that directory cannot be written, the handler falls back to `sujib_error.log` inside your system's temporary folder.
+The file is created automatically if it does not exist.
+
+Check this file whenever something fails silently. You can change the location
+by defining the `LOG_FILE` constant before including `functions.php`:
+
+```sh
+tail -f path/to/your/logfile
+```
+
 
 ## Example Profiles
 
