@@ -5,6 +5,10 @@ error_reporting(E_ALL);
 
 require_once 'functions.php';
 
+// Use PHP's default error handling so runtime warnings don't stop page output
+set_error_handler(null);
+set_exception_handler(null);
+
 // Redirect to install.php if the database does not exist
 if (!file_exists(DB_PATH)) {
   header("Location: install.php");
@@ -27,7 +31,7 @@ $options_rename_regex = $options['rename_regex'] ?? '';
 
 // Fetch profiles (with error handling)
 function fetchProfiles($database) {
-    $query = "SELECT id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache FROM profiles";
+    $query = "SELECT id, reorder, command_line, name, destination, dest_path, container, max_res, min_res, audio, video, cache FROM profiles";
     $stmt = $database->prepare($query);
     if (!$stmt) {
         throw new Exception("Error preparing statement: " . $database->lastErrorMsg());
@@ -349,11 +353,10 @@ $(document).ready(function() {
     <div class="button-container">
       <button type="button" class="btn" id="add_profile">Add Profile</button>
       <button type="button" class="btn" id="reset_profiles">Reset Profiles</button>
-      <button type="button" class="btn" id="save_profiles">Save Profiles</button>
     </div>
   </form>
   <div class="btn-container">
-    <button type="button" class="btn close" rel="modal:close"><i class="fas fa-window-close fa-sm"></i> Cancel</button>
+    <button type="button" class="btn close" id="save_close"><i class="fas fa-window-close fa-sm"></i> Save and Close</button>
   </div>
 </div>
 
