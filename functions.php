@@ -44,6 +44,7 @@ function handleError($errno, $errstr, $errfile, $errline) {
 }
 
 // Attempt to move a file even if the destination is on a different filesystem
+if (!function_exists('safeMove')) {
 function safeMove($source, $dest) {
     if (@rename($source, $dest)) {
         return true;
@@ -63,26 +64,6 @@ function safeMove($source, $dest) {
 
     return false;
 }
-
-// Attempt to move a file even if the destination is on a different filesystem
-function safeMove($source, $dest) {
-    if (@rename($source, $dest)) {
-        return true;
-    }
-
-    $error = error_get_last();
-    if ($error) {
-        error_log('Rename failed: ' . $error['message'] . PHP_EOL, 3, LOG_FILE);
-    }
-
-    if (@copy($source, $dest)) {
-        if (@unlink($source)) {
-            return true;
-        }
-        error_log('Unable to remove original file after copy: ' . $source . PHP_EOL, 3, LOG_FILE);
-    }
-
-    return false;
 }
 
 // Set custom error and exception handlers
