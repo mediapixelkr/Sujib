@@ -328,7 +328,6 @@ $(document).ready(function() {
     }
 
     $(document).on('modal:open', '#profiles-form', function(event, modal) {
-        $(this).css('display', 'flex');
         loadProfiles();
     });
 
@@ -358,9 +357,6 @@ $(document).ready(function() {
         }
     });
 
-    $('#save_profiles').click(function() {
-        saveProfiles();
-    });
 
     $(document).on('click', '.delete-profile', function() {
         var id = $(this).data('id');
