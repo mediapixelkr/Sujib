@@ -5,6 +5,10 @@ error_reporting(E_ALL);
 
 require_once 'functions.php';
 
+// Use PHP's default error handling so runtime warnings don't stop page output
+set_error_handler(null);
+set_exception_handler(null);
+
 // Redirect to install.php if the database does not exist
 if (!file_exists(DB_PATH)) {
   header("Location: install.php");
