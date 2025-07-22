@@ -83,4 +83,42 @@ class FunctionsTest extends TestCase
         $this->assertStringContainsString('Invalid rename regex', $result['error']);
     }
 
+    public function testHandleRenameRequestRejectsInvalidCharacters()
+    {
+        @unlink(DB_PATH);
+        $db = connectDatabase();
+        createTables($db);
+
+        $orig = tempnam(sys_get_temp_dir(), 'file');
+        $file = $orig . '.mp4';
+        rename($orig, $file);
+        $db->exec("INSERT INTO downloaded (id, video_id, filename) VALUES (1, 'v', '$file')");
+
+        ob_start();
+        handleRenameRequest(1, 'bad*name');
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString('Invalid filename', $output);
+        $this->assertFileExists($file);
+    }
+
+    public function testHandleRenameRequestRejectsDirectoryTraversal()
+    {
+        @unlink(DB_PATH);
+        $db = connectDatabase();
+        createTables($db);
+
+        $orig = tempnam(sys_get_temp_dir(), 'file');
+        $file = $orig . '.mp4';
+        rename($orig, $file);
+        $db->exec("INSERT INTO downloaded (id, video_id, filename) VALUES (1, 'v', '$file')");
+
+        ob_start();
+        handleRenameRequest(1, '../evil');
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString('Invalid filename', $output);
+        $this->assertFileExists($file);
+    }
+
 }
