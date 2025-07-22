@@ -17,8 +17,8 @@
     <script src="js/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="css/jquery-ui.min.css">
     <script src="js/jquery-ui.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="css/jquery.modal.min.css" />
+    <script src="js/jquery.modal.min.js"></script>
     <!-- Use local version of Select2 -->
     <link href="css/select2.min.css" rel="stylesheet" />
     <link href="css/select2-flat-theme.css" rel="stylesheet" />

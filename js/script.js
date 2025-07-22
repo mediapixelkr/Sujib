@@ -290,7 +290,13 @@ $(document).ready(function() {
             });
         });
 
-        $.post('profiles.php', { update_profiles: true, profiles: profiles }, function(response) {
+        $.ajax({
+            url: 'profiles.php',
+            method: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({ update_profiles: true, profiles: profiles })
+        }).done(function(response) {
             if (response.status === 'success') {
                 console.log('Profiles saved successfully!');
                 if (callback) callback();
@@ -298,7 +304,7 @@ $(document).ready(function() {
                 console.error('Failed to save profiles:', response.message);
                 alert('Failed to save profiles. Please try again.');
             }
-        }, 'json').fail(function() {
+        }).fail(function() {
             console.error('Failed to save profiles.');
             alert('Failed to save profiles. Please try again.');
         });
@@ -328,7 +334,6 @@ $(document).ready(function() {
     }
 
     $(document).on('modal:open', '#profiles-form', function(event, modal) {
-        $(this).css('display', 'flex');
         loadProfiles();
     });
 
@@ -358,9 +363,19 @@ $(document).ready(function() {
         }
     });
 
-    $('#save_profiles').click(function() {
+    // Persist profile changes whenever the Manage Profiles dialog closes
+    $(document).on('modal:before-close', '#profiles-form', function() {
         saveProfiles();
     });
+
+    // Explicit Save and Close button handler
+    $(document).on('click', '#save_close', function(e) {
+        e.preventDefault();
+        saveProfiles(function() {
+            $.modal.close();
+        });
+    });
+
 
     $(document).on('click', '.delete-profile', function() {
         var id = $(this).data('id');

@@ -4,6 +4,19 @@ require_once 'functions.php';
 // Database connection
 $database = new SQLite3(DB_PATH);
 
+// If the request body contains JSON, populate \$_POST so existing logic works
+$rawInput = file_get_contents('php://input');
+if ($rawInput) {
+    $jsonData = json_decode($rawInput, true);
+    if (is_array($jsonData)) {
+        foreach ($jsonData as $key => $value) {
+            if (!isset($_POST[$key])) {
+                $_POST[$key] = $value;
+            }
+        }
+    }
+}
+
 // Get profiles
 if (isset($_GET['get_profiles'])) {
     header('Content-Type: application/json');
@@ -53,7 +66,17 @@ if (isset($_POST['reset_profiles'])) {
 if (isset($_POST['update_profiles'])) {
     header('Content-Type: application/json');
     try {
-        $profiles = $_POST['profiles'];
+        $profiles = $_POST['profiles'] ?? null;
+        if ($profiles === null) {
+            $raw = file_get_contents('php://input');
+            $data = json_decode($raw, true);
+            if (isset($data['profiles'])) {
+                $profiles = $data['profiles'];
+            }
+        }
+        if (!is_array($profiles)) {
+            throw new Exception('Invalid profile data');
+        }
         foreach ($profiles as $profile) {
             $id = $database->escapeString($profile['id']);
             $name = $database->escapeString($profile['name']);
