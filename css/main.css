@@ -758,7 +758,10 @@ ul li:hover .hide {
   min-width: 850px;
 }
 
-
+#profiles_form {
+  max-height: 90vh;
+  overflow-y: auto;
+}
 
 #submit-delete, #submit-rename {
   margin-left: 100px;
