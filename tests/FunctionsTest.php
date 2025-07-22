@@ -83,4 +83,35 @@ class FunctionsTest extends TestCase
         $this->assertStringContainsString('Invalid rename regex', $result['error']);
     }
 
+    public function testApplyRenameRulesMatchesOldLoop()
+    {
+        $filename = 'Another Video.mp4';
+        $rules = "/\\s+/||_\n/Video/||Clip";
+
+        $base = basename($filename);
+        $expressions = preg_split('/\r?\n/', $rules, -1, PREG_SPLIT_NO_EMPTY);
+        foreach ($expressions as $expr) {
+            $expr = rtrim($expr, "\r\n");
+            if ($expr === '') {
+                continue;
+            }
+            $pattern = $expr;
+            $replacement = '';
+            if (strpos($expr, '||') !== false) {
+                list($pattern, $replacement) = explode('||', $expr, 2);
+            }
+            $pattern = trim($pattern);
+            $resultLoop = preg_replace($pattern, $replacement, $base);
+            if ($resultLoop !== null) {
+                $base = $resultLoop;
+            }
+        }
+
+        $expected = $base;
+
+        $result = applyRenameRules('Another Video.mp4', $rules);
+        $this->assertSame($expected, $result['filename']);
+        $this->assertNull($result['error']);
+    }
+
 }

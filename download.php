@@ -97,30 +97,10 @@ if (isset($_POST["url"])) {
     if (file_exists($final_filename)) {
         if (!empty($options_rename_regex)) {
             $dir = dirname($final_filename);
-            $base = basename($final_filename);
+            $rename = applyRenameRules(basename($final_filename), $options_rename_regex);
 
-            // Support multiple pattern||replacement lines
-            $expressions = preg_split('/\r?\n/', $options_rename_regex, -1, PREG_SPLIT_NO_EMPTY);
-            foreach ($expressions as $expr) {
-                $expr = rtrim($expr, "\r\n");
-                if ($expr === '') continue;
-
-                $pattern = $expr;
-                $replacement = '';
-
-                if (strpos($expr, '||') !== false) {
-                    list($pattern, $replacement) = explode('||', $expr, 2);
-                }
-
-                $pattern = trim($pattern);
-
-                $result = preg_replace($pattern, $replacement, $base);
-                if ($result !== null) {
-                    $base = $result;
-                }
-            }
-
-            if ($base !== basename($final_filename)) {
+            $base = $rename['filename'];
+            if ($rename['error'] === null && $base !== basename($final_filename)) {
                 $newPath = $dir . '/' . $base;
                 if (@rename($final_filename, $newPath)) {
                     $final_filename = $newPath;
