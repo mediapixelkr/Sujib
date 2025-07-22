@@ -290,7 +290,13 @@ $(document).ready(function() {
             });
         });
 
-        $.post('profiles.php', { update_profiles: true, profiles: profiles }, function(response) {
+        $.ajax({
+            url: 'profiles.php',
+            method: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({ update_profiles: true, profiles: profiles })
+        }).done(function(response) {
             if (response.status === 'success') {
                 console.log('Profiles saved successfully!');
                 if (callback) callback();
@@ -298,7 +304,7 @@ $(document).ready(function() {
                 console.error('Failed to save profiles:', response.message);
                 alert('Failed to save profiles. Please try again.');
             }
-        }, 'json').fail(function() {
+        }).fail(function() {
             console.error('Failed to save profiles.');
             alert('Failed to save profiles. Please try again.');
         });
