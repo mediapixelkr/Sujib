@@ -422,11 +422,14 @@ function handleRenameRequest($id, $newName) {
         $newFilenameSql = $path . "/" . stripslashes(SQLite3::escapeString($newName)) . "." . $ext;
 
         if (file_exists($val['filename'])) {
-            rename($val['filename'], $newFilename);
-            updateFilename($database, $newFilenameSql, $id);
+            if (safeMove($val['filename'], $newFilename)) {
+                updateFilename($database, $newFilenameSql, $id);
+                echo basename($newFilename);
+            } else {
+                error_log('Failed to rename ' . $val['filename'] . ' to ' . $newFilename . PHP_EOL, 3, LOG_FILE);
+                echo basename($val['filename']);
+            }
         }
-
-        echo basename($newFilename);
     }
 
     $database->close();
