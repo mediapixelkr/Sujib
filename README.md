@@ -198,6 +198,11 @@ by defining the `LOG_FILE` constant before including `functions.php`:
 tail -f path/to/your/logfile
 ```
 
+Moving the downloaded file can fail if the destination resides on a different
+filesystem or lacks the proper permissions. When that happens the application
+logs the rename error and leaves the file in the download directory, so be sure
+to inspect the log to determine the cause.
+
 
 ## Example Profiles
 

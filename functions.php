@@ -36,6 +36,27 @@ function handleError($errno, $errstr, $errfile, $errline) {
     exit();
 }
 
+// Attempt to move a file even if the destination is on a different filesystem
+function safeMove($source, $dest) {
+    if (@rename($source, $dest)) {
+        return true;
+    }
+
+    $error = error_get_last();
+    if ($error) {
+        error_log('Rename failed: ' . $error['message'] . PHP_EOL, 3, LOG_FILE);
+    }
+
+    if (@copy($source, $dest)) {
+        if (@unlink($source)) {
+            return true;
+        }
+        error_log('Unable to remove original file after copy: ' . $source . PHP_EOL, 3, LOG_FILE);
+    }
+
+    return false;
+}
+
 // Set custom error and exception handlers
 set_exception_handler('handleException');
 set_error_handler('handleError');
