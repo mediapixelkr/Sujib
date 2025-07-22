@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 
 const LOCALE = 'fr_FR.UTF-8';
 
-require 'functions.php';
+require_once 'functions.php';
 
 set_time_limit(4000);
 setlocale(LC_ALL, LOCALE);
@@ -102,7 +102,7 @@ if (isset($_POST["url"])) {
             $base = $rename['filename'];
             if ($rename['error'] === null && $base !== basename($final_filename)) {
                 $newPath = $dir . '/' . $base;
-                if (@rename($final_filename, $newPath)) {
+                if (safeMove($final_filename, $newPath)) {
                     $final_filename = $newPath;
                 }
             }
@@ -113,7 +113,7 @@ if (isset($_POST["url"])) {
                 @mkdir($dest_path, 0777, true);
             }
             $moved = rtrim($dest_path, '/') . '/' . basename($final_filename);
-            if (@rename($final_filename, $moved)) {
+            if (safeMove($final_filename, $moved)) {
                 $final_filename = $moved;
             }
         }
