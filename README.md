@@ -192,7 +192,8 @@ The original details are written to a log file defined by the `LOG_FILE` constan
 By default this file is `error.log` in the project directory, or `sujib_error.log` in your system's
 temporary folder if the directory is not writable.
 
-Check this file whenever something fails silently:
+Check this file whenever something fails silently. You can change the location
+by defining the `LOG_FILE` constant before including `functions.php`:
 
 ```sh
 tail -f path/to/your/logfile

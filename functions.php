@@ -1,8 +1,17 @@
 <?php
 
+// Path for error logging
+if (!defined('LOG_FILE')) {
+    $defaultLog = __DIR__ . '/error.log';
+    if (!is_writable(dirname($defaultLog))) {
+        $defaultLog = sys_get_temp_dir() . '/sujib_error.log';
+    }
+    define('LOG_FILE', $defaultLog);
+}
+
 // Custom error and exception handling functions
 function handleException($exception) {
-    error_log("Exception: " . $exception->getMessage() . PHP_EOL, 3, LOG_FILE);
+    error_log('Exception: ' . $exception->getMessage() . PHP_EOL, 3, LOG_FILE);
     echo json_encode(['error' => 'An error occurred. Please try again later.']);
     exit();
 }
