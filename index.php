@@ -5,6 +5,10 @@ error_reporting(E_ALL);
 
 require_once 'functions.php';
 
+// Use PHP's default error handling so runtime warnings don't stop page output
+set_error_handler(null);
+set_exception_handler(null);
+
 // Redirect to install.php if the database does not exist
 if (!file_exists(DB_PATH)) {
   header("Location: install.php");
@@ -353,7 +357,7 @@ $(document).ready(function() {
     </div>
   </form>
   <div class="btn-container">
-    <button type="button" class="btn close" rel="modal:close"><i class="fas fa-window-close fa-sm"></i> Cancel</button>
+    <button type="button" class="btn close" rel="modal:close"><i class="fas fa-window-close fa-sm"></i> Close</button>
   </div>
 </div>
 
