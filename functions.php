@@ -70,6 +70,15 @@ if (!defined('DB_PATH')) {
     define('DB_PATH', $defaultPath);
 }
 
+// Path for error logging
+if (!defined('LOG_FILE')) {
+    $defaultLog = __DIR__ . '/error.log';
+    if (!is_writable(dirname($defaultLog))) {
+        $defaultLog = sys_get_temp_dir() . '/sujib_error.log';
+    }
+    define('LOG_FILE', $defaultLog);
+}
+
 // Define a constant for the cache directory. Fallback to /tmp if not writable
 if (!defined('CACHE_DIR')) {
     $defaultCache = __DIR__ . '/cache';
