@@ -1,16 +1,60 @@
 <?php
 
+// Path for error logging
+if (!defined('LOG_FILE')) {
+    $defaultDir = __DIR__;
+    $logPath = $defaultDir . '/error.log';
+
+    if (!is_writable($defaultDir) || (file_exists($logPath) && !is_writable($logPath))) {
+        $logPath = sys_get_temp_dir() . '/sujib_error.log';
+    }
+
+    define('LOG_FILE', $logPath);
+
+    if (!file_exists(LOG_FILE)) {
+        @touch(LOG_FILE);
+        @chmod(LOG_FILE, 0666);
+    }
+}
+
 // Custom error and exception handling functions
 function handleException($exception) {
-    //error_log("Exception: " . $exception->getMessage());
+    $message = 'Exception: ' . $exception->getMessage();
+    if (!error_log($message . PHP_EOL, 3, LOG_FILE)) {
+        error_log($message);
+    }
     echo json_encode(['error' => 'An error occurred. Please try again later.']);
     exit();
 }
 
 function handleError($errno, $errstr, $errfile, $errline) {
-    //error_log("Error: [$errno] $errstr - $errfile:$errline");
+    $message = "Error: [$errno] $errstr - $errfile:$errline";
+    if (!error_log($message . PHP_EOL, 3, LOG_FILE)) {
+        error_log($message);
+    }
     echo json_encode(['error' => 'An error occurred. Please try again later.']);
     exit();
+}
+
+// Attempt to move a file even if the destination is on a different filesystem
+function safeMove($source, $dest) {
+    if (@rename($source, $dest)) {
+        return true;
+    }
+
+    $error = error_get_last();
+    if ($error) {
+        error_log('Rename failed: ' . $error['message'] . PHP_EOL, 3, LOG_FILE);
+    }
+
+    if (@copy($source, $dest)) {
+        if (@unlink($source)) {
+            return true;
+        }
+        error_log('Unable to remove original file after copy: ' . $source . PHP_EOL, 3, LOG_FILE);
+    }
+
+    return false;
 }
 
 // Set custom error and exception handlers
