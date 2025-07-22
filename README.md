@@ -176,6 +176,16 @@ Example rules:
 /Performance Video/||_Performance Video  # insert underscore before "Performance Video"
 ```
 
+#### Matching Curly Quotes
+
+Curly quotes such as `‘` and `’` are different from straight quotes. Patterns
+must explicitly include these characters and enable Unicode mode:
+
+```text
+/[‘’](.+)[‘’]/u||$1
+```
+
+
 ## Example Profiles
 
 During the first setup, Sujib creates a few sample profiles that you can use as a starting point. Each profile defines the maximum or minimum resolution passed to `yt-dlp`.
