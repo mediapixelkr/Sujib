@@ -132,7 +132,11 @@ if (isset($_POST["url"])) {
         $response = ['id' => $rowid, 'table' => $table];
         echo json_encode($response);
     } else {
-        echo json_encode(['error' => 'Download failed']);
+        $errorMsg = trim(implode("\n", $output));
+        if ($errorMsg === '') {
+            $errorMsg = 'Download failed';
+        }
+        echo json_encode(['error' => $errorMsg]);
     }
 
     $database->close();
