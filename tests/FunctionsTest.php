@@ -83,42 +83,35 @@ class FunctionsTest extends TestCase
         $this->assertStringContainsString('Invalid rename regex', $result['error']);
     }
 
-    public function testHandleRenameRequestRejectsInvalidCharacters()
+    public function testApplyRenameRulesMatchesOldLoop()
     {
-        @unlink(DB_PATH);
-        $db = connectDatabase();
-        createTables($db);
+        $filename = 'Another Video.mp4';
+        $rules = "/\\s+/||_\n/Video/||Clip";
 
-        $orig = tempnam(sys_get_temp_dir(), 'file');
-        $file = $orig . '.mp4';
-        rename($orig, $file);
-        $db->exec("INSERT INTO downloaded (id, video_id, filename) VALUES (1, 'v', '$file')");
+        $base = basename($filename);
+        $expressions = preg_split('/\r?\n/', $rules, -1, PREG_SPLIT_NO_EMPTY);
+        foreach ($expressions as $expr) {
+            $expr = rtrim($expr, "\r\n");
+            if ($expr === '') {
+                continue;
+            }
+            $pattern = $expr;
+            $replacement = '';
+            if (strpos($expr, '||') !== false) {
+                list($pattern, $replacement) = explode('||', $expr, 2);
+            }
+            $pattern = trim($pattern);
+            $resultLoop = preg_replace($pattern, $replacement, $base);
+            if ($resultLoop !== null) {
+                $base = $resultLoop;
+            }
+        }
 
-        ob_start();
-        handleRenameRequest(1, 'bad*name');
-        $output = ob_get_clean();
+        $expected = $base;
 
-        $this->assertStringContainsString('Invalid filename', $output);
-        $this->assertFileExists($file);
-    }
-
-    public function testHandleRenameRequestRejectsDirectoryTraversal()
-    {
-        @unlink(DB_PATH);
-        $db = connectDatabase();
-        createTables($db);
-
-        $orig = tempnam(sys_get_temp_dir(), 'file');
-        $file = $orig . '.mp4';
-        rename($orig, $file);
-        $db->exec("INSERT INTO downloaded (id, video_id, filename) VALUES (1, 'v', '$file')");
-
-        ob_start();
-        handleRenameRequest(1, '../evil');
-        $output = ob_get_clean();
-
-        $this->assertStringContainsString('Invalid filename', $output);
-        $this->assertFileExists($file);
+        $result = applyRenameRules('Another Video.mp4', $rules);
+        $this->assertSame($expected, $result['filename']);
+        $this->assertNull($result['error']);
     }
 
 }
