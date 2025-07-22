@@ -4,6 +4,19 @@ require_once 'functions.php';
 // Database connection
 $database = new SQLite3(DB_PATH);
 
+// If the request body contains JSON, populate \$_POST so existing logic works
+$rawInput = file_get_contents('php://input');
+if ($rawInput) {
+    $jsonData = json_decode($rawInput, true);
+    if (is_array($jsonData)) {
+        foreach ($jsonData as $key => $value) {
+            if (!isset($_POST[$key])) {
+                $_POST[$key] = $value;
+            }
+        }
+    }
+}
+
 // Get profiles
 if (isset($_GET['get_profiles'])) {
     header('Content-Type: application/json');
