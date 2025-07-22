@@ -328,7 +328,6 @@ $(document).ready(function() {
     }
 
     $(document).on('modal:open', '#profiles-form', function(event, modal) {
-        $(this).css('display', 'flex');
         loadProfiles();
     });
 
@@ -358,9 +357,12 @@ $(document).ready(function() {
         }
     });
 
-    $('#save_profiles').click(function() {
-        saveProfiles();
+    // Close the Manage Profiles modal when the Close button is clicked
+    $(document).on('click', '#profiles-form .btn.close', function(e) {
+        e.preventDefault();
+        $.modal.close();
     });
+
 
     $(document).on('click', '.delete-profile', function() {
         var id = $(this).data('id');
