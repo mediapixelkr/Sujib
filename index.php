@@ -31,7 +31,7 @@ $options_rename_regex = $options['rename_regex'] ?? '';
 
 // Fetch profiles (with error handling)
 function fetchProfiles($database) {
-    $query = "SELECT id, reorder, command_line, name, destination, container, max_res, min_res, audio, video, cache FROM profiles";
+    $query = "SELECT id, reorder, command_line, name, destination, dest_path, container, max_res, min_res, audio, video, cache FROM profiles";
     $stmt = $database->prepare($query);
     if (!$stmt) {
         throw new Exception("Error preparing statement: " . $database->lastErrorMsg());
