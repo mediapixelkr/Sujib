@@ -700,11 +700,7 @@ tbody:before {
 
 .button-container {
   text-align: center;
-  padding: 10px 0;
-  border-top: 1px solid #ddd;
-  position: sticky;
-  bottom: 0;
-  background: #fff;
+  margin-top: 20px;
 }
 
 .button-container .btn {
@@ -714,11 +710,6 @@ tbody:before {
 .btn-container {
   text-align: center;
   margin-top: 20px;
-  padding: 10px 0;
-  border-top: 1px solid #ddd;
-  position: sticky;
-  bottom: 0;
-  background: #fff;
 }
 
 .modal .btn.close {
@@ -766,11 +757,6 @@ ul li:hover .hide {
 #delete-form, #rename-form, #profiles-form, #profiles_form {
   max-width: 850px;
   width: 100%;
-}
-
-#profiles-form {
-  max-height: 90vh;
-  overflow-y: auto;
 }
 
 #submit-delete, #submit-rename {
