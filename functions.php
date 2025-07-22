@@ -337,6 +337,19 @@ function updateFilename($database, $newFilename, $id) {
 
 function handleRenameRequest($id, $newName) {
     $database = connectDatabase();
+
+    // Validate new filename
+    $isValid = preg_match('/^[\\w\- ]+$/u', $newName) &&
+               strpos($newName, '/') === false &&
+               strpos($newName, "\\") === false &&
+               strpos($newName, '..') === false;
+
+    if (!$isValid) {
+        echo 'Invalid filename';
+        $database->close();
+        return;
+    }
+
     $result = fetchRecordById($database, $id);
 
     while ($val = $result->fetchArray()) {
