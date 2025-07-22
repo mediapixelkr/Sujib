@@ -357,8 +357,13 @@ $(document).ready(function() {
         }
     });
 
-    // Save profiles and close the modal when the Save and Close button is clicked
-    $(document).on('click', '#profiles-form .btn.close', function(e) {
+    // Persist profile changes whenever the Manage Profiles dialog closes
+    $(document).on('modal:before-close', '#profiles-form', function() {
+        saveProfiles();
+    });
+
+    // Explicit Save and Close button handler
+    $(document).on('click', '#save_close', function(e) {
         e.preventDefault();
         saveProfiles(function() {
             $.modal.close();
