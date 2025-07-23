@@ -60,7 +60,7 @@ try {
 $locale = 'fr_FR.UTF-8';
 setlocale(LC_ALL, $locale);
 putenv('LC_ALL=' . $locale);
-$footer = "By Mick S. - mediapixel.kr © 2018-2024";
+$footer = "Copyright M. SERAPHIN - mediapixel.kr 2018-2025";
 
 include 'thumbnails.php';
 
