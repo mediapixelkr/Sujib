@@ -185,6 +185,35 @@ must explicitly include these characters and enable Unicode mode:
 /[‘’](.+)[‘’]/u||$1
 ```
 
+## Error Log
+
+When the application encounters an error or exception, it returns a short JSON message to the browser and writes the full details to a file defined by the `LOG_FILE` constant in `functions.php`.
+By default this file is `error.log` located in the same directory as the application code. If that directory cannot be written, the handler falls back to `sujib_error.log` inside your system's temporary folder.
+The file is created automatically if it does not exist.
+
+Check this file whenever something fails silently. You can change the location
+by defining the `LOG_FILE` constant before including `functions.php`:
+
+```sh
+tail -f path/to/your/logfile
+```
+
+Moving the downloaded file can fail if the destination resides on a different
+filesystem or lacks the proper permissions. When that happens the application
+logs the rename error and leaves the file in the download directory, so be sure
+to inspect the log to determine the cause.
+
+Warnings such as a failed `rename()` are logged but no longer stop the script,
+so the operation may continue using a fallback copy.
+
+## Manual Renames
+
+When renaming a downloaded video from the web interface, the new filename can
+include any characters except `/`, `\`, or the sequence `..`. If the name
+contains these invalid characters, the page will display `Invalid filename` and
+no changes will be applied. Any errors while moving the file are written to the
+error log described above.
+
 
 ## Example Profiles
 
