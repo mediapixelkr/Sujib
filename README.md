@@ -206,6 +206,14 @@ to inspect the log to determine the cause.
 Warnings such as a failed `rename()` are logged but no longer stop the script,
 so the operation may continue using a fallback copy.
 
+## Manual Renames
+
+When renaming a downloaded video from the web interface, the new filename can
+include any characters except `/`, `\`, or the sequence `..`. If the name
+contains these invalid characters, the page will display `Invalid filename` and
+no changes will be applied. Any errors while moving the file are written to the
+error log described above.
+
 
 ## Example Profiles
 

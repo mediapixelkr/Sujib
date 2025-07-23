@@ -401,7 +401,7 @@ function handleRenameRequest($id, $newName) {
     $database = connectDatabase();
 
     // Validate new filename
-    $isValid = preg_match('/^[\\w\- ]+$/u', $newName) &&
+    $isValid = $newName !== '' &&
                strpos($newName, '/') === false &&
                strpos($newName, "\\") === false &&
                strpos($newName, '..') === false;
