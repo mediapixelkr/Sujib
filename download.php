@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 
 const LOCALE = 'fr_FR.UTF-8';
 
-require 'functions.php';
+require_once 'functions.php';
 
 set_time_limit(4000);
 setlocale(LC_ALL, LOCALE);
