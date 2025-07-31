@@ -54,7 +54,7 @@ $(document).ready(function() {
 
         animateDownload();
 
-        download(downloadItem.link, downloadItem.quality)
+        download(downloadItem.link, downloadItem.quality, 0)
             .then(() => {
                 isDownloading = false;
                 processDownloadQueue();
@@ -66,7 +66,7 @@ $(document).ready(function() {
             });
     }
 
-    function download(url, params) {
+    function download(url, params, attempt = 0) {
         return new Promise((resolve, reject) => {
             $.post("thumbnails.php", { url: url }, function(data, status) {
                 $('#queue ul').find('.loader-container-temp').remove();
@@ -175,7 +175,14 @@ $(document).ready(function() {
 
                             resolve();
                         }).fail(function(jqXHR) {
-                            var errText = jqXHR.responseText ? jqXHR.responseText.trim() : 'Download failed';
+                            if (jqXHR.status === 504 && attempt < 1) {
+                                $(loaderSelector).replaceWith('<div class="text-bloc">504 Gateway Timeout. Retrying...</div>');
+                                setTimeout(function() {
+                                    download(url, params, attempt + 1).then(resolve).catch(reject);
+                                }, 60000);
+                                return;
+                            }
+                            var errText = jqXHR.status ? jqXHR.status + ' ' + jqXHR.statusText : 'Download failed';
                             $(loaderSelector).replaceWith('<div class="text-bloc">' + errText + '</div>');
                             resolve();
                         });
@@ -444,7 +451,7 @@ $(document).ready(function() {
 
             animateDownload();
 
-            download(Url, $(this).attr('id'));
+            download(Url, $(this).attr('id'), 0);
         });
     });
 
