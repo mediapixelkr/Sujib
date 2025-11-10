@@ -39,10 +39,14 @@ $(document).ready(function() {
         $('.input-link').val('');
     });
 
-    $('.quality-select').select2({
-        theme: "flat",
-        minimumResultsForSearch: Infinity
-    });
+    if ($.fn.select2) {
+        $('.quality-select').select2({
+            theme: "flat",
+            minimumResultsForSearch: Infinity
+        });
+    } else {
+        console.warn('Select2 is not available; falling back to native select.');
+    }
 
     function processDownloadQueue() {
         if (isDownloading || downloadQueue.length === 0) {
@@ -121,7 +125,9 @@ $(document).ready(function() {
 
                 setTimeout(function() {
                     var loaderSelector = "#loader" + thisdownload;
-                    if ($(loaderSelector).length > 0) {
+                    var loaderId = "loader" + thisdownload;
+
+                    function requestDownload(attempt) {
                         $.post("download.php", { url: url, id: params }, function(status2) {
                             if (typeof status2 === 'string') {
                                 try {
@@ -175,17 +181,31 @@ $(document).ready(function() {
 
                             resolve();
                         }).fail(function(jqXHR) {
+                            var $loaderElement = $(loaderSelector);
+                            if (!$loaderElement.length) {
+                                console.error("Loader element missing during download retry");
+                                resolve();
+                                return;
+                            }
+
                             if (jqXHR.status === 504 && attempt < 1) {
-                                $(loaderSelector).replaceWith('<div class="text-bloc">504 Gateway Timeout. Retrying...</div>');
+                                var $retryPlaceholder = $('<div class="text-bloc">504 Gateway Timeout. Retrying...</div>');
+                                $loaderElement.replaceWith($retryPlaceholder);
                                 setTimeout(function() {
-                                    download(url, params, attempt + 1).then(resolve).catch(reject);
+                                    $retryPlaceholder.replaceWith('<div class="loader" id="' + loaderId + '"></div>');
+                                    requestDownload(attempt + 1);
                                 }, 60000);
                                 return;
                             }
+
                             var errText = jqXHR.status ? jqXHR.status + ' ' + jqXHR.statusText : 'Download failed';
-                            $(loaderSelector).replaceWith('<div class="text-bloc">' + errText + '</div>');
+                            $loaderElement.replaceWith('<div class="text-bloc">' + errText + '</div>');
                             resolve();
                         });
+                    }
+
+                    if ($(loaderSelector).length > 0) {
+                        requestDownload(0);
                     } else {
                         console.error("Loader element not found for replacement");
                         reject();
@@ -230,6 +250,86 @@ $(document).ready(function() {
         e.preventDefault();
         saveOptions();
         $.modal.close();
+    });
+
+    function handleLinkAction($link, request) {
+        if ($link.hasClass('disabled')) {
+            return;
+        }
+        $link.addClass('disabled');
+        request().always(function() {
+            $link.removeClass('disabled');
+        });
+    }
+
+    function setOptionsFeedback(message, isError) {
+        var $feedback = $('#cleanup_feedback');
+        if (!$feedback.length) {
+            return;
+        }
+        $feedback.toggleClass('error', !!isError);
+        $feedback.text(message);
+        $feedback.show();
+    }
+
+    $(document).on('click', '#clean_cache', function(e) {
+        e.preventDefault();
+        var $link = $(this);
+        handleLinkAction($link, function() {
+            setOptionsFeedback('Cleaning yt-dlp cache...', false);
+            return $.ajax({
+                url: 'options.php',
+                data: { cache: 1 },
+                dataType: 'text',
+                cache: false
+            }).done(function(response) {
+                var message = response ? response.trim() : 'Cache cleaned.';
+                setOptionsFeedback(message, false);
+            }).fail(function() {
+                var message = 'Unable to clean yt-dlp cache.';
+                setOptionsFeedback(message, true);
+            });
+        });
+    });
+
+    $(document).on('click', '#cleanup_failed_downloads', function(e) {
+        e.preventDefault();
+        var $link = $(this);
+        handleLinkAction($link, function() {
+            setOptionsFeedback('Removing temporary files...', false);
+            return $.ajax({
+                url: 'options.php',
+                data: { cleanup_failed: 1 },
+                dataType: 'json',
+                cache: false
+            }).done(function(response) {
+                if (!response || response.status === 'error') {
+                    setOptionsFeedback((response && response.message) ? response.message : 'Cleanup failed.', true);
+                    return;
+                }
+
+                var message;
+                if (response.deleted === 0) {
+                    message = 'No temporary files found.';
+                } else {
+                    message = response.deleted + ' temporary file(s) removed.';
+                }
+
+                if (response.files && response.files.length) {
+                    message += ' [' + response.files.join(', ') + ']';
+                }
+
+                if (response.status === 'partial' && response.failed && response.failed.length) {
+                    message += ' | Unable to remove: ' + response.failed.join(', ');
+                    setOptionsFeedback(message, true);
+                } else {
+                    setOptionsFeedback(message, false);
+                }
+            }).fail(function() {
+                var message = 'Unable to remove failed downloads.';
+                setOptionsFeedback(message, true);
+            });
+        });
     });
 
     function htmlspecialchars(str) {

@@ -314,6 +314,10 @@ $(document).ready(function() {
   <p>
     <a href="#" id="clean_cache">Clean yt-dlp cache</a>
   </p>
+  <p>
+    <a href="#" id="cleanup_failed_downloads">Delete failed downloads (.mp4/.mkv)</a>
+  </p>
+  <p class="options-feedback" id="cleanup_feedback" aria-live="polite"></p>
   <div class="btn-container">
     <button type="button" class="btn close" rel="modal:close"><i class="fas fa-window-close fa-sm"></i> Save and Close</button>
   </div>

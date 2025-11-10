@@ -4,6 +4,7 @@
 # Ignore cached thumbnails but keep the directory
 cache/*
 !cache/.gitkeep
+cache/.DS_Store
 
 # Composer dependencies
 vendor/
@@ -14,6 +15,14 @@ vendor/
 # Ignore log files
 *.log
 
+# Ignore contributor guidelines generated locally
+AGENTS.md
+
+# Ignore downloaded media artifacts
+*.mp4
+*.mkv
+*.webm
+
 # Ignore temporary files
 *.tmp
 *.temp
@@ -23,4 +32,3 @@ vendor/
 # OS generated files
 .DS_Store
 Thumbs.db
-

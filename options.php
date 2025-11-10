@@ -57,6 +57,81 @@ if (isset($_GET["cache"])) {
     exit();
 }
 
+if (isset($_GET['cleanup_failed'])) {
+    header('Content-Type: application/json');
+
+    $appDir = realpath(__DIR__);
+    $extensions = ['mp4', 'mkv'];
+    $deleted = 0;
+    $errors = [];
+    $removedFiles = [];
+    $searched = [];
+
+    try {
+        if (!$appDir) {
+            throw new Exception('Application directory not found.');
+        }
+
+        $targets = [$appDir];
+
+        $cleanupDirectory = function($dir) use (&$deleted, &$errors, &$removedFiles, &$searched, $appDir, $extensions) {
+            if (!$dir || !is_dir($dir) || strpos($dir, $appDir) !== 0) {
+                return;
+            }
+
+            $searched[] = $dir;
+            $iterator = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
+
+            foreach ($iterator as $fileinfo) {
+                if (!$fileinfo->isFile() || $fileinfo->isLink()) {
+                    continue;
+                }
+
+                $extension = strtolower($fileinfo->getExtension());
+                if (!in_array($extension, $extensions, true)) {
+                    continue;
+                }
+
+                $path = $fileinfo->getPathname();
+                $relative = ltrim(str_replace($appDir, '', $path), DIRECTORY_SEPARATOR);
+
+                if (@unlink($path)) {
+                    $deleted++;
+                    $removedFiles[] = $relative ?: $fileinfo->getFilename();
+                } else {
+                    $errors[] = $relative ?: $fileinfo->getFilename();
+                }
+            }
+        };
+
+        foreach ($targets as $dir) {
+            $cleanupDirectory($dir);
+        }
+
+        $response = [
+            'deleted' => $deleted,
+            'files' => $removedFiles,
+            'searched' => $searched
+        ];
+
+        if (!empty($errors)) {
+            $response['status'] = 'partial';
+            $response['message'] = 'Unable to remove: ' . implode(', ', $errors);
+            $response['failed'] = $errors;
+        } else {
+            $response['status'] = 'success';
+        }
+
+        echo json_encode($response);
+    } catch (Exception $e) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ]);
+    }
+    exit();
+}
+
 if (isset($_GET['get_profiles'])) {
     $profiles_req = $database->prepare('SELECT * FROM profiles ORDER BY reorder ASC;');
     $profiles_result = $profiles_req->execute();

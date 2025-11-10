@@ -720,6 +720,24 @@ tbody:before {
   background-color: #c9302c;
 }
 
+#options-form .options-feedback {
+  margin-top: 10px;
+  font-size: 0.95rem;
+  color: #2d572c;
+  background: #e6f4ea;
+  border: 1px solid #9dd1a7;
+  border-radius: 4px;
+  padding: 6px 10px;
+  min-height: 1.2em;
+  display: none;
+}
+
+#options-form .options-feedback.error {
+  color: #7d1b1b;
+  background: #fdecea;
+  border-color: #f5b5b0;
+}
+
 
 div.hide {
   position: absolute;
