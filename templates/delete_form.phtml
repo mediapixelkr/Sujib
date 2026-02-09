@@ -1,0 +1,24 @@
+<form id="delete_form" style="margin: 0 auto; border-radius: 5px; display: inline-block; max-width: 55em !important; margin-right: 4em;" autocomplete="off">
+    <span style="position: relative;">Delete file "<b><?= htmlspecialchars($truncatedFilename) ?>.<?= htmlspecialchars($extension) ?></b>" from disk?</span>
+</form>
+<button class="submit-delete btn delete" id="<?= htmlspecialchars($id) ?>"><i class="fas fa-trash-alt fa-sm"></i> Delete</button>
+<button class="submit-delete-close btn link"><i class="fas fa-window-close fa-sm"></i> Cancel</button>
+
+<script type="text/javascript">
+    $(".submit-delete").click(function(e) {
+        e.preventDefault();
+        var delid = $(this).attr('id');
+        $.post("delete.php?id=" + delid, { file: true }, function(status) {
+            if (status == 'done') {
+                $('.tabs #' + delid).remove();
+                $.modal.close();
+                location.reload();
+            }
+        });
+    });
+
+    $(".submit-delete-close").click(function(e) {
+        e.preventDefault();
+        $.modal.close();
+    });
+</script>

@@ -1,0 +1,74 @@
+<div class="content-pink">
+    <div class="row">
+        <?php foreach ($profiles as $profile): ?>
+            <div class="drop" id="<?= $profile['id'] ?>">
+                <span class="drop-text">Drop the <?= htmlspecialchars($profile['name']) ?> video link here</span>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <div class="row">
+        <form id="download_form" style="margin: 0 auto; border-radius: 5px;" autocomplete="off">
+            <input type="hidden" name="csrf_token" value="<?= getCsrfToken() ?>">
+            <div class="download-form">
+                <label style="position: relative;">Or paste the full video link : </label>
+                <input class="input-link" type="text" placeholder="https://www.youtube.com/watch?v=X">
+                <select id="quality" class="quality-select" name="quality" style="min-width: 180px;">
+                    <?php foreach ($profiles as $profile): ?>
+                        <option value="<?= $profile['id'] ?>" <?= $profile['reorder'] === "0" ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($profile['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>              
+                <button class="submit-download"><i class="fas fa-arrow-circle-right"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="content-grey">
+    <div id="queue">
+        <ul class="tabs">
+            <?php foreach ($queueItems as $queue): 
+                $bgStyle = "background: linear-gradient(to right, #d4edda {$queue['progress']}, #f0e7a1 {$queue['progress']});";
+            ?>
+                <li id="<?= $queue['id'] ?>" class="<?= $queue['video_id'] ?>" style="<?= $bgStyle ?>">
+                    <img src="thumbnail.php?id=<?= $queue['video_id'] ?>&type=default">
+                    <img src="thumbnail.php?id=<?= $queue['video_id'] ?>&type=1">
+                    <img src="thumbnail.php?id=<?= $queue['video_id'] ?>&type=2">
+                    <div class="text-bloc">
+                        <div class="loader" id="loader<?= $queue['id'] ?>"></div>
+                    </div>
+                    <div class="options opt<?= $queue['video_id'] ?>">
+                        <button type="button" class="btn link" id="<?= $queue['video_id'] ?>"><i class="fab fa-youtube fa-lg"></i> Launch Youtube</button>
+                        <button type="button" class="btn terminate" id="<?= $queue['id'] ?>"><i class="fas fa-times-circle fa-lg"></i> Terminate</button>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+
+            <?php foreach ($downloadedItems as $last): ?>
+                <li id="<?= $last['id'] ?>" class="li_old_download <?= $last['video_id'] ?>">
+                    <img src="thumbnail.php?id=<?= $last['video_id'] ?>&type=default">
+                    <img src="thumbnail.php?id=<?= $last['video_id'] ?>&type=1">
+                    <img src="thumbnail.php?id=<?= $last['video_id'] ?>&type=2">
+                    <div class="text-bloc">
+                        <?= createTable(basename($last['filename']), [
+                            'duration' => $last['duration'],
+                            'resolution' => $last['resolution'],
+                            'codec' => $last['codec_v'],
+                            'bitrate' => $last['bitrate_v'],
+                            'codec_audio' => $last['codec_a'],
+                            'bitrate_audio' => $last['bitrate_a'],
+                            'size' => $last['size']
+                        ], $last['date']) ?>
+                        <div class="hide"><a id="<?= $last['id'] ?>" title="Hide this download"><i class="fas fa-times-circle fa-lg"></i></a></div>
+                    </div>
+                    <div class="options">
+                        <button type="button" class="btn link" id="<?= $last['video_id'] ?>"><i class="fab fa-youtube fa-lg"></i> Launch Youtube</button>
+                        <button type="button" class="btn rename" id="<?= $last['id'] ?>"><i class="fas fa-edit fa-sm"></i> Rename</button>
+                        <button type="button" class="btn delete" id="<?= $last['id'] ?>"><i class="fas fa-trash-alt fa-sm"></i> Delete file</button>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+</div>

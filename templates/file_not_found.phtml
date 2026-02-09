@@ -1,0 +1,13 @@
+<span style="position: relative; max-width: 57em !important; margin-right: 4em;">
+    Can't find the file: <b><?= htmlspecialchars($filename) ?>.<?= htmlspecialchars($extension) ?></b>
+</span>
+<button class="submit-rename-close btn link">
+    <i class="fas fa-window-close fa-sm"></i> Close
+</button>
+
+<script type="text/javascript">
+    $(".submit-rename-close").click(function(e) {
+        e.preventDefault();
+        $.modal.close();
+    });
+</script>

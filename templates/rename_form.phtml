@@ -1,0 +1,25 @@
+<form id="rename_form" style="margin: 0 auto; border-radius: 5px; display: inline-block;" autocomplete="off">
+    <label style="position: relative;">File name : </label>
+    <input class="input-link input-name" style="width:35rem" type="text" value="<?= htmlspecialchars($filenameWithoutExt) ?>">
+</form>
+<button class="submit-rename btn rename" id="<?= htmlspecialchars($id) ?>">
+    <i class="fas fa-edit fa-sm"></i> Rename
+</button>
+<button class="submit-rename-close btn link">
+    <i class="fas fa-window-close fa-sm"></i> Cancel
+</button>
+
+<script type="text/javascript">
+    $(".submit-rename").click(function(e) {
+        e.preventDefault();
+        var renid = $(this).attr('id');
+        $.post("rename.php?id=" + renid, {name: $('.input-name').val()}, function(status) {
+            $('.tabs #' + renid + ' .table_title').html(status);
+            $.modal.close();
+        });
+    });
+    $(".submit-rename-close").click(function(e) {
+        e.preventDefault();
+        $.modal.close();
+    });
+</script>

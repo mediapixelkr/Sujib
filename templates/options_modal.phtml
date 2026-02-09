@@ -1,0 +1,40 @@
+<div id="options-form" class="modal">
+  <p><b>Options</b></p>
+  <form id="options_form" autocomplete="off">
+    <input type="hidden" name="csrf_token" value="<?= getCsrfToken() ?>">
+    <p>
+      <label style="position: relative;">Previous downloads to show: </label>
+      <select id="show_last" name="showlast">
+        <?php foreach ([0, 1, 3, 5, 10, 20, 50] as $val): ?>
+          <option value="<?= $val ?>" <?= $options['show_last'] == $val ? 'selected' : '' ?>><?= $val === 0 ? 'None' : $val ?></option>
+        <?php endforeach; ?>
+      </select>
+    </p>
+    <p>
+      <label style="position: relative;">Subtitles: </label>
+      <select id="subtitles" name="subtitles">
+        <option value="0" <?= $options['subtitles'] == "0" ? 'selected' : '' ?>>None</option>
+        <option value="1" <?= $options['subtitles'] == "1" ? 'selected' : '' ?>>External .srt file</option>
+        <option value="2" <?= $options['subtitles'] == "2" ? 'selected' : '' ?>>Embed Subtitles</option>
+      </select>
+    </p>
+    <p>
+      <label style="position: relative;">Subtitle Language (2 letters): </label>
+      <input type="text" id="sub_lang" name="sub_lang" maxlength="2" value="<?= htmlspecialchars($options['sub_lang'] ?? '') ?>">
+    </p>
+    <p>
+      <label style="position: relative;">Download Directory: </label>
+      <input type="text" id="download_dir" name="download_dir" value="<?= htmlspecialchars($options['download_dir'] ?? '') ?>">
+    </p>
+    <p>
+      <label style="position: relative;">Rename Regex (pattern||replacement per line): </label>
+      <textarea id="rename_regex" name="rename_regex" rows="3" placeholder="/pattern/||replacement&#10;/another/||replace"><?= htmlspecialchars($options['rename_regex'] ?? '') ?></textarea>
+    </p>
+  </form>
+  <p><a href="#" id="clean_cache">Clean yt-dlp cache</a></p>
+  <p><a href="#" id="cleanup_failed_downloads">Delete failed downloads (.mp4/.mkv)</a></p>
+  <p class="options-feedback" id="cleanup_feedback" aria-live="polite"></p>
+  <div class="btn-container">
+    <button type="button" class="btn close" id="save_options_close" rel="modal:close"><i class="fas fa-window-close fa-sm"></i> Save and Close</button>
+  </div>
+</div>

@@ -1,0 +1,270 @@
+
+# Sujib - PHP YouTube Video Download Manager
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) ![Debian](https://img.shields.io/badge/Debian-D70A53?style=for-the-badge&logo=debian&logoColor=white) ![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white) ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white) ![jQuery](https://img.shields.io/badge/jquery-%230769AD.svg?style=for-the-badge&logo=jquery&logoColor=white) ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white) ![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)
+
+## Introduction
+
+**Sujib** (수집, meaning "collection" in Korean) is a web-based GUI for the command-line utility `yt-dlp`. This application allows users to download YouTube videos by simply dragging and dropping URLs onto different quality profiles. The program uses a local SQLite database to eliminate the need for a separate SQL server. This script was originally created in 2018 to launch YouTube video downloads from anywhere in the world, primarily focusing on Music Videos, to store them in a collection located on a NAS in a home lab environment.
+
+## Features
+
+- **Asynchronous Background Downloads**: Multi-threaded queue system prevents server timeouts.
+- **Visual Progress Tracking**: Real-time filling background effect on video cards.
+- **Full Playlist Support**: Detect and download multiple videos from a single playlist link.
+- **Clean Templating Engine**: Separated logic and UI for easier maintenance.
+- **Robust Security**: Full CSRF protection and SQL injection prevention using prepared statements.
+- **Advanced Renaming**: Isolates file extensions before applying custom regex rules.
+- **Performance Optimized**: Optimized MediaInfo extraction and SQLite concurrent access.
+
+## Screenshots
+
+![Screenshot](https://github.com/mediapixelkr/Sujib/assets/42218992/f3f1d667-c69d-4dbb-b34f-a4677ce06ac6)
+
+## Installation
+
+### Prerequisites
+
+This application was created on Linux Debian and requires the following utilities:
+
+- A web server (Nginx or Apache)
+- PHP 8.1+
+- `yt-dlp`
+- `mediainfo`
+- `ffmpeg`
+- `Node.js` (required for yt-dlp signature decryption)
+- cURL, wget or pip
+- SQLite module for PHP
+
+### Steps (Linux Debian)
+
+1. **Clone the repository into your default html folder:**
+    ```sh
+    cd /var/www/html
+    git clone https://github.com/mediapixelkr/Sujib.git ./sujib
+    cd sujib
+    chown -R www-data:www-data .
+    chmod -R 755 .
+    chmod 777 cache
+    ```
+
+2. **Install `yt-dlp`:**
+    Follow the [yt-dlp installation instructions](https://github.com/yt-dlp/yt-dlp#installation).
+
+    You can use Aptitude (default):
+    ```sh
+    sudo add-apt-repository ppa:tomtomtom/yt-dlp    # Add ppa repo to apt
+    sudo apt update                                 # Update package list
+    sudo apt install yt-dlp                         # Install yt-dlp
+    ```
+
+    or Curl :
+    ```sh
+    curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
+    chmod a+rx ~/.local/bin/yt-dlp  # Make executable
+    ```
+
+    or wget :
+    ```sh
+    wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O ~/.local/bin/yt-dlp
+    chmod a+rx ~/.local/bin/yt-dlp  # Make executable
+    ```
+
+    or pip :
+    ```sh
+    python3 -m pip install -U "yt-dlp[default]"
+    ```
+
+3. **Install `mediainfo` and `ffmpeg`:**
+    ```sh
+    sudo apt update
+    sudo apt install mediainfo ffmpeg
+    ```
+
+4. **Ensure you have PHP 8.x, cURL, and SQLite installed:**
+    A docker with PHP8 and a web server with SQLite3 will work fine too.
+    ```sh
+    php -v
+    sudo apt install php8.2 php8.2-curl php8.2-sqlite3
+    ```
+
+5. **Install and configure your web server (if you don't already have one):**
+
+    **For Apache:**
+    ```sh
+    sudo apt install apache2 libapache2-mod-php8.2
+    ```
+
+    **For Nginx:**
+    ```sh
+    sudo apt install nginx php8.2-fpm
+    ```
+
+6. **Restart your web server:**
+    ```sh
+    sudo systemctl restart apache2
+    # or for nginx
+    sudo systemctl restart nginx
+    ```
+
+7. **Protect the access (recommended):**
+   Generate a password file
+    ```sh
+    sudo apt update
+    sudo apt install apache2-utils
+    htpasswd -c /etc/apache2/.htpasswd $USER
+    ```
+
+    **For Apache:**
+   (adapt USER name)
+    ```sh
+    echo 'AuthType Basic
+    AuthName "Restricted Content"
+    AuthUserFile /home/USER/.htpasswd
+    Require valid-user' | sudo tee /var/www/html/Sujib/.htaccess
+    ```
+
+    **For Nginx:**
+    ```sh
+    sudo nano /etc/nginx/sites-enabled/default
+    ```
+    Then add after "server_name _;" (adapt USER name):
+    ```sh
+    location /youtube/ {
+        try_files $uri $uri/ =404;
+        auth_basic "restricted access";
+        auth_basic_user_file /home/USER/.htpasswd;
+    }
+    ```
+
+8. **Update yt-dlp with cron (recommended):**
+    ```sh
+    sudo crontab -e
+    ```
+    
+    At the end of the file, add (for a default Aptitude install):   
+    ```sh
+    0 4 * * * /usr/local/bin/yt-dlp --update >/dev/null 2>&1
+    ```
+
+    or adapt (for a pip install):   
+    ```sh
+    0 4 * * * python3 -m pip install -U yt-dlp[default] >/dev/null 2>&1
+    ```
+
+9. **Access the application via your browser:**
+    ```
+    http://host/sujib
+    ```
+
+## Usage
+
+1. Follow the instructions for the first setup, the database will be created.
+2. Use the options menu or profiles to change the download settings.
+3. **Drag and drop a YouTube video URL into the designated area or use the form. The link should not contain anything else than https://www.youtube.com/watch?v=[ID]**
+4. **The video will be downloaded using `yt-dlp` and saved to your specified directory.**
+
+### Rename Rules Syntax
+
+Sujib supports automatic renaming through regular expression rules. Open the **Options** modal from the navigation bar to edit the *Rename Regex* field. Each line follows a `pattern||replacement` format where the pattern is a PHP regex and the replacement defines how matched text is transformed.
+
+Example rules:
+
+```text
+/["']/||               # remove single or double quotes
+/\s+/||-               # replace spaces with hyphens
+/Performance Video/||_Performance Video  # insert underscore before "Performance Video"
+```
+
+#### Matching Curly Quotes
+
+Curly quotes such as `‘` and `’` are different from straight quotes. Patterns
+must explicitly include these characters and enable Unicode mode:
+
+```text
+/[‘’](.+)[‘’]/u||$1
+```
+
+## Error Log
+
+When the application encounters an error or exception, it returns a short JSON message to the browser and writes the full details to a file defined by the `LOG_FILE` constant in `functions.php`.
+By default this file is `error.log` located in the same directory as the application code. If that directory cannot be written, the handler falls back to `sujib_error.log` inside your system's temporary folder.
+The file is created automatically if it does not exist.
+
+Check this file whenever something fails silently. You can change the location
+by defining the `LOG_FILE` constant before including `functions.php`:
+
+```sh
+tail -f path/to/your/logfile
+```
+
+Moving the downloaded file can fail if the destination resides on a different
+filesystem or lacks the proper permissions. When that happens the application
+logs the rename error and leaves the file in the download directory, so be sure
+to inspect the log to determine the cause.
+
+Warnings such as a failed `rename()` are logged but no longer stop the script,
+so the operation may continue using a fallback copy.
+
+## Manual Renames
+
+When renaming a downloaded video from the web interface, the new filename can
+include any characters except `/`, `\`, or the sequence `..`. If the name
+contains these invalid characters, the page will display `Invalid filename` and
+no changes will be applied. Any errors while moving the file are written to the
+error log described above.
+
+
+## Example Profiles
+
+During the first setup, Sujib creates a few sample profiles that you can use as a starting point. Each profile defines the maximum or minimum resolution passed to `yt-dlp`.
+
+| Profile Name | Resolution |
+|--------------|------------|
+| video-highest (4K) | >=1080p |
+| video-1440p (1440P) | up to 1440p |
+| video-1080p (1080P) | up to 1080p |
+| video-720p (720P) | up to 720p |
+| SD | up to 480p |
+
+## TODO
+
+- Directories management for each profile
+- Example profiles, like vertical videos
+- Choice of thumbnail quality, export options and MP4 embed
+- Multiple languages for subtitles
+- Your suggestions
+
+## Contributing
+
+Contributions are welcome! Please fork this repository and submit a pull request for any features, bug fixes, or enhancements.
+
+## Changelog (February 2026)
+
+### 🚀 Major Updates
+- **Asynchronous Queue System**: Introduced `worker.php` to handle downloads in the background via `proc_open`.
+- **Enhanced UI**: Replaced the progress bar with a dynamic "filling card" effect.
+- **Playlist Management**: Added a selection modal for YouTube playlists.
+- **Architecture Refactor**: Fully migrated to a template-based system (`.phtml`).
+- **Real-time Feedback**: Centered status messages during the preparation phase.
+
+### 🛡️ Security & Reliability
+- **CSRF Defense**: Implemented global CSRF protection using HTTP headers.
+- **SQL Security**: Migrated all database interactions to prepared statements.
+- **SQLite Optimization**: Added `busyTimeout` to handle concurrent access gracefully.
+- **yt-dlp Stability**: Integrated `ejs:github` remote components for better signature solving.
+
+### 🔧 Fixes
+- **Regex Logic**: Fixed a bug where renaming rules failed due to file extensions.
+- **MediaInfo Speed**: Switched to JSON output to reduce system calls by 7x.
+- **Process Control**: Added a "Terminate" feature to kill stuck or unwanted processes.
+
+## License
+
+Distributed under the GNU General Public License v3.0.
+
+## Contact
+
+Mick - [contact.mediapixel@gmail.com](mailto:contact.mediapixel@gmail.com)
+
+Project Link: [https://github.com/mediapixel/Sujib](https://github.com/mediapixel/Sujib)

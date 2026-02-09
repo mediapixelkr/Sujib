@@ -1,0 +1,49 @@
+# Ignore local SQLite database
+/db.sqlite
+
+# Ignore cached thumbnails but keep the directory
+cache/*
+!cache/.gitkeep
+!cache/.gitignore
+cache/.DS_Store
+
+# yt-dlp internal caches
+cache/youtube-nsig/
+cache/youtube-sigfuncs/
+cache/youtube-sts/
+cache/challenge-solver/
+
+# Composer dependencies
+vendor/
+composer.lock
+composer.phar
+.composer/
+
+# PHPUnit and tests
+phpunit.xml
+tests/
+.phpunit.result.cache
+
+# Ignore log files
+*.log
+error.log
+
+# Ignore contributor guidelines generated locally
+AGENTS.md
+
+# Ignore downloaded media artifacts
+*.mp4
+*.mkv
+*.webm
+*.part
+*.ytdl
+
+# Ignore temporary files
+*.tmp
+*.temp
+/tmp/
+/temp/
+
+# OS generated files
+.DS_Store
+Thumbs.db

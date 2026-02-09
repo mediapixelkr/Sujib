@@ -1,0 +1,23 @@
+<table>
+    <tr>
+        <td colspan="4" class="table_title" style="padding-bottom:5px"><?= htmlspecialchars($filename) ?></td>
+    </tr>
+    <tr>
+        <td width="50%" colspan="2"><i class="far fa-clock"></i> <b>Duration :</b> <?= htmlspecialchars($mediainfo['duration']) ?></td>
+        <td width="50%" colspan="2"><i class="fas fa-desktop"></i> <b>Resolution :</b> <?= htmlspecialchars($mediainfo['resolution']) ?></td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <table>
+                <tr>
+                    <td width="50%" colspan="2"><i class="fas fa-film"></i> <b>Video :</b> <?= htmlspecialchars($mediainfo['codec']) ?> @ <?= htmlspecialchars($mediainfo['bitrate']) ?></td>
+                    <td width="50%" colspan="2"><i class="fas fa-volume-up"></i> <b>Audio :</b> <?= htmlspecialchars($mediainfo['codec_audio']) ?> @ <?= htmlspecialchars($mediainfo['bitrate_audio']) ?></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><i class="far fa-calendar"></i> <b>Date :</b> <?= htmlspecialchars($date) ?></td>
+        <td colspan="2"><i class="far fa-hdd"></i> <b>Size :</b> <?= htmlspecialchars($mediainfo['size']) ?></td>
+    </tr>
+</table>
