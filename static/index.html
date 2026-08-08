@@ -83,31 +83,34 @@
 
                 </div>
 
-                <!-- CASCADING PANEL 1: CHOISIR UN PROFIL -->
-                <div id="cascade-profiles-panel" class="cascade-panel glass hidden">
-                    <div class="cascade-panel-header">
-                        <div class="cascade-header-left">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                            </svg>
-                            <span>CHOISIR UN PROFIL</span>
+                <!-- FLOATING OVERLAY CONTAINER (FLOATS ABOVE THE PAGE WITHOUT LAYOUT SHIFT) -->
+                <div id="cascade-overlay-wrapper" class="cascade-overlay-wrapper hidden">
+                    <!-- CASCADING PANEL 1: CHOISIR UN PROFIL -->
+                    <div id="cascade-profiles-panel" class="cascade-panel glass hidden">
+                        <div class="cascade-panel-header">
+                            <div class="cascade-header-left">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                                <span>CHOISIR UN PROFIL</span>
+                            </div>
                         </div>
+                        <div id="drag-profiles-list" class="cascade-grid profiles-grid" role="radiogroup" aria-label="Profils"></div>
                     </div>
-                    <div id="drag-profiles-list" class="cascade-grid profiles-grid" role="radiogroup" aria-label="Profils"></div>
-                </div>
 
-                <!-- CASCADING PANEL 2: CHOISIR UN DOSSIER DE DESTINATION -->
-                <div id="cascade-dests-panel" class="cascade-panel glass hidden">
-                    <div class="cascade-panel-header">
-                        <div class="cascade-header-left">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                            <span>CHOISIR UN DOSSIER DE DESTINATION</span>
+                    <!-- CASCADING PANEL 2: CHOISIR UN DOSSIER DE DESTINATION -->
+                    <div id="cascade-dests-panel" class="cascade-panel glass hidden">
+                        <div class="cascade-panel-header">
+                            <div class="cascade-header-left">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                <span>CHOISIR UN DOSSIER DE DESTINATION</span>
+                            </div>
+                            <div id="cascade-live-summary" class="cascade-live-summary hidden"></div>
                         </div>
-                        <div id="cascade-live-summary" class="cascade-live-summary hidden"></div>
+                        <div id="drag-dests-list" class="cascade-grid dests-grid" role="radiogroup" aria-label="Dossiers"></div>
                     </div>
-                    <div id="drag-dests-list" class="cascade-grid dests-grid" role="radiogroup" aria-label="Dossiers"></div>
                 </div>
 
                 <!-- SUCCESS / LAUNCH NOTIFICATION BANNER -->

@@ -677,7 +677,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (cascadeState.dragDepth === 0 && cascadeState.mode === 'dragging') {
                         resetCascadeState();
                     }
-                }, 600); // 600ms grace period so moving across gaps never collapses panel
+                }, 150); // 150ms grace period when leaving the entire component
             }
         });
 
@@ -717,6 +717,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 dropCard.click();
             }
         });
+
+        // Global drag completion safety listeners
+        window.addEventListener('dragend', () => {
+            resetCascadeState();
+        });
+
+        window.addEventListener('drop', (e) => {
+            if (!e.target.closest('.dest-card')) {
+                if (cascadeState.active && cascadeState.mode === 'dragging') {
+                    showToast('Sélection annulée', 'info');
+                }
+                resetCascadeState();
+            }
+        }, true);
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                resetCascadeState();
+            }
+        });
     }
 
     function activateCascadeDrag(initialUrl = null) {
@@ -727,9 +747,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (initialUrl) cascadeState.url = initialUrl;
 
         const dropCard = document.getElementById('drop-target-card');
+        const overlayWrapper = document.getElementById('cascade-overlay-wrapper');
         const profilesPanel = document.getElementById('cascade-profiles-panel');
 
         if (dropCard) dropCard.classList.add('drag-hovering');
+        if (overlayWrapper) overlayWrapper.classList.remove('hidden');
         if (profilesPanel) profilesPanel.classList.remove('hidden');
 
         renderCascadeProfiles();
@@ -973,10 +995,12 @@ document.addEventListener('DOMContentLoaded', () => {
         cascadeState.dragDepth = 0;
 
         const dropCard = document.getElementById('drop-target-card');
+        const overlayWrapper = document.getElementById('cascade-overlay-wrapper');
         const profilesPanel = document.getElementById('cascade-profiles-panel');
         const destsPanel = document.getElementById('cascade-dests-panel');
 
         if (dropCard) dropCard.classList.remove('drag-hovering');
+        if (overlayWrapper) overlayWrapper.classList.add('hidden');
         if (profilesPanel) profilesPanel.classList.add('hidden');
         if (destsPanel) destsPanel.classList.add('hidden');
 
