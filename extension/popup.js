@@ -13,9 +13,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     defaultProfile: '1'
   });
 
-  profileSelect.value = settings.defaultProfile;
+  const headers = {};
+  if (settings.authUser && settings.authPass) {
+    headers['Authorization'] = 'Basic ' + btoa(`${settings.authUser}:${settings.authPass}`);
+  }
 
-  // Get active tab URL
+  // Synchronize profiles dynamically from Sujib server API
+  await loadProfilesFromServer(settings.serverUrl, headers, settings.defaultProfile);
+
+  // Auto-detect active YouTube tab URL
   const tabs = await browser.tabs.query({ active: true, currentWindow: true });
   if (tabs && tabs[0] && tabs[0].url) {
     if (tabs[0].url.includes('youtube.com') || tabs[0].url.includes('youtu.be')) {
@@ -26,6 +32,45 @@ document.addEventListener('DOMContentLoaded', async () => {
   btnOptions.addEventListener('click', () => {
     browser.runtime.openOptionsPage();
   });
+
+  async function loadProfilesFromServer(baseUrl, reqHeaders, savedDefault) {
+    const endpoint = `${baseUrl.replace(/\/+$/, '')}/api/profiles`;
+    try {
+      const res = await fetch(endpoint, { headers: reqHeaders });
+      if (res.ok) {
+        const profiles = await res.json();
+        profileSelect.innerHTML = '';
+        if (profiles.length === 0) {
+          profileSelect.innerHTML = '<option value="1">Aucun profil actif</option>';
+          return;
+        }
+        profiles.forEach(prof => {
+          const opt = document.createElement('option');
+          opt.value = prof.id;
+          const destText = prof.dest_path ? ` 📁 ${prof.dest_path.split('/').pop()}` : '';
+          opt.textContent = `${prof.name} (${prof.container.toUpperCase()})${destText}`;
+          profileSelect.appendChild(opt);
+        });
+
+        if (savedDefault && profileSelect.querySelector(`option[value="${savedDefault}"]`)) {
+          profileSelect.value = savedDefault;
+        }
+        return;
+      }
+    } catch (err) {
+      console.warn('Erreur de synchro profils Sujib:', err);
+    }
+
+    // Fallback if server unreachable
+    profileSelect.innerHTML = `
+      <option value="1">4K (2160p)</option>
+      <option value="2">1440p (2K)</option>
+      <option value="3">1080p (Full HD)</option>
+      <option value="4">720p (HD)</option>
+      <option value="5">SD (480p)</option>
+      <option value="6">Audio Only (MP3)</option>
+    `;
+  }
 
   btnSend.addEventListener('click', async () => {
     const url = videoUrlInput.value.trim();
