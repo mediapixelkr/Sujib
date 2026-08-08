@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    function apiPath(endpoint) {
+        const base = window.location.pathname.replace(/\/+$/, '');
+        const path = endpoint.startsWith('/') ? endpoint : '/' + endpoint;
+        return `${base}/api${path}`;
+    }
+
     // State
     let profiles = [];
     let queueItems = [];
@@ -99,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // API Calls & Data Loaders
     async function loadStatus() {
         try {
-            const res = await fetch('/api/status');
+            const res = await fetch(apiPath('/status'));
             if (res.ok) {
                 const data = await res.json();
                 ytdlpVerText.textContent = data.ytdlp_version || 'Inconnu';
@@ -111,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadProfiles() {
         try {
-            const res = await fetch('/api/profiles');
+            const res = await fetch(apiPath('/profiles'));
             if (res.ok) {
                 profiles = await res.json();
                 renderProfiles();
@@ -123,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadQueue() {
         try {
-            const res = await fetch('/api/queue');
+            const res = await fetch(apiPath('/queue'));
             if (res.ok) {
                 queueItems = await res.json();
                 renderQueue();
@@ -135,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadHistory() {
         try {
-            const res = await fetch('/api/downloaded');
+            const res = await fetch(apiPath('/downloaded'));
             if (res.ok) {
                 historyItems = await res.json();
                 renderHistory();
@@ -147,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // SSE Connection for Live Progress
     function setupSSE() {
-        const evtSource = new EventSource('/api/events');
+        const evtSource = new EventSource(apiPath('/events'));
         evtSource.onmessage = (e) => {
             try {
                 const data = JSON.parse(e.data);
@@ -296,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnCancel.className = 'btn-sm btn-outline';
             btnCancel.textContent = 'Annuler';
             btnCancel.addEventListener('click', async () => {
-                await fetch(`/api/queue/${item.id}`, { method: 'DELETE' });
+                await fetch(apiPath(`/queue/${item.id}`), { method: 'DELETE' });
                 showToast('Téléchargement annulé', 'info');
                 loadQueue();
             });
@@ -362,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnDel.className = 'btn-sm btn-outline';
             btnDel.textContent = 'Supprimer';
             btnDel.addEventListener('click', async () => {
-                await fetch(`/api/downloaded/${item.id}?delete_file=true`, { method: 'DELETE' });
+                await fetch(apiPath(`/downloaded/${item.id}?delete_file=true`), { method: 'DELETE' });
                 showToast('Fichier et historique supprimés', 'success');
                 loadHistory();
             });
@@ -382,7 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('Analyse de l\'URL en cours...', 'info');
 
         try {
-            const res = await fetch('/api/analyze', {
+            const res = await fetch(apiPath('/analyze'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url })
@@ -400,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 openPlaylistModal(data, profileId);
             } else {
                 // Direct Video download request
-                const dlRes = await fetch('/api/download', {
+                const dlRes = await fetch(apiPath('/download'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -468,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Options Modal
         btnOpenOptions.addEventListener('click', async () => {
-            const res = await fetch('/api/options');
+            const res = await fetch(apiPath('/options'));
             if (res.ok) {
                 const opt = await res.json();
                 optDownloadDir.value = opt.download_dir || '';
@@ -494,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sub_lang: optSubLang.value.trim()
             };
 
-            const res = await fetch('/api/options', {
+            const res = await fetch(apiPath('/options'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
@@ -513,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Mise à jour de yt-dlp en cours...', 'info');
             btnUpdateYtdlp.disabled = true;
             try {
-                const res = await fetch('/api/update-ytdlp', { method: 'POST' });
+                const res = await fetch(apiPath('/update-ytdlp'), { method: 'POST' });
                 const data = await res.json();
                 if (data.success) {
                     showToast(data.message, 'success');
@@ -558,7 +564,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (const chk of checkedBoxes) {
                 const idx = parseInt(chk.dataset.index, 10);
                 const video = playlistData.videos[idx];
-                await fetch('/api/download', {
+                await fetch(apiPath('/download'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -624,7 +630,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 is_active: 1
             };
 
-            const url = pid > 0 ? `/api/profiles/${pid}` : '/api/profiles';
+            const url = pid > 0 ? apiPath(`/profiles/${pid}`) : apiPath('/profiles');
             const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -666,7 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadManagerProfiles() {
         const includeArchived = chkShowArchived.checked;
-        const res = await fetch(`/api/profiles?include_archived=${includeArchived}`);
+        const res = await fetch(apiPath(`/profiles?include_archived=${includeArchived}`));
         if (res.ok) {
             const list = await res.json();
             renderProfilesManagerList(list);
@@ -734,7 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnToggle.textContent = prof.is_active === 1 ? '📦 Archiver' : '🔄 Restaurer';
             btnToggle.addEventListener('click', async () => {
                 const newActive = prof.is_active === 1 ? 0 : 1;
-                await fetch(`/api/profiles/${prof.id}/toggle-active?is_active=${newActive}`, { method: 'POST' });
+                await fetch(apiPath(`/profiles/${prof.id}/toggle-active?is_active=${newActive}`), { method: 'POST' });
                 showToast(newActive === 1 ? 'Profil restauré !' : 'Profil archivé !', 'success');
                 await loadProfiles();
                 await loadManagerProfiles();
@@ -748,7 +754,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnDelete.textContent = '🗑️ Supprimer';
             btnDelete.addEventListener('click', async () => {
                 if (confirm(`Voulez-vous vraiment supprimer le profil "${prof.name}" ?`)) {
-                    await fetch(`/api/profiles/${prof.id}`, { method: 'DELETE' });
+                    await fetch(apiPath(`/profiles/${prof.id}`), { method: 'DELETE' });
                     showToast('Profil supprimé !', 'info');
                     await loadProfiles();
                     await loadManagerProfiles();
