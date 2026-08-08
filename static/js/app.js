@@ -691,15 +691,10 @@ document.addEventListener('DOMContentLoaded', () => {
         dropCard.addEventListener('drop', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            const extracted = extractUrl(e);
-            if (!extracted) {
-                showToast('Aucune URL valide trouvée', 'error');
-                return;
+            if (cascadeState.active && cascadeState.mode === 'dragging') {
+                showToast('Sélection annulée', 'info');
             }
-            cascadeState.url = extracted;
-            cascadeState.mode = 'click_pending';
-            activateCascadeDrag(extracted);
-            showToast('Lien enregistré ! Choisissez un profil puis un dossier.', 'info');
+            resetCascadeState();
         });
 
         // Drop Card Click Support
