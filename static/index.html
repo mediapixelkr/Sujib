@@ -3,31 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sujib (수집) - YouTube Video Download Manager</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="static/css/style.css">
+    <title>Sujib 수집 — Gestionnaire de Téléchargements YouTube</title>
+    <meta name="description" content="Sujib 2.0 — Téléchargez vos vidéos YouTube en haute qualité avec profils personnalisables, playlists, et organisation automatique.">
     <link rel="icon" type="image/x-icon" href="static/img/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="64x64" href="static/img/favicon-64.png">
     <link rel="icon" type="image/png" sizes="96x96" href="static/img/favicon-96.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
     <div class="app-container">
-        <!-- Header / Navigation Bar -->
-        <header class="navbar">
-            <div class="brand">
-                <img src="static/img/logo.svg" alt="Sujib Logo" class="brand-logo-img">
-                <div class="brand-text">
+        <header class="app-header glass">
+            <div class="header-brand">
+                <img src="static/img/favicon-96.png" alt="Sujib logo" class="brand-logo">
+                <div>
                     <span class="brand-name">SUJIB</span>
-                    <span class="brand-badge">수집 2.0</span>
+                    <span class="brand-tagline">수집 2.0</span>
                 </div>
             </div>
-
-            <div class="status-bar">
-                <div class="status-item">
-                    <span class="status-dot online"></span>
+            <div class="header-actions">
+                <div class="status-pill">
+                    <span class="status-dot"></span>
                     <span class="status-label">yt-dlp:</span>
                     <span id="ytdlp-ver-text" class="status-value">--</span>
                 </div>
@@ -47,13 +45,13 @@
             </div>
         </header>
 
-        <!-- Main Content Area -->
         <main class="content">
-            <!-- Top Section: 2 Side-by-Side Cards -->
+
+            <!-- TOP SECTION: 2 cards -->
             <section class="top-cards-section">
-                <div class="top-cards-container">
-                    
-                    <!-- LEFT CARD (1/3 Width): Interactive Multi-Layer Drag & Drop Target -->
+                <div id="top-cards-container" class="top-cards-container">
+
+                    <!-- LEFT CARD: Drag & Drop multi-layer target -->
                     <div id="drop-target-card" class="card-drag-target glass">
                         <div id="drop-normal-state" class="drop-normal-state">
                             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -62,29 +60,21 @@
                                 <line x1="12" y1="3" x2="12" y2="15"></line>
                             </svg>
                             <div class="drop-label-group">
-                                <span class="drop-main-label">Glisser un lien YouTube ici</span>
-                                <span class="drop-sub-label">Survolez pour choisir profil & dossier</span>
+                                <span class="drop-main-label">Glisser un lien ici</span>
+                                <span class="drop-sub-label">Choisir profil &amp; dossier au survol</span>
                             </div>
                         </div>
-
-                        <!-- Multi-layer Drop Zone: Appears on Drag Over -->
-                        <div id="drop-expanded-layer" class="drop-expanded-layer hidden">
+                        <div id="drop-expanded-layer" class="drop-expanded-layer" style="display:none;">
                             <div class="drop-layer-title">🎯 Glissez sur la qualité souhaitée :</div>
-                            <div id="drag-profiles-list" class="drag-profiles-list">
-                                <!-- Profile pills rendered dynamically -->
-                            </div>
+                            <div id="drag-profiles-list" class="drag-profiles-list"></div>
                         </div>
-
-                        <!-- Flyout preset path menu -->
-                        <div id="drag-paths-flyout" class="drag-paths-flyout hidden">
-                            <div id="flyout-profile-title" class="flyout-header">Dossier de destination :</div>
-                            <div id="flyout-paths-list" class="flyout-paths-list">
-                                <!-- Paths rendered dynamically -->
-                            </div>
+                        <div id="drag-paths-flyout" class="drag-paths-flyout" style="display:none;">
+                            <div id="flyout-profile-title" class="flyout-header">Dossier :</div>
+                            <div id="flyout-paths-list" class="flyout-paths-list"></div>
                         </div>
                     </div>
 
-                    <!-- RIGHT CARD (2/3 Width): URL Input Form -->
+                    <!-- RIGHT CARD: URL input -->
                     <div class="card-url-input glass">
                         <form id="url-form" class="url-form">
                             <div class="input-wrapper">
@@ -103,7 +93,7 @@
                 </div>
             </section>
 
-            <!-- Active Queue Section -->
+            <!-- QUEUE -->
             <section class="queue-section">
                 <div class="section-header">
                     <h2 class="section-title">File de Téléchargement En Cours</h2>
@@ -114,7 +104,7 @@
                 </div>
             </section>
 
-            <!-- History Section -->
+            <!-- HISTORY -->
             <section class="history-section">
                 <div class="section-header">
                     <h2 class="section-title">Historique des Fichiers Téléchargés</h2>
@@ -124,74 +114,119 @@
                     <div class="empty-state" id="history-empty">Aucun fichier dans l'historique.</div>
                 </div>
             </section>
+
         </main>
     </div>
 
-    <!-- Options & Configuration Modal (1200px Accordion Dashboard) -->
+    <!-- CONFIGURATION MODAL -->
     <div id="options-modal" class="modal-overlay hidden">
         <div class="modal-card glass modal-xl">
             <div class="modal-header">
-                <h3>⚙️ Panneau de Configuration Sujib 2.0</h3>
+                <h3>⚙️ Panneau de Configuration — Sujib 2.0</h3>
                 <button class="btn-close" id="btn-close-options">&times;</button>
             </div>
-            
+
             <div class="accordion-container">
-                <!-- Accordion 1: Preset Destination Paths -->
-                <div class="accordion-item active">
+
+                <!-- 1. Preset Paths -->
+                <div class="accordion-item active" id="acc-paths">
                     <button class="accordion-header" type="button">
-                        <span>📁 1. Chemins & Dossiers Prédéfinis (Albums US, MV K-Pop, EDM...)</span>
+                        <span>📁 1. Dossiers Prédéfinis (Albums US, MV K-Pop, EDM...)</span>
                         <span class="accordion-icon">▲</span>
                     </button>
                     <div class="accordion-content">
-                        <div class="preset-paths-manager">
-                            <p class="section-desc">Ajoutez vos dossiers de destination personnalisés. Ils s'afficheront au survol dans le menu Drag & Drop !</p>
-                            <div class="preset-add-form">
-                                <input type="text" id="preset-new-label" placeholder="Libellé (ex: MV K-Pop)" class="form-input" style="flex: 1;">
-                                <input type="text" id="preset-new-path" placeholder="Dossier absolu (ex: /var/www/html/sujib/downloads/KPop)" class="form-input" style="flex: 2;">
-                                <button id="btn-add-preset" class="btn-sm btn-primary" type="button">➕ Ajouter le dossier</button>
-                            </div>
-                            <div id="preset-paths-list" class="preset-paths-list">
-                                <!-- Preset path items rendered dynamically -->
-                            </div>
+                        <p class="section-desc">Ces dossiers apparaissent dans le menu Drag &amp; Drop pour choisir la destination.</p>
+                        <div class="preset-add-form">
+                            <input type="text" id="preset-new-label" placeholder="Libellé (ex: MV K-Pop)" class="form-input" style="flex:1;">
+                            <input type="text" id="preset-new-path" placeholder="Chemin absolu (ex: /data/downloads/kpop)" class="form-input" style="flex:2;">
+                            <button id="btn-add-preset" class="btn-sm btn-primary" type="button">➕ Ajouter</button>
                         </div>
+                        <div id="preset-paths-list" class="preset-paths-list"></div>
                     </div>
                 </div>
 
-                <!-- Accordion 2: Quality Profiles -->
-                <div class="accordion-item">
+                <!-- 2. Quality Profiles -->
+                <div class="accordion-item" id="acc-profiles">
                     <button class="accordion-header" type="button">
-                        <span>🎛️ 2. Gestion des Profils de Qualité (4K, 1080p, MP3...)</span>
+                        <span>🎛️ 2. Profils de Qualité (4K, 1080p, MP3...)</span>
                         <span class="accordion-icon">▼</span>
                     </button>
                     <div class="accordion-content">
-                        <div class="playlist-controls" style="margin-bottom: 14px;">
-                            <button id="btn-new-profile" class="btn-sm btn-primary" type="button">➕ Créer un profil</button>
-                            <label class="selected-counter">
-                                <input type="checkbox" id="chk-show-archived"> Afficher profils archivés
-                            </label>
+                        <!-- View: list -->
+                        <div id="pm-view-list">
+                            <div class="playlist-controls" style="margin-bottom:14px;">
+                                <button id="btn-new-profile" class="btn-sm btn-primary" type="button">➕ Créer un profil</button>
+                                <label class="selected-counter" style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                                    <input type="checkbox" id="chk-show-archived"> Afficher profils archivés
+                                </label>
+                            </div>
+                            <div id="profiles-manager-list" class="pm-container-grid"></div>
                         </div>
-                        <div id="profiles-manager-list" class="pm-container-grid">
-                            <!-- Grid rendered dynamically -->
+                        <!-- View: edit form -->
+                        <div id="pm-view-form" class="hidden">
+                            <div class="pm-form-header">
+                                <button id="btn-back-to-pm-list" class="btn-sm btn-outline" type="button">← Retour à la liste</button>
+                                <span id="pm-form-mode-title" class="pm-mode-title">Nouveau profil</span>
+                            </div>
+                            <form id="profile-edit-form" class="pm-form-layout" style="margin-top:16px;">
+                                <input type="hidden" id="prof-edit-id">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="prof-edit-name">Nom du profil :</label>
+                                        <input type="text" id="prof-edit-name" required class="form-input" placeholder="ex: 1080p (Full HD)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="prof-edit-dest">Dossier spécifique (optionnel) :</label>
+                                        <input type="text" id="prof-edit-dest" class="form-input" placeholder="Vide = dossier global">
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group half">
+                                            <label for="prof-edit-container">Conteneur :</label>
+                                            <select id="prof-edit-container" class="form-select">
+                                                <option value="mkv">MKV</option>
+                                                <option value="mp4">MP4</option>
+                                                <option value="webm">WebM</option>
+                                                <option value="mp3">MP3 (Audio)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group half">
+                                            <label for="prof-edit-res">Résolution / Tag :</label>
+                                            <input type="text" id="prof-edit-res" class="form-input" placeholder="ex: 1080p">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="prof-edit-format">Spécification yt-dlp (-f) :</label>
+                                        <input type="text" id="prof-edit-format" required class="form-input code-font" placeholder="bestvideo[height&lt;=1080]+bestaudio/best">
+                                        <small style="color:var(--text-muted);font-size:0.78rem;margin-top:4px;display:block;">Formule passée directement à <code>yt-dlp -f</code></small>
+                                    </div>
+                                    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+                                        <button type="button" class="btn-secondary" id="btn-cancel-profile-edit">Annuler</button>
+                                        <button type="submit" class="btn-primary">Enregistrer le Profil</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
 
-                <!-- Accordion 3: System Options -->
-                <div class="accordion-item">
+                <!-- 3. System Options -->
+                <div class="accordion-item" id="acc-system">
                     <button class="accordion-header" type="button">
-                        <span>⚙️ 3. Règles de Renommage & Options Système</span>
+                        <span>⚙️ 3. Règles de Renommage &amp; Options Système</span>
                         <span class="accordion-icon">▼</span>
                     </button>
                     <div class="accordion-content">
                         <form id="options-form" class="pm-form-layout">
                             <div class="form-col">
                                 <div class="form-group">
-                                    <label for="opt-download-dir">Dossier de destination par défaut (chemin absolu) :</label>
+                                    <label for="opt-download-dir">Dossier de destination par défaut :</label>
                                     <input type="text" id="opt-download-dir" required class="form-input">
                                 </div>
                                 <div class="form-group">
-                                    <label for="opt-rename-regex">Règles de renommage Regex (motif||remplacement par ligne) :</label>
-                                    <textarea id="opt-rename-regex" rows="4" class="form-input code-font"></textarea>
+                                    <label for="opt-rename-regex">Règles de renommage Regex (motif||remplacement) :</label>
+                                    <textarea id="opt-rename-regex" rows="5" class="form-input code-font"></textarea>
                                 </div>
                             </div>
                             <div class="form-col">
@@ -206,14 +241,14 @@
                                     </div>
                                     <div class="form-group half">
                                         <label for="opt-sub-lang">Langue sous-titres :</label>
-                                        <input type="text" id="opt-sub-lang" class="form-input">
+                                        <input type="text" id="opt-sub-lang" class="form-input" placeholder="fr, en...">
                                     </div>
                                 </div>
                                 <div class="form-group half">
-                                    <label for="opt-show-last">Historique affiché :</label>
-                                    <input type="number" id="opt-show-last" class="form-input">
+                                    <label for="opt-show-last">Historique affiché (nb) :</label>
+                                    <input type="number" id="opt-show-last" class="form-input" min="5" max="200">
                                 </div>
-                                <div class="modal-footer" style="padding: 0; margin-top: 20px; justify-content: flex-end;">
+                                <div style="margin-top:20px;text-align:right;">
                                     <button type="submit" class="btn-primary">Enregistrer les options</button>
                                 </div>
                             </div>
@@ -221,26 +256,26 @@
                     </div>
                 </div>
 
-                <!-- Accordion 4: Firefox Extension & Installers -->
-                <div class="accordion-item">
+                <!-- 4. Firefox Extension -->
+                <div class="accordion-item" id="acc-firefox">
                     <button class="accordion-header" type="button">
-                        <span>🦊 4. Module Firefox & Installateurs 1-Clic</span>
+                        <span>🦊 4. Module Firefox &amp; Installateurs 1-Clic</span>
                         <span class="accordion-icon">▼</span>
                     </button>
                     <div class="accordion-content">
-                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                            <div style="flex: 1; min-width: 250px;">
-                                <strong>Paquets d'extension Firefox :</strong>
-                                <div style="display: flex; gap: 10px; margin-top: 8px;">
-                                    <a href="static/sujib-firefox-extension.xpi" class="btn-sm btn-outline" style="text-decoration: none;" download>📦 Paquet .xpi</a>
-                                    <a href="static/sujib-firefox-extension.zip" class="btn-sm btn-outline" style="text-decoration: none;" download>📁 Archive .zip</a>
+                        <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                            <div style="flex:1;min-width:220px;">
+                                <strong>Extension Firefox :</strong>
+                                <div style="display:flex;gap:10px;margin-top:10px;">
+                                    <a href="static/sujib-firefox-extension.xpi" class="btn-sm btn-outline" style="text-decoration:none;" download>📦 .xpi</a>
+                                    <a href="static/sujib-firefox-extension.zip" class="btn-sm btn-outline" style="text-decoration:none;" download>📁 .zip</a>
                                 </div>
                             </div>
-                            <div style="flex: 2; min-width: 280px;">
-                                <strong>Installateurs Automatiques 1-Clic :</strong>
-                                <div style="display: flex; gap: 10px; margin-top: 8px;">
-                                    <a href="static/installers/install-windows.bat" class="btn-sm btn-primary" style="text-decoration: none;" download>💻 Installateur Windows (.bat)</a>
-                                    <a href="static/installers/install-linux.sh" class="btn-sm btn-outline" style="text-decoration: none;" download>🐧 Installateur Linux (.sh)</a>
+                            <div style="flex:2;min-width:280px;">
+                                <strong>Installateurs 1-Clic :</strong>
+                                <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
+                                    <a href="static/installers/install-windows.bat" class="btn-sm btn-primary" style="text-decoration:none;" download>💻 Windows (.bat)</a>
+                                    <a href="static/installers/install-linux.sh" class="btn-sm btn-outline" style="text-decoration:none;" download>🐧 Linux (.sh)</a>
                                 </div>
                             </div>
                         </div>
@@ -248,94 +283,14 @@
                 </div>
 
             </div>
-            
-            <div class="modal-footer" style="margin-top: 16px;">
+
+            <div class="modal-footer" style="margin-top:16px;">
                 <button type="button" class="btn-secondary" id="btn-done-options">Fermer</button>
             </div>
         </div>
     </div>
 
-    <!-- Unified Profile Manager Modal (1200px Width) -->
-    <div id="profiles-manager-modal" class="modal-overlay hidden">
-        <div class="modal-card glass modal-xl">
-            <div class="modal-header">
-                <h3 id="pm-modal-title">Gestionnaire des Profils</h3>
-                <button class="btn-close" id="btn-close-prof-manager">&times;</button>
-            </div>
-            <div class="modal-body">
-                <!-- VIEW 1: Profiles Grid List -->
-                <div id="pm-view-list">
-                    <div class="playlist-controls">
-                        <button id="btn-new-profile" class="btn-sm btn-primary">➕ Créer un profil</button>
-                        <label class="selected-counter">
-                            <input type="checkbox" id="chk-show-archived"> Afficher profils archivés
-                        </label>
-                    </div>
-                    <div id="profiles-manager-list" class="pm-container-grid">
-                        <!-- Grid rendered dynamically -->
-                    </div>
-                </div>
-
-                <!-- VIEW 2: Structured 2-Column Profile Form -->
-                <div id="pm-view-form" class="hidden">
-                    <div class="pm-form-header">
-                        <button id="btn-back-to-pm-list" class="btn-sm btn-outline">← Retour à la liste des profils</button>
-                        <span id="pm-form-mode-title" class="pm-mode-title">Nouveau profil</span>
-                    </div>
-                    <form id="profile-edit-form" class="pm-form-layout">
-                        <input type="hidden" id="prof-edit-id">
-                        
-                        <!-- Column 1: General & Paths -->
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label for="prof-edit-name">Nom du profil :</label>
-                                <input type="text" id="prof-edit-name" required class="form-input" placeholder="ex: 1080p (Full HD)">
-                            </div>
-                            <div class="form-group">
-                                <label for="prof-edit-dest">Dossier de destination spécifique :</label>
-                                <input type="text" id="prof-edit-dest" class="form-input" placeholder="ex: /var/www/html/sujib/downloads/4K (laisser vide pour dossier par défaut)">
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group half">
-                                    <label for="prof-edit-container">Format Conteneur :</label>
-                                    <select id="prof-edit-container" class="form-select">
-                                        <option value="mkv">MKV</option>
-                                        <option value="mp4">MP4</option>
-                                        <option value="webm">WebM</option>
-                                        <option value="mp3">MP3 (Audio)</option>
-                                    </select>
-                                </div>
-                                <div class="form-group half">
-                                    <label for="prof-edit-res">Résolution / Tag :</label>
-                                    <input type="text" id="prof-edit-res" class="form-input" placeholder="ex: 1080p">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Column 2: yt-dlp Formula & Actions -->
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label for="prof-edit-format">Spécification Format yt-dlp :</label>
-                                <input type="text" id="prof-edit-format" required class="form-input code-font" placeholder="bestvideo[height<=1080]+bestaudio/best">
-                                <small style="color: var(--text-muted); font-size: 0.78rem; margin-top: 4px;">
-                                    Formule passée directement à <code>yt-dlp -f</code> (ex: <code>bestvideo[height&lt;=2160]+bestaudio/best</code>).
-                                </small>
-                            </div>
-                            <div class="modal-footer" style="padding: 0; margin-top: 24px; justify-content: flex-end;">
-                                <button type="button" class="btn-secondary" id="btn-cancel-profile-edit">Annuler</button>
-                                <button type="submit" class="btn-primary">Enregistrer le Profil</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="modal-footer" id="pm-list-footer">
-                <button type="button" class="btn-secondary" id="btn-done-prof-manager">Fermer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Playlist Selection Modal -->
+    <!-- PLAYLIST MODAL -->
     <div id="playlist-modal" class="modal-overlay hidden">
         <div class="modal-card glass modal-lg">
             <div class="modal-header">
@@ -343,15 +298,13 @@
                 <button class="btn-close" id="btn-close-playlist">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Sélectionnez les vidéos de la playlist que vous souhaitez télécharger :</p>
+                <p>Sélectionnez les vidéos de la playlist à télécharger :</p>
                 <div class="playlist-controls">
                     <button id="btn-select-all" class="btn-sm btn-outline">Tout sélectionner</button>
                     <button id="btn-deselect-all" class="btn-sm btn-outline">Tout désélectionner</button>
                     <span id="playlist-selected-count" class="selected-counter">0 sélectionné(s)</span>
                 </div>
-                <div id="playlist-items-list" class="playlist-items-list">
-                    <!-- Playlist items rendered dynamically -->
-                </div>
+                <div id="playlist-items-list" class="playlist-items-list"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="btn-cancel-playlist">Annuler</button>
@@ -360,9 +313,7 @@
         </div>
     </div>
 
-    <!-- Notification Toast Container -->
     <div id="toast-container" class="toast-container"></div>
-
     <script src="static/js/app.js"></script>
 </body>
 </html>

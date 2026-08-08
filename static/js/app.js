@@ -1,11 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ─── API path helper (subpath aware) ─────────────────────────────────────
     function apiPath(endpoint) {
-        const base = window.location.pathname.replace(/\/+$/, '');
+        const base = window.location.pathname.replace(/\/+$/, '').replace(/\/[^/]*\.[^/]*$/, '');
+        // Detect if we're under /sujib/
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        const appBase = parts.length > 0 && !parts[parts.length-1].includes('.') ? window.location.pathname.replace(/\/$/, '') : window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
         const path = endpoint.startsWith('/') ? endpoint : '/' + endpoint;
-        return `${base}/api${path}`;
+        return `${appBase}/api${path}`;
     }
 
-    // State
+    // ─── State ────────────────────────────────────────────────────────────────
     let profiles = [];
     let presetPaths = [];
     let queueItems = [];
@@ -14,88 +18,86 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedProfileId = 1;
     let hoveredDragProfile = null;
 
-    // DOM Elements
-    const ytdlpVerText = document.getElementById('ytdlp-ver-text');
-    const btnUpdateYtdlp = document.getElementById('btn-update-ytdlp');
-    const btnOpenOptions = document.getElementById('btn-open-options');
-    const urlForm = document.getElementById('url-form');
-    const urlInput = document.getElementById('url-input');
+    // ─── DOM: Header ──────────────────────────────────────────────────────────
+    const ytdlpVerText    = document.getElementById('ytdlp-ver-text');
+    const btnUpdateYtdlp  = document.getElementById('btn-update-ytdlp');
+    const btnOpenOptions  = document.getElementById('btn-open-options');
 
-    // Interactive Drag Target Elements
-    const dropTargetCard = document.getElementById('drop-target-card');
-    const dropNormalState = document.getElementById('drop-normal-state');
-    const dropExpandedLayer = document.getElementById('drop-expanded-layer');
-    const dragProfilesList = document.getElementById('drag-profiles-list');
-    const dragPathsFlyout = document.getElementById('drag-paths-flyout');
+    // ─── DOM: Top Cards ───────────────────────────────────────────────────────
+    const topCardsContainer  = document.getElementById('top-cards-container');
+    const dropTargetCard     = document.getElementById('drop-target-card');
+    const dropNormalState    = document.getElementById('drop-normal-state');
+    const dropExpandedLayer  = document.getElementById('drop-expanded-layer');
+    const dragProfilesList   = document.getElementById('drag-profiles-list');
+    const dragPathsFlyout    = document.getElementById('drag-paths-flyout');
     const flyoutProfileTitle = document.getElementById('flyout-profile-title');
-    const flyoutPathsList = document.getElementById('flyout-paths-list');
+    const flyoutPathsList    = document.getElementById('flyout-paths-list');
 
-    // Preset Paths Elements
-    const presetNewLabel = document.getElementById('preset-new-label');
-    const presetNewPath = document.getElementById('preset-new-path');
-    const btnAddPreset = document.getElementById('btn-add-preset');
-    const presetPathsList = document.getElementById('preset-paths-list');
-    const btnDoneOptions = document.getElementById('btn-done-options');
-    const profilesGrid = document.getElementById('profiles-grid');
-    const queueList = document.getElementById('queue-list');
-    const queueEmpty = document.getElementById('queue-empty');
-    const queueCountBadge = document.getElementById('queue-count-badge');
-    const historyList = document.getElementById('history-list');
-    const historyEmpty = document.getElementById('history-empty');
+    // ─── DOM: URL Form ────────────────────────────────────────────────────────
+    const urlForm   = document.getElementById('url-form');
+    const urlInput  = document.getElementById('url-input');
+
+    // ─── DOM: Queue / History ─────────────────────────────────────────────────
+    const queueList         = document.getElementById('queue-list');
+    const queueEmpty        = document.getElementById('queue-empty');
+    const queueCountBadge   = document.getElementById('queue-count-badge');
+    const historyList       = document.getElementById('history-list');
+    const historyEmpty      = document.getElementById('history-empty');
     const historyCountBadge = document.getElementById('history-count-badge');
 
-    // Options Modal Elements
-    const optionsModal = document.getElementById('options-modal');
-    const optionsForm = document.getElementById('options-form');
-    const btnCloseOptions = document.getElementById('btn-close-options');
-    const btnCancelOptions = document.getElementById('btn-cancel-options');
+    // ─── DOM: Config Modal ────────────────────────────────────────────────────
+    const optionsModal   = document.getElementById('options-modal');
+    const btnCloseOptions= document.getElementById('btn-close-options');
+    const btnDoneOptions = document.getElementById('btn-done-options');
+
+    // Accordion section: Preset paths
+    const presetNewLabel  = document.getElementById('preset-new-label');
+    const presetNewPath   = document.getElementById('preset-new-path');
+    const btnAddPreset    = document.getElementById('btn-add-preset');
+    const presetPathsList = document.getElementById('preset-paths-list');
+
+    // Accordion section: Profiles
+    const pmViewList        = document.getElementById('pm-view-list');
+    const pmViewForm        = document.getElementById('pm-view-form');
+    const profilesManagerList = document.getElementById('profiles-manager-list');
+    const btnNewProfile     = document.getElementById('btn-new-profile');
+    const chkShowArchived   = document.getElementById('chk-show-archived');
+    const btnBackToPmList   = document.getElementById('btn-back-to-pm-list');
+    const pmFormModeTitle   = document.getElementById('pm-form-mode-title');
+    const profileEditForm   = document.getElementById('profile-edit-form');
+    const profEditId        = document.getElementById('prof-edit-id');
+    const profEditName      = document.getElementById('prof-edit-name');
+    const profEditDest      = document.getElementById('prof-edit-dest');
+    const profEditContainer = document.getElementById('prof-edit-container');
+    const profEditRes       = document.getElementById('prof-edit-res');
+    const profEditFormat    = document.getElementById('prof-edit-format');
+    const btnCancelProfileEdit = document.getElementById('btn-cancel-profile-edit');
+
+    // Accordion section: System options
+    const optionsForm    = document.getElementById('options-form');
     const optDownloadDir = document.getElementById('opt-download-dir');
     const optRenameRegex = document.getElementById('opt-rename-regex');
-    const optSubtitles = document.getElementById('opt-subtitles');
-    const optSubLang = document.getElementById('opt-sub-lang');
-    const optShowLast = document.getElementById('opt-show-last');
+    const optSubtitles   = document.getElementById('opt-subtitles');
+    const optSubLang     = document.getElementById('opt-sub-lang');
+    const optShowLast    = document.getElementById('opt-show-last');
 
-    // Playlist Modal Elements
-    const playlistModal = document.getElementById('playlist-modal');
-    const playlistTitle = document.getElementById('playlist-title');
-    const btnClosePlaylist = document.getElementById('btn-close-playlist');
-    const btnCancelPlaylist = document.getElementById('btn-cancel-playlist');
-    const btnConfirmPlaylist = document.getElementById('btn-confirm-playlist');
-    const btnSelectAll = document.getElementById('btn-select-all');
-    const btnDeselectAll = document.getElementById('btn-deselect-all');
+    // ─── DOM: Playlist Modal ──────────────────────────────────────────────────
+    const playlistModal         = document.getElementById('playlist-modal');
+    const playlistTitle         = document.getElementById('playlist-title');
+    const btnClosePlaylist      = document.getElementById('btn-close-playlist');
+    const btnCancelPlaylist     = document.getElementById('btn-cancel-playlist');
+    const btnConfirmPlaylist    = document.getElementById('btn-confirm-playlist');
+    const btnSelectAll          = document.getElementById('btn-select-all');
+    const btnDeselectAll        = document.getElementById('btn-deselect-all');
     const playlistSelectedCount = document.getElementById('playlist-selected-count');
-    const playlistItemsList = document.getElementById('playlist-items-list');
+    const playlistItemsList     = document.getElementById('playlist-items-list');
 
-    // Profile Edit Modal Elements
-    const profileEditModal = document.getElementById('profile-edit-modal');
-    const profileEditForm = document.getElementById('profile-edit-form');
-    const btnCloseProfileEdit = document.getElementById('btn-close-profile-edit');
-    const btnCancelProfileEdit = document.getElementById('btn-cancel-profile-edit');
-    const profEditId = document.getElementById('prof-edit-id');
-    const profEditName = document.getElementById('prof-edit-name');
-    const profEditDest = document.getElementById('prof-edit-dest');
-    const profEditContainer = document.getElementById('prof-edit-container');
-    const profEditRes = document.getElementById('prof-edit-res');
-    const profEditFormat = document.getElementById('prof-edit-format');
-
-    // Profile Manager Elements
-    const btnManageProfiles = document.getElementById('btn-manage-profiles');
-    const profilesManagerModal = document.getElementById('profiles-manager-modal');
-    const btnCloseProfManager = document.getElementById('btn-close-prof-manager');
-    const btnDoneProfManager = document.getElementById('btn-done-prof-manager');
-    const btnNewProfile = document.getElementById('btn-new-profile');
-    const chkShowArchived = document.getElementById('chk-show-archived');
-    const profilesManagerList = document.getElementById('profiles-manager-list');
-    const pmViewList = document.getElementById('pm-view-list');
-    const pmViewForm = document.getElementById('pm-view-form');
-    const btnBackToPmList = document.getElementById('btn-back-to-pm-list');
-    const pmFormModeTitle = document.getElementById('pm-form-mode-title');
-    const pmModalTitle = document.getElementById('pm-modal-title');
-
-    // Toast Container
+    // ─── DOM: Toast ───────────────────────────────────────────────────────────
     const toastContainer = document.getElementById('toast-container');
 
-    // Initialize App
+    // ─────────────────────────────────────────────────────────────────────────
+    // INIT
+    // ─────────────────────────────────────────────────────────────────────────
     init();
 
     async function init() {
@@ -110,20 +112,16 @@ document.addEventListener('DOMContentLoaded', () => {
         setupDragTarget();
     }
 
-    // Helper: Toast Notifications
+    // ─── Toast ────────────────────────────────────────────────────────────────
     function showToast(message, type = 'info') {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
         toast.textContent = message;
         toastContainer.appendChild(toast);
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-            }
-        }, 4000);
+        setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 4000);
     }
 
-    // API Calls & Data Loaders
+    // ─── API: Status ──────────────────────────────────────────────────────────
     async function loadStatus() {
         try {
             const res = await fetch(apiPath('/status'));
@@ -131,47 +129,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 ytdlpVerText.textContent = data.ytdlp_version || 'Inconnu';
             }
-        } catch (err) {
-            console.error('Error loading status', err);
-        }
+        } catch (err) { console.error('loadStatus error', err); }
     }
 
+    // ─── API: Profiles ────────────────────────────────────────────────────────
     async function loadProfiles() {
         try {
             const res = await fetch(apiPath('/profiles'));
-            if (res.ok) {
-                profiles = await res.json();
-                renderProfiles();
-            }
-        } catch (err) {
-            console.error('Error loading profiles', err);
-        }
+            if (res.ok) { profiles = await res.json(); }
+        } catch (err) { console.error('loadProfiles error', err); }
     }
 
-    async function loadQueue() {
-        try {
-            const res = await fetch(apiPath('/queue'));
-            if (res.ok) {
-                queueItems = await res.json();
-                renderQueue();
-            }
-        } catch (err) {
-            console.error('Error loading queue', err);
-        }
-    }
-
-    async function loadHistory() {
-        try {
-            const res = await fetch(apiPath('/downloaded'));
-            if (res.ok) {
-                historyItems = await res.json();
-                renderHistory();
-            }
-        } catch (err) {
-            console.error('Error loading history', err);
-        }
-    }
-
+    // ─── API: Preset Paths ────────────────────────────────────────────────────
     async function loadPresetPaths() {
         try {
             const res = await fetch(apiPath('/preset-paths'));
@@ -179,33 +148,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 presetPaths = await res.json();
                 renderPresetPathsList();
             }
-        } catch (err) {
-            console.error('Error loading preset paths', err);
-        }
+        } catch (err) { console.error('loadPresetPaths error', err); }
     }
 
     function renderPresetPathsList() {
         if (!presetPathsList) return;
         presetPathsList.replaceChildren();
-
         if (presetPaths.length === 0) {
-            presetPathsList.innerHTML = '<div class="empty-state">Aucun dossier pré-enregistré.</div>';
+            presetPathsList.innerHTML = '<div class="empty-state">Aucun dossier pré-enregistré. Ajoutez-en un ci-dessus.</div>';
             return;
         }
-
         presetPaths.forEach(item => {
             const row = document.createElement('div');
             row.className = 'preset-path-row';
 
             const info = document.createElement('div');
-            info.innerHTML = `<strong>${item.icon || '📁'} ${item.label}</strong> <span style="font-size:0.8rem; color:var(--text-muted); margin-left:8px;">${item.path || 'Dossier par défaut'}</span>`;
+            info.style.cssText = 'display:flex;flex-direction:column;gap:2px;';
+            info.innerHTML = `<strong>${item.icon || '📁'} ${item.label}</strong><span style="font-size:0.8rem;color:var(--text-muted);">${item.path || '— Dossier par défaut (global)'}</span>`;
 
             const btnDel = document.createElement('button');
             btnDel.className = 'btn-sm btn-outline';
-            btnDel.style.color = '#ef4444';
-            btnDel.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            btnDel.style.cssText = 'color:#ef4444;border-color:rgba(239,68,68,0.4);white-space:nowrap;';
             btnDel.textContent = '🗑️ Supprimer';
             btnDel.addEventListener('click', async () => {
+                if (!confirm(`Supprimer « ${item.label} » ?`)) return;
                 await fetch(apiPath(`/preset-paths/${item.id}`), { method: 'DELETE' });
                 showToast('Dossier supprimé', 'info');
                 await loadPresetPaths();
@@ -217,13 +183,143 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Accordion Control
+    // ─── API: Queue ───────────────────────────────────────────────────────────
+    async function loadQueue() {
+        try {
+            const res = await fetch(apiPath('/queue'));
+            if (res.ok) { queueItems = await res.json(); renderQueue(); }
+        } catch (err) { console.error('loadQueue error', err); }
+    }
+
+    function renderQueue() {
+        queueList.replaceChildren();
+        const active = queueItems.filter(i => ['pending','downloading'].includes(i.status));
+        queueCountBadge.textContent = active.length;
+
+        if (queueItems.length === 0) { queueList.appendChild(queueEmpty); return; }
+
+        queueItems.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'queue-item';
+
+            const info = document.createElement('div');
+            info.className = 'queue-info';
+
+            const title = document.createElement('span');
+            title.className = 'queue-title';
+            title.textContent = item.title || item.url;
+
+            const meta = document.createElement('span');
+            meta.className = 'queue-meta';
+            meta.textContent = `${item.profile_name || ''} · ${item.status}`;
+
+            const progressBar = document.createElement('div');
+            progressBar.className = 'queue-progress';
+            if (item.status === 'downloading') {
+                const fill = document.createElement('div');
+                fill.className = 'queue-progress-fill';
+                fill.style.width = `${item.progress_pct || 0}%`;
+                progressBar.appendChild(fill);
+            }
+
+            info.appendChild(title);
+            info.appendChild(meta);
+            if (item.status === 'downloading') info.appendChild(progressBar);
+
+            const actions = document.createElement('div');
+            actions.className = 'queue-actions';
+
+            if (['pending','downloading'].includes(item.status)) {
+                const btnCancel = document.createElement('button');
+                btnCancel.className = 'btn-sm btn-outline';
+                btnCancel.textContent = 'Annuler';
+                btnCancel.addEventListener('click', async () => {
+                    await fetch(apiPath(`/queue/${item.id}`), { method: 'DELETE' });
+                    showToast('Téléchargement annulé', 'info');
+                    loadQueue();
+                });
+                actions.appendChild(btnCancel);
+            }
+
+            row.appendChild(info);
+            row.appendChild(actions);
+            queueList.appendChild(row);
+        });
+    }
+
+    // ─── API: History ─────────────────────────────────────────────────────────
+    async function loadHistory() {
+        try {
+            const res = await fetch(apiPath('/downloaded'));
+            if (res.ok) { historyItems = await res.json(); renderHistory(); }
+        } catch (err) { console.error('loadHistory error', err); }
+    }
+
+    function renderHistory() {
+        historyList.replaceChildren();
+        historyCountBadge.textContent = historyItems.length;
+
+        if (historyItems.length === 0) { historyList.appendChild(historyEmpty); return; }
+
+        historyItems.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'history-item';
+
+            const info = document.createElement('div');
+            info.className = 'history-info';
+
+            const title = document.createElement('span');
+            title.className = 'history-title';
+            title.textContent = item.title || item.filename;
+
+            const meta = document.createElement('span');
+            meta.className = 'history-meta';
+            const size = item.filesize ? `${(item.filesize / 1024 / 1024).toFixed(1)} MB` : '';
+            meta.textContent = [item.resolution, item.format_info, size].filter(Boolean).join(' · ');
+
+            info.appendChild(title);
+            info.appendChild(meta);
+
+            const actions = document.createElement('div');
+            actions.className = 'history-actions';
+
+            const btnDel = document.createElement('button');
+            btnDel.className = 'btn-sm btn-outline';
+            btnDel.textContent = 'Supprimer';
+            btnDel.addEventListener('click', async () => {
+                await fetch(apiPath(`/downloaded/${item.id}?delete_file=true`), { method: 'DELETE' });
+                showToast('Fichier supprimé', 'success');
+                loadHistory();
+            });
+            actions.appendChild(btnDel);
+
+            row.appendChild(info);
+            row.appendChild(actions);
+            historyList.appendChild(row);
+        });
+    }
+
+    // ─── SSE ──────────────────────────────────────────────────────────────────
+    function setupSSE() {
+        const evtSource = new EventSource(apiPath('/events'));
+        evtSource.onmessage = (e) => {
+            try {
+                const data = JSON.parse(e.data);
+                if (['progress','completed','failed','cancelled'].includes(data.event)) {
+                    loadQueue();
+                    if (data.event === 'completed') loadHistory();
+                }
+            } catch (err) { console.error('SSE parse error', err); }
+        };
+    }
+
+    // ─── Accordion ────────────────────────────────────────────────────────────
     function setupAccordion() {
         document.querySelectorAll('.accordion-header').forEach(header => {
             header.addEventListener('click', () => {
                 const item = header.parentElement;
                 const isActive = item.classList.contains('active');
-                
+
                 document.querySelectorAll('.accordion-item').forEach(i => {
                     i.classList.remove('active');
                     const icon = i.querySelector('.accordion-icon');
@@ -234,525 +330,232 @@ document.addEventListener('DOMContentLoaded', () => {
                     item.classList.add('active');
                     const icon = header.querySelector('.accordion-icon');
                     if (icon) icon.textContent = '▲';
+                    // Load profiles when profiles accordion opens
+                    if (item.id === 'acc-profiles') loadManagerProfiles();
                 }
             });
         });
     }
 
-    // Multi-Layer Interactive Drag Target Setup
+    // ─── Drag & Drop Multi-Layer ──────────────────────────────────────────────
     function setupDragTarget() {
         if (!dropTargetCard) return;
-
         let dragLeaveTimer = null;
 
-        const expandTargetCard = () => {
+        const expand = () => {
+            if (dropTargetCard.classList.contains('expanded')) return;
+            topCardsContainer.classList.add('drag-expanded');
             dropTargetCard.classList.add('expanded');
-            dropNormalState.classList.add('hidden');
-            dropExpandedLayer.classList.remove('hidden');
+            dropNormalState.style.display = 'none';
+            dropExpandedLayer.style.display = 'flex';
             renderDragProfilePills();
         };
 
-        const resetTargetCard = () => {
+        const collapse = () => {
+            topCardsContainer.classList.remove('drag-expanded');
             dropTargetCard.classList.remove('expanded');
-            dropNormalState.classList.remove('hidden');
-            dropExpandedLayer.classList.add('hidden');
-            if (dragPathsFlyout) dragPathsFlyout.classList.add('hidden');
+            dropNormalState.style.display = 'flex';
+            dropExpandedLayer.style.display = 'none';
+            dragPathsFlyout.style.display = 'none';
             hoveredDragProfile = null;
+            document.querySelectorAll('.drag-profile-pill').forEach(p => p.classList.remove('active'));
         };
+
+        dropTargetCard.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            if (dragLeaveTimer) { clearTimeout(dragLeaveTimer); dragLeaveTimer = null; }
+            expand();
+        });
 
         dropTargetCard.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'copy';
-            if (dragLeaveTimer) clearTimeout(dragLeaveTimer);
-            if (!dropTargetCard.classList.contains('expanded')) {
-                expandTargetCard();
-            }
+            if (dragLeaveTimer) { clearTimeout(dragLeaveTimer); dragLeaveTimer = null; }
         });
 
         dropTargetCard.addEventListener('dragleave', (e) => {
-            dragLeaveTimer = setTimeout(() => {
-                resetTargetCard();
-            }, 400);
+            dragLeaveTimer = setTimeout(() => { collapse(); }, 300);
         });
 
         dropTargetCard.addEventListener('drop', async (e) => {
             e.preventDefault();
-            const text = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list');
-            resetTargetCard();
-
-            if (!text) {
-                showToast('Aucun lien valide détecté', 'error');
-                return;
-            }
-
+            collapse();
+            const text = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list') || '';
             const urlMatch = text.match(/https?:\/\/[^\s]+/);
-            const targetUrl = urlMatch ? urlMatch[0] : text.trim();
+            if (!urlMatch) { showToast('Aucun lien valide détecté', 'error'); return; }
 
-            if (!targetUrl.startsWith('http')) {
-                showToast('URL invalide', 'error');
-                return;
-            }
-
-            const activeProf = hoveredDragProfile || profiles[0];
-            const profId = activeProf ? activeProf.id : 1;
-
-            showToast(`Lancement du téléchargement (${activeProf ? activeProf.name : '4K'})...`, 'info');
+            const targetUrl = urlMatch[0];
+            const prof = hoveredDragProfile || profiles[0];
+            showToast(`Lancement: ${prof ? prof.name : 'Profil par défaut'}…`, 'info');
 
             await fetch(apiPath('/download'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    url: targetUrl,
-                    profile_id: profId
-                })
+                body: JSON.stringify({ url: targetUrl, profile_id: prof ? prof.id : 1 })
             });
-
             loadQueue();
         });
     }
 
     function renderDragProfilePills() {
-        if (!dragProfilesList) return;
         dragProfilesList.replaceChildren();
-
         profiles.forEach(prof => {
             const pill = document.createElement('div');
             pill.className = 'drag-profile-pill';
-            pill.textContent = `${prof.name} (${prof.container ? prof.container.toUpperCase() : 'MKV'})`;
-
-            pill.addEventListener('dragover', (e) => {
-                e.preventDefault();
+            pill.textContent = prof.name;
+            pill.addEventListener('dragenter', (e) => {
                 e.stopPropagation();
                 document.querySelectorAll('.drag-profile-pill').forEach(p => p.classList.remove('active'));
                 pill.classList.add('active');
                 hoveredDragProfile = prof;
                 showFlyoutPaths(prof);
             });
-
             dragProfilesList.appendChild(pill);
         });
     }
 
     function showFlyoutPaths(profile) {
-        if (!dragPathsFlyout) return;
-        flyoutProfileTitle.textContent = `📁 Dossier pour ${profile.name} :`;
+        flyoutProfileTitle.textContent = `📁 Destination pour ${profile.name} :`;
         flyoutPathsList.replaceChildren();
 
         presetPaths.forEach(pathItem => {
-            const pathPill = document.createElement('div');
-            pathPill.className = 'flyout-path-item';
-            pathPill.innerHTML = `<span>${pathItem.icon || '📁'} <strong>${pathItem.label}</strong></span> <span style="font-size:0.75rem; color:var(--text-muted);">${pathItem.path ? 'Dossier dédié' : 'Dossier par défaut'}</span>`;
+            const item = document.createElement('div');
+            item.className = 'flyout-path-item';
+            item.innerHTML = `<span>${pathItem.icon || '📁'} <strong>${pathItem.label}</strong></span><span style="font-size:0.75rem;color:var(--text-muted);">${pathItem.path ? '→ dédié' : '→ global'}</span>`;
 
-            pathPill.addEventListener('dragover', (e) => {
-                e.preventDefault();
+            item.addEventListener('dragenter', (e) => {
                 e.stopPropagation();
                 document.querySelectorAll('.flyout-path-item').forEach(pi => pi.classList.remove('drag-over'));
-                pathPill.classList.add('drag-over');
+                item.classList.add('drag-over');
             });
 
-            pathPill.addEventListener('drop', async (e) => {
+            item.addEventListener('drop', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-
-                const text = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list');
-                dropTargetCard.classList.remove('expanded');
-                dropNormalState.classList.remove('hidden');
-                dropExpandedLayer.classList.add('hidden');
-                dragPathsFlyout.classList.add('hidden');
-
-                if (!text) {
-                    showToast('Aucun lien valide détecté', 'error');
-                    return;
-                }
-
+                const text = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list') || '';
                 const urlMatch = text.match(/https?:\/\/[^\s]+/);
-                const targetUrl = urlMatch ? urlMatch[0] : text.trim();
 
-                if (!targetUrl.startsWith('http')) {
-                    showToast('URL invalide', 'error');
-                    return;
-                }
+                // collapse
+                topCardsContainer.classList.remove('drag-expanded');
+                dropTargetCard.classList.remove('expanded');
+                dropNormalState.style.display = 'flex';
+                dropExpandedLayer.style.display = 'none';
+                dragPathsFlyout.style.display = 'none';
+                hoveredDragProfile = null;
 
-                showToast(`🚀 Téléchargement lancé : ${profile.name} → ${pathItem.label}...`, 'success');
+                if (!urlMatch) { showToast('Aucun lien valide', 'error'); return; }
 
+                showToast(`🚀 ${profile.name} → ${pathItem.label}`, 'success');
                 await fetch(apiPath('/download'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        url: targetUrl,
-                        profile_id: profile.id,
-                        dest_path: pathItem.path || ''
-                    })
+                    body: JSON.stringify({ url: urlMatch[0], profile_id: profile.id, dest_path: pathItem.path || '' })
                 });
-
                 loadQueue();
             });
 
-            flyoutPathsList.appendChild(pathPill);
+            item.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); });
+
+            flyoutPathsList.appendChild(item);
         });
 
-        dragPathsFlyout.classList.remove('hidden');
+        dragPathsFlyout.style.display = 'block';
     }
 
-    // SSE Connection for Live Progress
-    function setupSSE() {
-        const evtSource = new EventSource(apiPath('/events'));
-        evtSource.onmessage = (e) => {
+    // ─── URL Form Submit ──────────────────────────────────────────────────────
+    function setupEventListeners() {
+        // URL form
+        urlForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const rawUrl = urlInput.value.trim();
+            if (!rawUrl) return;
+            showToast('Analyse de l\'URL en cours...', 'info');
+
             try {
-                const data = JSON.parse(e.data);
-                if (data.event === 'progress' || data.event === 'completed' || data.event === 'failed' || data.event === 'cancelled') {
-                    loadQueue();
-                    if (data.event === 'completed') {
-                        loadHistory();
+                const res = await fetch(apiPath('/analyze'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: rawUrl })
+                });
+
+                if (!res.ok) { showToast('Erreur lors de l\'analyse', 'error'); return; }
+                const data = await res.json();
+
+                if (data.is_playlist) {
+                    openPlaylistModal(data, selectedProfileId);
+                } else {
+                    const dlRes = await fetch(apiPath('/download'), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: rawUrl, title: data.title, video_id: data.video_id, profile_id: selectedProfileId })
+                    });
+                    if (dlRes.ok) {
+                        showToast('Téléchargement ajouté à la file !', 'success');
+                        urlInput.value = '';
+                        loadQueue();
+                    } else {
+                        showToast('Erreur lors du lancement du téléchargement', 'error');
                     }
                 }
             } catch (err) {
-                console.error('SSE parse error', err);
+                showToast('Erreur réseau', 'error');
+                console.error(err);
             }
-        };
-    }
-
-    // Render Profiles (with Drag & Drop support)
-    function renderProfiles() {
-        profilesGrid.replaceChildren();
-
-        profiles.forEach(profile => {
-            const card = document.createElement('div');
-            card.className = `profile-card ${profile.id === selectedProfileId ? 'selected' : ''}`;
-            card.dataset.profileId = profile.id;
-
-            // Edit button top corner
-            const editBtn = document.createElement('button');
-            editBtn.className = 'btn-profile-edit';
-            editBtn.title = 'Éditer ce profil (Dossier, Qualité, Conteneur)';
-            editBtn.innerHTML = '⚙️';
-            editBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openProfileEditModal(profile);
-            });
-
-            const iconDiv = document.createElement('div');
-            iconDiv.className = 'profile-icon';
-            iconDiv.innerHTML = profile.audio_only === 1
-                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>'
-                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>';
-
-            const nameDiv = document.createElement('div');
-            nameDiv.className = 'profile-name';
-            nameDiv.textContent = profile.name;
-
-            const subDiv = document.createElement('div');
-            subDiv.className = 'profile-sub';
-            subDiv.textContent = profile.container ? profile.container.toUpperCase() : 'MKV';
-
-            const destDiv = document.createElement('div');
-            destDiv.className = 'profile-dest-badge';
-            destDiv.title = profile.dest_path ? `Chemin spécifique: ${profile.dest_path}` : 'Dossier de destination par défaut';
-            destDiv.textContent = profile.dest_path ? `📁 ${profile.dest_path}` : '📁 Dossier par défaut';
-
-            card.appendChild(editBtn);
-            card.appendChild(iconDiv);
-            card.appendChild(nameDiv);
-            card.appendChild(subDiv);
-            card.appendChild(destDiv);
-
-            // Click handler
-            card.addEventListener('click', () => {
-                selectedProfileId = profile.id;
-                renderProfiles();
-            });
-
-            // Drag & Drop handlers
-            card.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                card.classList.add('drag-over');
-            });
-
-            card.addEventListener('dragleave', () => {
-                card.classList.remove('drag-over');
-            });
-
-            card.addEventListener('drop', (e) => {
-                e.preventDefault();
-                card.classList.remove('drag-over');
-                const text = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list');
-                if (text && text.trim().startsWith('http')) {
-                    urlInput.value = text.trim();
-                    handleAnalyzeOrDownload(text.trim(), profile.id);
-                }
-            });
-
-            profilesGrid.appendChild(card);
         });
-    }
 
-    // Render Active Queue Cards
-    function renderQueue() {
-        const activeItems = queueItems.filter(q => q.status === 'pending' || q.status === 'downloading');
-        queueCountBadge.textContent = activeItems.length;
-
-        if (activeItems.length === 0) {
-            queueEmpty.style.display = 'block';
-            queueList.replaceChildren(queueEmpty);
-            return;
-        }
-
-        queueEmpty.style.display = 'none';
-        queueList.replaceChildren();
-
-        activeItems.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'item-card';
-
-            const progressBg = document.createElement('div');
-            progressBg.className = 'progress-bg';
-            progressBg.style.width = `${item.progress_pct || 0}%`;
-
-            const content = document.createElement('div');
-            content.className = 'item-content';
-
-            const title = document.createElement('div');
-            title.className = 'item-title';
-            title.textContent = item.title || item.filename || 'Téléchargement en cours...';
-
-            const meta = document.createElement('div');
-            meta.className = 'item-meta';
-
-            const pSpan = document.createElement('span');
-            pSpan.textContent = `Profil: ${item.profile_name}`;
-
-            const pctSpan = document.createElement('span');
-            pctSpan.textContent = `${item.progress_pct || 0}%`;
-
-            const speedSpan = document.createElement('span');
-            speedSpan.textContent = item.speed || '';
-
-            const etaSpan = document.createElement('span');
-            etaSpan.textContent = item.eta ? `ETA: ${item.eta}` : '';
-
-            meta.appendChild(pSpan);
-            meta.appendChild(pctSpan);
-            if (item.speed) meta.appendChild(speedSpan);
-            if (item.eta) meta.appendChild(etaSpan);
-
-            content.appendChild(title);
-            content.appendChild(meta);
-
-            const actions = document.createElement('div');
-            actions.className = 'item-actions';
-
-            const btnCancel = document.createElement('button');
-            btnCancel.className = 'btn-sm btn-outline';
-            btnCancel.textContent = 'Annuler';
-            btnCancel.addEventListener('click', async () => {
-                await fetch(apiPath(`/queue/${item.id}`), { method: 'DELETE' });
-                showToast('Téléchargement annulé', 'info');
-                loadQueue();
-            });
-
-            actions.appendChild(btnCancel);
-
-            card.appendChild(progressBg);
-            card.appendChild(content);
-            card.appendChild(actions);
-
-            queueList.appendChild(card);
-        });
-    }
-
-    // Render Downloaded History Cards
-    function renderHistory() {
-        historyCountBadge.textContent = historyItems.length;
-
-        if (historyItems.length === 0) {
-            historyEmpty.style.display = 'block';
-            historyList.replaceChildren(historyEmpty);
-            return;
-        }
-
-        historyEmpty.style.display = 'none';
-        historyList.replaceChildren();
-
-        historyItems.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'item-card';
-
-            const content = document.createElement('div');
-            content.className = 'item-content';
-
-            const title = document.createElement('div');
-            title.className = 'item-title';
-            title.textContent = item.filename || item.title;
-
-            const meta = document.createElement('div');
-            meta.className = 'item-meta';
-
-            const resSpan = document.createElement('span');
-            resSpan.textContent = `Qualité: ${item.resolution || 'Auto'}`;
-
-            const sizeSpan = document.createElement('span');
-            const sizeMB = (item.filesize / (1024 * 1024)).toFixed(1);
-            sizeSpan.textContent = `${sizeMB} MB`;
-
-            const dateSpan = document.createElement('span');
-            dateSpan.textContent = item.downloaded_at ? item.downloaded_at.substring(0, 16) : '';
-
-            meta.appendChild(resSpan);
-            meta.appendChild(sizeSpan);
-            meta.appendChild(dateSpan);
-
-            content.appendChild(title);
-            content.appendChild(meta);
-
-            const actions = document.createElement('div');
-            actions.className = 'item-actions';
-
-            const btnDel = document.createElement('button');
-            btnDel.className = 'btn-sm btn-outline';
-            btnDel.textContent = 'Supprimer';
-            btnDel.addEventListener('click', async () => {
-                await fetch(apiPath(`/downloaded/${item.id}?delete_file=true`), { method: 'DELETE' });
-                showToast('Fichier et historique supprimés', 'success');
-                loadHistory();
-            });
-
-            actions.appendChild(btnDel);
-
-            card.appendChild(content);
-            card.appendChild(actions);
-
-            historyList.appendChild(card);
-        });
-    }
-
-    // Process Input URL or Dragged Link
-    async function handleAnalyzeOrDownload(url, profileId) {
-        if (!url) return;
-        showToast('Analyse de l\'URL en cours...', 'info');
-
-        try {
-            const res = await fetch(apiPath('/analyze'), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url })
-            });
-
-            if (!res.ok) {
-                const errData = await res.json();
-                showToast(errData.detail || 'Erreur lors de l\'analyse', 'error');
-                return;
+        // yt-dlp update
+        btnUpdateYtdlp.addEventListener('click', async () => {
+            showToast('Mise à jour de yt-dlp en cours...', 'info');
+            btnUpdateYtdlp.disabled = true;
+            try {
+                const res = await fetch(apiPath('/update-ytdlp'), { method: 'POST' });
+                const data = await res.json();
+                showToast(data.success ? data.message : (data.message || 'Mise à jour échouée'), data.success ? 'success' : 'error');
+                loadStatus();
+            } catch (err) {
+                showToast('Erreur réseau pendant la mise à jour', 'error');
+            } finally {
+                btnUpdateYtdlp.disabled = false;
             }
-
-            const data = await res.json();
-
-            if (data.type === 'playlist') {
-                openPlaylistModal(data, profileId);
-            } else {
-                // Direct Video download request
-                const dlRes = await fetch(apiPath('/download'), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        url: data.url,
-                        title: data.title,
-                        video_id: data.id,
-                        profile_id: profileId
-                    })
-                });
-
-                if (dlRes.ok) {
-                    showToast('Ajouté à la file de téléchargement !', 'success');
-                    urlInput.value = '';
-                    loadQueue();
-                } else {
-                    showToast('Erreur lors de l\'ajout à la file', 'error');
-                }
-            }
-        } catch (err) {
-            showToast('Erreur réseau lors de l\'analyse', 'error');
-        }
-    }
-
-    // Playlist Selection Modal Handling
-    function openPlaylistModal(playlistData, profileId) {
-        currentPlaylistData = { playlistData, profileId };
-        playlistTitle.textContent = `Playlist: ${playlistData.title} (${playlistData.videos.length} vidéos)`;
-        playlistItemsList.replaceChildren();
-
-        playlistData.videos.forEach((video, index) => {
-            const row = document.createElement('div');
-            row.className = 'playlist-item-row';
-
-            const chk = document.createElement('input');
-            chk.type = 'checkbox';
-            chk.checked = true;
-            chk.id = `pl-vid-${index}`;
-            chk.dataset.index = index;
-            chk.addEventListener('change', updatePlaylistCounter);
-
-            const label = document.createElement('label');
-            label.htmlFor = `pl-vid-${index}`;
-            label.textContent = video.title;
-
-            row.appendChild(chk);
-            row.appendChild(label);
-            playlistItemsList.appendChild(row);
         });
 
-        updatePlaylistCounter();
-        playlistModal.classList.remove('hidden');
-    }
-
-    function updatePlaylistCounter() {
-        const checkboxes = playlistItemsList.querySelectorAll('input[type="checkbox"]:checked');
-        playlistSelectedCount.textContent = `${checkboxes.length} sélectionné(s)`;
-    }
-
-    // Setup Form & Modal Listeners
-    function setupEventListeners() {
-        urlForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleAnalyzeOrDownload(urlInput.value.trim(), selectedProfileId);
-        });
-
-        // Options Modal
+        // Config modal open
         btnOpenOptions.addEventListener('click', async () => {
             const res = await fetch(apiPath('/options'));
             if (res.ok) {
                 const opt = await res.json();
                 optDownloadDir.value = opt.download_dir || '';
                 optRenameRegex.value = opt.rename_regex || '';
-                optSubtitles.value = opt.subtitles || 0;
-                optSubLang.value = opt.sub_lang || 'fr';
-                optShowLast.value = opt.show_last || 20;
-                optionsModal.classList.remove('hidden');
+                optSubtitles.value   = opt.subtitles || 0;
+                optSubLang.value     = opt.sub_lang || 'fr';
+                optShowLast.value    = opt.show_last || 20;
             }
+            await loadPresetPaths();
+            optionsModal.classList.remove('hidden');
         });
 
         const closeOptions = () => optionsModal.classList.add('hidden');
         btnCloseOptions.addEventListener('click', closeOptions);
-        if (btnDoneOptions) btnDoneOptions.addEventListener('click', closeOptions);
+        btnDoneOptions.addEventListener('click', closeOptions);
+        optionsModal.addEventListener('click', (e) => { if (e.target === optionsModal) closeOptions(); });
 
-        if (btnAddPreset) {
-            btnAddPreset.addEventListener('click', async () => {
-                const label = presetNewLabel.value.trim();
-                const path = presetNewPath.value.trim();
-                if (!label) {
-                    showToast('Veuillez saisir un libellé', 'info');
-                    return;
-                }
-                await fetch(apiPath('/preset-paths'), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ label, path, icon: '📁' })
-                });
-                presetNewLabel.value = '';
-                presetNewPath.value = '';
-                showToast('Nouveau dossier ajouté avec succès !', 'success');
-                await loadPresetPaths();
+        // Add preset path
+        btnAddPreset.addEventListener('click', async () => {
+            const label = presetNewLabel.value.trim();
+            const path = presetNewPath.value.trim();
+            if (!label) { showToast('Veuillez saisir un libellé', 'info'); return; }
+            await fetch(apiPath('/preset-paths'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ label, path, icon: '📁' })
             });
-        }
+            presetNewLabel.value = '';
+            presetNewPath.value = '';
+            showToast('Dossier ajouté !', 'success');
+            await loadPresetPaths();
+        });
 
+        // System options save
         optionsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const body = {
@@ -762,127 +565,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 subtitles: parseInt(optSubtitles.value, 10),
                 sub_lang: optSubLang.value.trim()
             };
-
             const res = await fetch(apiPath('/options'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
-
-            if (res.ok) {
-                showToast('Options enregistrées avec succès !', 'success');
-                closeOptions();
-            } else {
-                showToast('Erreur lors de l\'enregistrement des options', 'error');
-            }
+            showToast(res.ok ? 'Options enregistrées !' : 'Erreur lors de l\'enregistrement', res.ok ? 'success' : 'error');
         });
 
-        // yt-dlp Update Button
-        btnUpdateYtdlp.addEventListener('click', async () => {
-            showToast('Mise à jour de yt-dlp en cours...', 'info');
-            btnUpdateYtdlp.disabled = true;
-            try {
-                const res = await fetch(apiPath('/update-ytdlp'), { method: 'POST' });
-                const data = await res.json();
-                if (data.success) {
-                    showToast(data.message, 'success');
-                    loadStatus();
-                } else {
-                    showToast(data.message || 'Mise à jour échouée', 'error');
-                }
-            } catch (err) {
-                showToast('Erreur réseau pendant la mise à jour', 'error');
-            } finally {
-                btnUpdateYtdlp.disabled = false;
-            }
-        });
-
-        // Playlist Modal Actions
-        const closePlaylist = () => playlistModal.classList.add('hidden');
-        btnClosePlaylist.addEventListener('click', closePlaylist);
-        btnCancelPlaylist.addEventListener('click', closePlaylist);
-
-        btnSelectAll.addEventListener('click', () => {
-            playlistItemsList.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = true);
-            updatePlaylistCounter();
-        });
-
-        btnDeselectAll.addEventListener('click', () => {
-            playlistItemsList.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
-            updatePlaylistCounter();
-        });
-
-        btnConfirmPlaylist.addEventListener('click', async () => {
-            if (!currentPlaylistData) return;
-            const checkedBoxes = playlistItemsList.querySelectorAll('input[type="checkbox"]:checked');
-            if (checkedBoxes.length === 0) {
-                showToast('Veuillez sélectionner au moins une vidéo', 'info');
-                return;
-            }
-
-            const { playlistData, profileId } = currentPlaylistData;
-            closePlaylist();
-            showToast(`Ajout de ${checkedBoxes.length} vidéo(s) à la file...`, 'info');
-
-            for (const chk of checkedBoxes) {
-                const idx = parseInt(chk.dataset.index, 10);
-                const video = playlistData.videos[idx];
-                await fetch(apiPath('/download'), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        url: video.url,
-                        title: video.title,
-                        video_id: video.id,
-                        profile_id: profileId
-                    })
-                });
-            }
-
-            urlInput.value = '';
-            showToast('Toutes les vidéos sélectionnées ont été ajoutées !', 'success');
-            loadQueue();
-        });
-
-        // Profile Form Actions (Single Modal View Switching)
+        // Profile list/form view switching
         const showPmListView = () => {
             pmViewForm.classList.add('hidden');
             pmViewList.classList.remove('hidden');
-            pmModalTitle.textContent = "Gestionnaire des Profils";
-            btnDoneProfManager.style.display = 'inline-block';
         };
 
         const showPmFormView = (profile) => {
             pmViewList.classList.add('hidden');
             pmViewForm.classList.remove('hidden');
-            pmModalTitle.textContent = profile ? `Édition du profil : ${profile.name}` : "Nouveau profil";
-            pmFormModeTitle.textContent = profile ? `Édition du profil : ${profile.name}` : "Création d'un profil";
-            btnDoneProfManager.style.display = 'none';
-
+            pmFormModeTitle.textContent = profile ? `Édition: ${profile.name}` : 'Nouveau profil';
             if (profile) {
-                profEditId.value = profile.id;
-                profEditName.value = profile.name || '';
-                profEditDest.value = profile.dest_path || '';
+                profEditId.value        = profile.id;
+                profEditName.value      = profile.name || '';
+                profEditDest.value      = profile.dest_path || '';
                 profEditContainer.value = profile.container || 'mkv';
-                profEditRes.value = profile.max_res || '';
-                profEditFormat.value = profile.format_spec || '';
+                profEditRes.value       = profile.max_res || '';
+                profEditFormat.value    = profile.format_spec || '';
             } else {
-                profEditId.value = '';
-                profEditName.value = '';
-                profEditDest.value = '';
+                profEditId.value        = '';
+                profEditName.value      = '';
+                profEditDest.value      = '';
                 profEditContainer.value = 'mkv';
-                profEditRes.value = '1080p';
-                profEditFormat.value = 'bestvideo[height<=1080]+bestaudio/best';
+                profEditRes.value       = '1080p';
+                profEditFormat.value    = 'bestvideo[height<=1080]+bestaudio/best';
             }
         };
 
         btnBackToPmList.addEventListener('click', showPmListView);
         btnCancelProfileEdit.addEventListener('click', showPmListView);
 
+        btnNewProfile.addEventListener('click', () => showPmFormView(null));
+
+        chkShowArchived.addEventListener('change', loadManagerProfiles);
+
         profileEditForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const pidStr = profEditId.value;
-            const pid = pidStr ? parseInt(pidStr, 10) : 0;
+            const pid = profEditId.value ? parseInt(profEditId.value, 10) : 0;
             const body = {
                 name: profEditName.value.trim(),
                 dest_path: profEditDest.value.trim(),
@@ -892,16 +619,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 audio_only: profEditContainer.value === 'mp3' ? 1 : 0,
                 is_active: 1
             };
-
             const url = pid > 0 ? apiPath(`/profiles/${pid}`) : apiPath('/profiles');
             const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
-
             if (res.ok) {
-                showToast(pid > 0 ? 'Profil mis à jour !' : 'Nouveau profil créé !', 'success');
+                showToast(pid > 0 ? 'Profil mis à jour !' : 'Profil créé !', 'success');
                 showPmListView();
                 await loadProfiles();
                 await loadManagerProfiles();
@@ -910,31 +635,85 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Profile Manager Modal Actions
-        const closeProfManager = () => {
-            profilesManagerModal.classList.add('hidden');
-            showPmListView();
-        };
+        // Playlist modal
+        const closePlaylist = () => playlistModal.classList.add('hidden');
+        btnClosePlaylist.addEventListener('click', closePlaylist);
+        btnCancelPlaylist.addEventListener('click', closePlaylist);
 
-        btnManageProfiles.addEventListener('click', async () => {
-            await loadManagerProfiles();
-            showPmListView();
-            profilesManagerModal.classList.remove('hidden');
+        btnSelectAll.addEventListener('click', () => {
+            playlistItemsList.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = true);
+            updatePlaylistCounter();
         });
-        btnCloseProfManager.addEventListener('click', closeProfManager);
-        btnDoneProfManager.addEventListener('click', closeProfManager);
-
-        btnNewProfile.addEventListener('click', () => {
-            showPmFormView(null);
+        btnDeselectAll.addEventListener('click', () => {
+            playlistItemsList.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+            updatePlaylistCounter();
         });
 
-        chkShowArchived.addEventListener('change', () => {
-            loadManagerProfiles();
+        btnConfirmPlaylist.addEventListener('click', async () => {
+            if (!currentPlaylistData) return;
+            const checkedBoxes = playlistItemsList.querySelectorAll('input[type="checkbox"]:checked');
+            if (checkedBoxes.length === 0) { showToast('Sélectionnez au moins une vidéo', 'info'); return; }
+            const profileId = selectedProfileId;
+            const playlistData = currentPlaylistData;
+
+            showToast(`Ajout de ${checkedBoxes.length} vidéo(s) à la file…`, 'info');
+            closePlaylist();
+
+            for (const chk of checkedBoxes) {
+                const idx = parseInt(chk.dataset.index, 10);
+                const video = playlistData.videos[idx];
+                await fetch(apiPath('/download'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: video.url, title: video.title, video_id: video.id, profile_id: profileId })
+                });
+            }
+
+            urlInput.value = '';
+            showToast('Toutes les vidéos sélectionnées ont été ajoutées !', 'success');
+            loadQueue();
         });
     }
 
+    // ─── Playlist Modal ───────────────────────────────────────────────────────
+    function openPlaylistModal(data, profileId) {
+        currentPlaylistData = data;
+        playlistTitle.textContent = `Playlist : ${data.title || 'Sans titre'} (${data.videos ? data.videos.length : 0} vidéos)`;
+        playlistItemsList.replaceChildren();
+
+        (data.videos || []).forEach((video, idx) => {
+            const item = document.createElement('div');
+            item.className = 'playlist-item';
+
+            const chk = document.createElement('input');
+            chk.type = 'checkbox';
+            chk.checked = true;
+            chk.dataset.index = idx;
+            chk.id = `pl-item-${idx}`;
+            chk.addEventListener('change', updatePlaylistCounter);
+
+            const label = document.createElement('label');
+            label.htmlFor = `pl-item-${idx}`;
+            label.className = 'playlist-item-label';
+            label.textContent = video.title || `Vidéo ${idx + 1}`;
+
+            item.appendChild(chk);
+            item.appendChild(label);
+            playlistItemsList.appendChild(item);
+        });
+
+        updatePlaylistCounter();
+        playlistModal.classList.remove('hidden');
+    }
+
+    function updatePlaylistCounter() {
+        const checked = playlistItemsList.querySelectorAll('input[type="checkbox"]:checked').length;
+        playlistSelectedCount.textContent = `${checked} sélectionné(s)`;
+    }
+
+    // ─── Profile Manager (in accordion) ──────────────────────────────────────
     async function loadManagerProfiles() {
-        const includeArchived = chkShowArchived.checked;
+        const includeArchived = chkShowArchived ? chkShowArchived.checked : false;
         const res = await fetch(apiPath(`/profiles?include_archived=${includeArchived}`));
         if (res.ok) {
             const list = await res.json();
@@ -942,10 +721,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderProfilesManagerList(managerProfiles) {
+    function renderProfilesManagerList(list) {
         profilesManagerList.replaceChildren();
 
-        if (managerProfiles.length === 0) {
+        if (list.length === 0) {
             const empty = document.createElement('div');
             empty.className = 'empty-state';
             empty.style.gridColumn = '1 / -1';
@@ -954,50 +733,53 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        managerProfiles.forEach(prof => {
+        list.forEach(prof => {
             const card = document.createElement('div');
             card.className = 'pm-item-card';
 
-            // Top Header
             const header = document.createElement('div');
             header.className = 'pm-item-header';
-
             const title = document.createElement('span');
             title.className = 'pm-item-title';
             title.textContent = prof.name;
-
             const badge = document.createElement('span');
             badge.className = prof.is_active === 1 ? 'pm-badge-active' : 'pm-badge-archived';
             badge.textContent = prof.is_active === 1 ? 'Actif' : 'Archivé';
-
             header.appendChild(title);
             header.appendChild(badge);
 
-            // Middle Details
             const details = document.createElement('div');
             details.className = 'pm-item-details';
-
             const specInfo = document.createElement('div');
-            specInfo.innerHTML = `<strong>Conteneur :</strong> ${prof.container.toUpperCase()} &bull; <strong>Résolution :</strong> ${prof.max_res || 'Auto'}`;
-
+            specInfo.innerHTML = `<strong>${prof.container.toUpperCase()}</strong> · ${prof.max_res || 'Auto'}`;
             const pathPill = document.createElement('div');
             pathPill.className = 'pm-path-pill';
-            pathPill.textContent = prof.dest_path ? `📁 ${prof.dest_path}` : '📁 Dossier par défaut (global)';
-
+            pathPill.textContent = prof.dest_path ? `📁 ${prof.dest_path}` : '📁 Dossier global';
             details.appendChild(specInfo);
             details.appendChild(pathPill);
 
-            // Bottom Actions
             const actions = document.createElement('div');
             actions.className = 'pm-item-actions';
 
-            // Edit
             const btnEdit = document.createElement('button');
             btnEdit.className = 'btn-sm btn-outline';
             btnEdit.textContent = '✏️ Éditer';
-            btnEdit.addEventListener('click', () => showPmFormView(prof));
+            btnEdit.addEventListener('click', () => {
+                // Open profiles accordion if not already open
+                const accProfiles = document.getElementById('acc-profiles');
+                if (accProfiles && !accProfiles.classList.contains('active')) {
+                    document.querySelectorAll('.accordion-item').forEach(i => {
+                        i.classList.remove('active');
+                        const icon = i.querySelector('.accordion-icon');
+                        if (icon) icon.textContent = '▼';
+                    });
+                    accProfiles.classList.add('active');
+                    const icon = accProfiles.querySelector('.accordion-icon');
+                    if (icon) icon.textContent = '▲';
+                }
+                showPmFormViewInner(prof);
+            });
 
-            // Archive / Restore toggle
             const btnToggle = document.createElement('button');
             btnToggle.className = 'btn-sm btn-outline';
             btnToggle.textContent = prof.is_active === 1 ? '📦 Archiver' : '🔄 Restaurer';
@@ -1009,14 +791,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 await loadManagerProfiles();
             });
 
-            // Delete
             const btnDelete = document.createElement('button');
             btnDelete.className = 'btn-sm btn-outline';
-            btnDelete.style.color = '#ef4444';
-            btnDelete.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            btnDelete.style.cssText = 'color:#ef4444;border-color:rgba(239,68,68,0.4);';
             btnDelete.textContent = '🗑️ Supprimer';
             btnDelete.addEventListener('click', async () => {
-                if (confirm(`Voulez-vous vraiment supprimer le profil "${prof.name}" ?`)) {
+                if (confirm(`Supprimer le profil "${prof.name}" ?`)) {
                     await fetch(apiPath(`/profiles/${prof.id}`), { method: 'DELETE' });
                     showToast('Profil supprimé !', 'info');
                     await loadProfiles();
@@ -1031,13 +811,22 @@ document.addEventListener('DOMContentLoaded', () => {
             card.appendChild(header);
             card.appendChild(details);
             card.appendChild(actions);
-
             profilesManagerList.appendChild(card);
         });
     }
 
-    function openProfileEditModal(profile) {
-        profilesManagerModal.classList.remove('hidden');
-        showPmFormView(profile);
+    // Inner version (used when clicking Edit from card list)
+    function showPmFormViewInner(profile) {
+        pmViewList.classList.add('hidden');
+        pmViewForm.classList.remove('hidden');
+        pmFormModeTitle.textContent = profile ? `Édition: ${profile.name}` : 'Nouveau profil';
+        if (profile) {
+            profEditId.value        = profile.id;
+            profEditName.value      = profile.name || '';
+            profEditDest.value      = profile.dest_path || '';
+            profEditContainer.value = profile.container || 'mkv';
+            profEditRes.value       = profile.max_res || '';
+            profEditFormat.value    = profile.format_spec || '';
+        }
     }
 });
