@@ -1394,53 +1394,53 @@ body {
 
 .wallpaper-wave-back {
     will-change: transform;
-    animation: wallpaper-wave-drift-back 20s ease-in-out infinite;
+    animation: wallpaper-wave-drift-back 12s ease-in-out infinite;
 }
 
 .wallpaper-wave-main {
     will-change: transform;
-    animation: wallpaper-wave-drift-main 16s ease-in-out infinite;
+    animation: wallpaper-wave-drift-main 8s ease-in-out infinite;
 }
 
 .wallpaper-wave-front {
     will-change: transform;
-    animation: wallpaper-wave-drift-front 14s ease-in-out infinite;
+    animation: wallpaper-wave-drift-front 6s ease-in-out infinite;
 }
 
-/* Extremely subtle breathing / drift animations */
+/* Fluid & Clearly Visible Wave Motion */
 @keyframes wallpaper-wave-drift-back {
     0% {
-        transform: translate3d(-1%, 0, 0) scaleY(1);
+        transform: translate3d(-3%, 0, 0) scaleY(1);
     }
     50% {
-        transform: translate3d(1.5%, -8px, 0) scaleY(1.02);
+        transform: translate3d(3%, -18px, 0) scaleY(1.05);
     }
     100% {
-        transform: translate3d(-1%, 0, 0) scaleY(1);
+        transform: translate3d(-3%, 0, 0) scaleY(1);
     }
 }
 
 @keyframes wallpaper-wave-drift-main {
     0% {
-        transform: translate3d(1.5%, 3px, 0) scaleY(1);
+        transform: translate3d(3%, 8px, 0) scaleY(1.02);
     }
     50% {
-        transform: translate3d(-1%, -6px, 0) scaleY(1.015);
+        transform: translate3d(-3%, -14px, 0) scaleY(0.97);
     }
     100% {
-        transform: translate3d(1.5%, 3px, 0) scaleY(1);
+        transform: translate3d(3%, 8px, 0) scaleY(1.02);
     }
 }
 
 @keyframes wallpaper-wave-drift-front {
     0% {
-        transform: translate3d(-0.5%, 2px, 0) scaleY(1);
+        transform: translate3d(-2%, -6px, 0) scaleY(0.98);
     }
     50% {
-        transform: translate3d(1%, -4px, 0) scaleY(1.01);
+        transform: translate3d(2.5%, 10px, 0) scaleY(1.03);
     }
     100% {
-        transform: translate3d(-0.5%, 2px, 0) scaleY(1);
+        transform: translate3d(-2%, -6px, 0) scaleY(0.98);
     }
 }
 
