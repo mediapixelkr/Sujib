@@ -145,8 +145,9 @@ class DownloadQueueManager:
     async def _execute_download(self, qid: int, task_info: Dict[str, Any]):
         url = task_info['url']
         profile = task_info['profile']
+        options = get_options()
         # Use profile-specific dest_path if specified, otherwise fallback to options download_dir
-        profile_dest = profile.get('dest_path', '')
+        profile_dest = task_info.get('dest_path') or profile.get('dest_path', '')
         if profile_dest and profile_dest.strip():
             download_dir = profile_dest.strip()
         else:

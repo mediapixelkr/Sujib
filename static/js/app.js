@@ -337,129 +337,450 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ─── Drag & Drop Multi-Layer ──────────────────────────────────────────────
+    // ─── Drag & Drop Cascading Selector ──────────────────────────────────────
+    const cascadeState = {
+        active: false,
+        mode: 'idle', // 'idle' | 'dragging' | 'click_pending'
+        url: null,
+        hoveredProfile: null,
+        selectedProfile: null,
+        hoveredDest: null,
+        selectedDest: null,
+        dragDepth: 0,
+        hoverTimer: null,
+        leaveTimer: null
+    };
+
+    function extractUrl(e) {
+        if (!e || !e.dataTransfer) return cascadeState.url;
+        let text = '';
+        try {
+            text = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/html') || '';
+        } catch (err) {}
+        const match = text.match(/https?:\/\/[^\s"'<>()]+/i);
+        return match ? match[0] : cascadeState.url;
+    }
+
+    function isUrlDragPayload(e) {
+        if (!e.dataTransfer) return false;
+        const types = Array.from(e.dataTransfer.types || []);
+        return types.includes('text/uri-list') || types.includes('text/plain') || types.includes('text/html') || types.includes('URL');
+    }
+
     function setupDragTarget() {
-        if (!dropTargetCard) return;
-        let dragLeaveTimer = null;
+        const zone = document.getElementById('drag-cascade-zone');
+        const dropCard = document.getElementById('drop-target-card');
+        const panel = document.getElementById('drag-cascade-panel');
+        const btnCancel = document.getElementById('btn-cascade-cancel');
 
-        const expand = () => {
-            if (dropTargetCard.classList.contains('expanded')) return;
-            topCardsContainer.classList.add('drag-expanded');
-            dropTargetCard.classList.add('expanded');
-            dropNormalState.style.display = 'none';
-            dropExpandedLayer.style.display = 'flex';
-            renderDragProfilePills();
-        };
+        if (!zone || !dropCard) return;
 
-        const collapse = () => {
-            topCardsContainer.classList.remove('drag-expanded');
-            dropTargetCard.classList.remove('expanded');
-            dropNormalState.style.display = 'flex';
-            dropExpandedLayer.style.display = 'none';
-            dragPathsFlyout.style.display = 'none';
-            hoveredDragProfile = null;
-            document.querySelectorAll('.drag-profile-pill').forEach(p => p.classList.remove('active'));
-        };
-
-        dropTargetCard.addEventListener('dragenter', (e) => {
+        // Master Zone Drag Enter
+        zone.addEventListener('dragenter', (e) => {
+            if (!isUrlDragPayload(e)) return;
             e.preventDefault();
-            if (dragLeaveTimer) { clearTimeout(dragLeaveTimer); dragLeaveTimer = null; }
-            expand();
+            cascadeState.dragDepth++;
+            if (cascadeState.leaveTimer) {
+                clearTimeout(cascadeState.leaveTimer);
+                cascadeState.leaveTimer = null;
+            }
+            if (!cascadeState.active) {
+                activateCascadeDrag();
+            }
         });
 
-        dropTargetCard.addEventListener('dragover', (e) => {
+        // Master Zone Drag Over
+        zone.addEventListener('dragover', (e) => {
+            if (!isUrlDragPayload(e)) return;
             e.preventDefault();
             e.dataTransfer.dropEffect = 'copy';
-            if (dragLeaveTimer) { clearTimeout(dragLeaveTimer); dragLeaveTimer = null; }
+            if (cascadeState.leaveTimer) {
+                clearTimeout(cascadeState.leaveTimer);
+                cascadeState.leaveTimer = null;
+            }
         });
 
-        dropTargetCard.addEventListener('dragleave', (e) => {
-            dragLeaveTimer = setTimeout(() => { collapse(); }, 300);
+        // Master Zone Drag Leave
+        zone.addEventListener('dragleave', (e) => {
+            cascadeState.dragDepth = Math.max(0, cascadeState.dragDepth - 1);
+            if (cascadeState.dragDepth === 0 && cascadeState.mode === 'dragging') {
+                cascadeState.leaveTimer = setTimeout(() => {
+                    if (cascadeState.dragDepth === 0 && cascadeState.mode === 'dragging') {
+                        resetCascadeState();
+                    }
+                }, 150);
+            }
         });
 
-        dropTargetCard.addEventListener('drop', async (e) => {
+        // Drop Card Drag Over & Drop
+        dropCard.addEventListener('dragover', (e) => {
+            if (!isUrlDragPayload(e)) return;
             e.preventDefault();
-            collapse();
-            const text = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list') || '';
-            const urlMatch = text.match(/https?:\/\/[^\s]+/);
-            if (!urlMatch) { showToast('Aucun lien valide détecté', 'error'); return; }
-
-            const targetUrl = urlMatch[0];
-            const prof = hoveredDragProfile || profiles[0];
-            showToast(`Lancement: ${prof ? prof.name : 'Profil par défaut'}…`, 'info');
-
-            await fetch(apiPath('/download'), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: targetUrl, profile_id: prof ? prof.id : 1 })
-            });
-            loadQueue();
+            e.dataTransfer.dropEffect = 'copy';
         });
+
+        dropCard.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const extracted = extractUrl(e);
+            if (!extracted) {
+                showToast('Aucune URL valide trouvée', 'error');
+                return;
+            }
+            cascadeState.url = extracted;
+            cascadeState.mode = 'click_pending';
+            activateCascadeDrag(extracted);
+            revealDestinationRow();
+            showToast('Lien enregistré ! Cliquez sur un profil puis un dossier.', 'info');
+        });
+
+        // Drop Card Click Support (for direct click or keyboard)
+        dropCard.addEventListener('click', (e) => {
+            if (cascadeState.active && cascadeState.mode === 'click_pending') {
+                return;
+            }
+            cascadeState.mode = 'click_pending';
+            activateCascadeDrag();
+            revealDestinationRow();
+        });
+
+        dropCard.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                dropCard.click();
+            }
+        });
+
+        // Cancel button
+        if (btnCancel) {
+            btnCancel.addEventListener('click', (e) => {
+                e.stopPropagation();
+                resetCascadeState();
+            });
+        }
     }
 
-    function renderDragProfilePills() {
-        dragProfilesList.replaceChildren();
-        profiles.forEach(prof => {
+    function activateCascadeDrag(initialUrl = null) {
+        cascadeState.active = true;
+        if (cascadeState.mode === 'idle') {
+            cascadeState.mode = 'dragging';
+        }
+        if (initialUrl) cascadeState.url = initialUrl;
+
+        const dropCard = document.getElementById('drop-target-card');
+        const panel = document.getElementById('drag-cascade-panel');
+        const profileRow = document.getElementById('cascade-profile-row');
+
+        if (dropCard) dropCard.classList.add('drag-hovering');
+        if (panel) panel.classList.remove('hidden');
+        if (profileRow) profileRow.classList.remove('hidden');
+
+        renderCascadeProfiles();
+        updateSummaryText();
+    }
+
+    function renderCascadeProfiles() {
+        const listEl = document.getElementById('drag-profiles-list');
+        if (!listEl) return;
+        listEl.replaceChildren();
+
+        const activeProfiles = profiles.length > 0 ? profiles : [
+            { id: 1, name: '4K (2160p)', max_res: '2160p', container: 'mkv' },
+            { id: 2, name: '1440p (2K)', max_res: '1440p', container: 'mkv' },
+            { id: 3, name: '1080p (Full HD)', max_res: '1080p', container: 'mkv' },
+            { id: 4, name: '720p (HD)', max_res: '720p', container: 'mp4' },
+            { id: 5, name: 'Audio Only (MP3)', max_res: 'audio', container: 'mp3' }
+        ];
+
+        activeProfiles.forEach(prof => {
             const pill = document.createElement('div');
-            pill.className = 'drag-profile-pill';
-            pill.textContent = prof.name;
-            pill.addEventListener('dragenter', (e) => {
-                e.stopPropagation();
-                document.querySelectorAll('.drag-profile-pill').forEach(p => p.classList.remove('active'));
+            pill.className = 'cascade-pill profile-pill';
+            pill.tabIndex = 0;
+            pill.role = 'button';
+            pill.setAttribute('aria-label', `Profil ${prof.name}`);
+
+            if (cascadeState.selectedProfile && cascadeState.selectedProfile.id === prof.id) {
                 pill.classList.add('active');
-                hoveredDragProfile = prof;
-                showFlyoutPaths(prof);
-            });
-            dragProfilesList.appendChild(pill);
-        });
-    }
+            }
 
-    function showFlyoutPaths(profile) {
-        flyoutProfileTitle.textContent = `📁 Destination pour ${profile.name} :`;
-        flyoutPathsList.replaceChildren();
+            pill.innerHTML = `
+                <div class="cascade-pill-header">
+                    <span>${prof.name}</span>
+                    <span class="cascade-pill-tag">${(prof.container || 'mkv').toUpperCase()}</span>
+                </div>
+                <div class="cascade-pill-sub">${prof.max_res || 'Auto'}</div>
+            `;
 
-        presetPaths.forEach(pathItem => {
-            const item = document.createElement('div');
-            item.className = 'flyout-path-item';
-            item.innerHTML = `<span>${pathItem.icon || '📁'} <strong>${pathItem.label}</strong></span><span style="font-size:0.75rem;color:var(--text-muted);">${pathItem.path ? '→ dédié' : '→ global'}</span>`;
-
-            item.addEventListener('dragenter', (e) => {
-                e.stopPropagation();
-                document.querySelectorAll('.flyout-path-item').forEach(pi => pi.classList.remove('drag-over'));
-                item.classList.add('drag-over');
-            });
-
-            item.addEventListener('drop', async (e) => {
+            // Drag Enter / Over
+            pill.addEventListener('dragenter', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const text = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list') || '';
-                const urlMatch = text.match(/https?:\/\/[^\s]+/);
-
-                // collapse
-                topCardsContainer.classList.remove('drag-expanded');
-                dropTargetCard.classList.remove('expanded');
-                dropNormalState.style.display = 'flex';
-                dropExpandedLayer.style.display = 'none';
-                dragPathsFlyout.style.display = 'none';
-                hoveredDragProfile = null;
-
-                if (!urlMatch) { showToast('Aucun lien valide', 'error'); return; }
-
-                showToast(`🚀 ${profile.name} → ${pathItem.label}`, 'success');
-                await fetch(apiPath('/download'), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: urlMatch[0], profile_id: profile.id, dest_path: pathItem.path || '' })
-                });
-                loadQueue();
+                handleProfileHover(prof);
             });
 
-            item.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); });
+            pill.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.dataTransfer.dropEffect = 'copy';
+            });
 
-            flyoutPathsList.appendChild(item);
+            // Early Drop on Profile
+            pill.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const url = extractUrl(e) || cascadeState.url;
+                if (!url) {
+                    showToast('Aucun lien valide détecté', 'error');
+                    return;
+                }
+                cascadeState.url = url;
+                cascadeState.selectedProfile = prof;
+                cascadeState.mode = 'click_pending';
+                updateProfilePillsSelection(prof.id);
+                revealDestinationRow();
+                showToast(`Profil ${prof.name} sélectionné. Cliquez sur un dossier pour lancer.`, 'info');
+            });
+
+            // Click Support
+            pill.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cascadeState.selectedProfile = prof;
+                updateProfilePillsSelection(prof.id);
+                revealDestinationRow();
+            });
+
+            // Keyboard Focus & Keydown Support
+            pill.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    pill.click();
+                }
+            });
+
+            listEl.appendChild(pill);
         });
+    }
 
-        dragPathsFlyout.style.display = 'block';
+    function handleProfileHover(prof) {
+        cascadeState.hoveredProfile = prof;
+        cascadeState.selectedProfile = prof;
+
+        updateProfilePillsSelection(prof.id);
+        updateSummaryText();
+
+        if (cascadeState.hoverTimer) clearTimeout(cascadeState.hoverTimer);
+        cascadeState.hoverTimer = setTimeout(() => {
+            revealDestinationRow();
+        }, 120); // 100-150ms delay
+    }
+
+    function updateProfilePillsSelection(selectedId) {
+        const listEl = document.getElementById('drag-profiles-list');
+        if (!listEl) return;
+        const activeProfiles = profiles.length > 0 ? profiles : [
+            { id: 1, name: '4K (2160p)' }, { id: 2, name: '1440p (2K)' },
+            { id: 3, name: '1080p (Full HD)' }, { id: 4, name: '720p (HD)' }, { id: 5, name: 'Audio Only (MP3)' }
+        ];
+
+        listEl.querySelectorAll('.cascade-pill').forEach((pill, idx) => {
+            const p = activeProfiles[idx];
+            if (p && p.id === selectedId) {
+                pill.classList.add('active');
+            } else {
+                pill.classList.remove('active');
+            }
+        });
+    }
+
+    function revealDestinationRow() {
+        const destRow = document.getElementById('cascade-dest-row');
+        if (destRow) destRow.classList.remove('hidden');
+        renderCascadeDestinations();
+        updateSummaryText();
+    }
+
+    function renderCascadeDestinations() {
+        const listEl = document.getElementById('drag-dests-list');
+        if (!listEl) return;
+        listEl.replaceChildren();
+
+        const activeDests = presetPaths.length > 0 ? presetPaths : [
+            { id: 1, label: 'Dossier par défaut (Global)', path: '', icon: '📁' },
+            { id: 2, label: 'Albums US', path: '/var/www/html/sujib/downloads/Albums_US', icon: '💿' },
+            { id: 3, label: 'MV K-Pop', path: '/var/www/html/sujib/downloads/KPop_MV', icon: '🎵' },
+            { id: 4, label: 'Musique / EDM', path: '/var/www/html/sujib/downloads/EDM', icon: '🎧' }
+        ];
+
+        activeDests.forEach(dest => {
+            const pill = document.createElement('div');
+            pill.className = 'cascade-pill dest-pill';
+            pill.tabIndex = 0;
+            pill.role = 'button';
+            pill.setAttribute('aria-label', `Dossier ${dest.label}`);
+
+            if (cascadeState.selectedDest && (cascadeState.selectedDest.id === dest.id || cascadeState.selectedDest.path === dest.path)) {
+                pill.classList.add('active');
+            }
+
+            const pathDisplay = dest.path ? dest.path : '— Dossier par défaut (Global)';
+
+            pill.innerHTML = `
+                <div class="cascade-pill-header">
+                    <span>${dest.icon || '📁'} ${dest.label}</span>
+                </div>
+                <div class="cascade-pill-sub">${pathDisplay}</div>
+            `;
+
+            // Drag Enter / Over
+            pill.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDestHover(dest);
+            });
+
+            pill.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.dataTransfer.dropEffect = 'copy';
+            });
+
+            // Drop on Destination Pill -> Instant Launch Download!
+            pill.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                await handleDestinationDrop(dest, e);
+            });
+
+            // Click Support
+            pill.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                cascadeState.selectedDest = dest;
+                updateDestPillsSelection(dest.id || dest.path);
+
+                if (cascadeState.url) {
+                    await handleDestinationDrop(dest, null);
+                } else {
+                    showToast(`Dossier « ${dest.label} » sélectionné. Collez une URL dans la barre de droite pour lancer.`, 'info');
+                }
+            });
+
+            pill.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    pill.click();
+                }
+            });
+
+            listEl.appendChild(pill);
+        });
+    }
+
+    function handleDestHover(dest) {
+        cascadeState.hoveredDest = dest;
+        cascadeState.selectedDest = dest;
+
+        updateDestPillsSelection(dest.id || dest.path);
+        updateSummaryText();
+    }
+
+    function updateDestPillsSelection(selectedKey) {
+        const listEl = document.getElementById('drag-dests-list');
+        if (!listEl) return;
+        const activeDests = presetPaths.length > 0 ? presetPaths : [
+            { id: 1, label: 'Dossier par défaut (Global)', path: '', icon: '📁' },
+            { id: 2, label: 'Albums US', path: '/var/www/html/sujib/downloads/Albums_US', icon: '💿' },
+            { id: 3, label: 'MV K-Pop', path: '/var/www/html/sujib/downloads/KPop_MV', icon: '🎵' },
+            { id: 4, label: 'Musique / EDM', path: '/var/www/html/sujib/downloads/EDM', icon: '🎧' }
+        ];
+
+        listEl.querySelectorAll('.cascade-pill').forEach((pill, idx) => {
+            const d = activeDests[idx];
+            if (d && (d.id === selectedKey || d.path === selectedKey)) {
+                pill.classList.add('active');
+            } else {
+                pill.classList.remove('active');
+            }
+        });
+    }
+
+    async function handleDestinationDrop(dest, e) {
+        const url = (e ? extractUrl(e) : null) || cascadeState.url;
+
+        if (!url) {
+            showToast('Aucun lien YouTube valide détecté', 'error');
+            return;
+        }
+
+        const prof = cascadeState.selectedProfile || profiles[0] || { id: 1, name: 'Default' };
+        const destPath = dest.path || '';
+        const destLabel = dest.label || 'Dossier par défaut';
+
+        showToast(`🚀 Téléchargement : ${prof.name} ➔ ${destLabel}`, 'success');
+
+        try {
+            const res = await fetch(apiPath('/download'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    url: url,
+                    profile_id: prof.id,
+                    dest_path: destPath
+                })
+            });
+
+            if (res.ok) {
+                showToast('Ajouté à la file de téléchargement !', 'success');
+                loadQueue();
+            } else {
+                showToast('Erreur lors de l\'ajout à la file', 'error');
+            }
+        } catch (err) {
+            showToast('Erreur réseau pendant le téléchargement', 'error');
+        }
+
+        resetCascadeState();
+    }
+
+    function updateSummaryText() {
+        const summaryEl = document.getElementById('cascade-summary-text');
+        if (!summaryEl) return;
+
+        const profName = cascadeState.selectedProfile ? cascadeState.selectedProfile.name : null;
+        const destLabel = cascadeState.selectedDest ? cascadeState.selectedDest.label : null;
+        const destPath = cascadeState.selectedDest ? cascadeState.selectedDest.path : null;
+
+        if (profName && destLabel) {
+            const pathDesc = destPath ? ` (${destPath})` : '';
+            summaryEl.innerHTML = `<span class="status-icon">🚀</span> Sélection : <strong>${profName}</strong> ➔ <strong>${destLabel}</strong><span style="color:var(--text-muted);">${pathDesc}</span> &mdash; Relâchez le clic pour lancer.`;
+        } else if (profName) {
+            summaryEl.innerHTML = `<span class="status-icon">🎯</span> Profil <strong>${profName}</strong> &mdash; Survolez ou cliquez sur un dossier de destination ci-dessous.`;
+        } else if (cascadeState.url) {
+            summaryEl.innerHTML = `<span class="status-icon">🔗</span> URL enregistrée &mdash; Choisissez un profil puis un dossier.`;
+        } else {
+            summaryEl.innerHTML = `<span class="status-icon">💡</span> Survolez un profil, puis un dossier de destination, et relâchez le clic.`;
+        }
+    }
+
+    function resetCascadeState() {
+        if (cascadeState.hoverTimer) clearTimeout(cascadeState.hoverTimer);
+        if (cascadeState.leaveTimer) clearTimeout(cascadeState.leaveTimer);
+
+        cascadeState.active = false;
+        cascadeState.mode = 'idle';
+        cascadeState.url = null;
+        cascadeState.hoveredProfile = null;
+        cascadeState.selectedProfile = null;
+        cascadeState.hoveredDest = null;
+        cascadeState.selectedDest = null;
+        cascadeState.dragDepth = 0;
+
+        const dropCard = document.getElementById('drop-target-card');
+        const panel = document.getElementById('drag-cascade-panel');
+        const destRow = document.getElementById('cascade-dest-row');
+
+        if (dropCard) dropCard.classList.remove('drag-hovering');
+        if (panel) panel.classList.add('hidden');
+        if (destRow) destRow.classList.add('hidden');
     }
 
     // ─── URL Form Submit ──────────────────────────────────────────────────────

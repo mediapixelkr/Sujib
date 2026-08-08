@@ -44,12 +44,15 @@
 
         <main class="content">
 
-            <!-- TOP SECTION: 2 cards -->
-            <section class="top-cards-section">
+            <!-- TOP SECTION: 2 cards + Full-width Cascading Selector -->
+            <section id="drag-cascade-zone" class="top-cards-section">
                 <div id="top-cards-container" class="top-cards-container">
 
-                    <!-- LEFT CARD: Drag & Drop multi-layer target -->
-                    <div id="drop-target-card" class="card-drag-target glass">
+                    <!-- LEFT CARD: Drag & Drop target card -->
+                    <div id="drop-target-card" class="card-drag-target glass" tabindex="0" role="button" aria-label="Glisser un lien ici ou cliquer pour sélectionner profil et destination">
+                        <div class="card-stack-layer layer-3"></div>
+                        <div class="card-stack-layer layer-2"></div>
+                        <div class="card-stack-layer layer-1"></div>
                         <div id="drop-normal-state" class="drop-normal-state">
                             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -60,14 +63,6 @@
                                 <span class="drop-main-label">Glisser un lien ici</span>
                                 <span class="drop-sub-label">Choisir profil &amp; dossier au survol</span>
                             </div>
-                        </div>
-                        <div id="drop-expanded-layer" class="drop-expanded-layer" style="display:none;">
-                            <div class="drop-layer-title">🎯 Glissez sur la qualité souhaitée :</div>
-                            <div id="drag-profiles-list" class="drag-profiles-list"></div>
-                        </div>
-                        <div id="drag-paths-flyout" class="drag-paths-flyout" style="display:none;">
-                            <div id="flyout-profile-title" class="flyout-header">Dossier :</div>
-                            <div id="flyout-paths-list" class="flyout-paths-list"></div>
                         </div>
                     </div>
 
@@ -87,6 +82,38 @@
                         </form>
                     </div>
 
+                </div>
+
+                <!-- FULL-WIDTH CASCADING SELECTOR PANEL -->
+                <div id="drag-cascade-panel" class="drag-cascade-panel glass hidden">
+                    <!-- ROW 1: PROFILE SELECTION ROW -->
+                    <div id="cascade-profile-row" class="cascade-row">
+                        <div class="cascade-row-header">
+                            <span class="cascade-row-step">1</span>
+                            <span class="cascade-row-title">🎯 Profil de Qualité</span>
+                            <span class="cascade-row-hint">Glissez ou cliquez sur la qualité souhaitée</span>
+                        </div>
+                        <div id="drag-profiles-list" class="drag-profiles-list" role="radiogroup" aria-label="Profils de Qualité"></div>
+                    </div>
+
+                    <!-- ROW 2: DESTINATION SELECTION ROW -->
+                    <div id="cascade-dest-row" class="cascade-row hidden">
+                        <div class="cascade-row-header">
+                            <span class="cascade-row-step">2</span>
+                            <span class="cascade-row-title">📁 Dossier de Destination</span>
+                            <span class="cascade-row-hint">Glissez ou cliquez sur le dossier de destination</span>
+                        </div>
+                        <div id="drag-dests-list" class="drag-dests-list" role="radiogroup" aria-label="Dossiers de Destination"></div>
+                    </div>
+
+                    <!-- LIVE SELECTION SUMMARY BAR -->
+                    <div id="cascade-summary-bar" class="cascade-summary-bar">
+                        <div id="cascade-summary-text" class="cascade-summary-text">
+                            <span class="status-icon">💡</span>
+                            <span class="status-msg">Glissez un lien sur un profil, puis sur un dossier et relâchez le clic.</span>
+                        </div>
+                        <button id="btn-cascade-cancel" class="btn-sm btn-outline btn-cascade-close" type="button" title="Fermer">✕</button>
+                    </div>
                 </div>
             </section>
 
