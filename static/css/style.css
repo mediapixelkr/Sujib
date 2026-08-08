@@ -401,6 +401,24 @@ body {
     gap: 6px;
 }
 
+.btn-close-cascade {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.btn-close-cascade:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+}
+
 .cascade-live-summary {
     display: inline-flex;
     align-items: center;

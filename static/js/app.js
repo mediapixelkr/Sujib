@@ -718,13 +718,33 @@ document.addEventListener('DOMContentLoaded', () => {
             resetCascadeState();
         });
 
-        // Drop Card Click Support
+        // Drop Card Click Support (Toggle open / close)
         dropCard.addEventListener('click', (e) => {
-            if (cascadeState.active && cascadeState.mode === 'click_pending') {
+            e.stopPropagation();
+            if (cascadeState.active) {
+                resetCascadeState();
                 return;
             }
             cascadeState.mode = 'click_pending';
             activateCascadeDrag();
+            revealDestinationPanel();
+        });
+
+        // Close button (✕) click listener
+        const closeBtn = document.getElementById('btn-close-cascade');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                resetCascadeState();
+            });
+        }
+
+        // Click Outside Listener (Closes panel when clicking anywhere outside drag cascade zone)
+        document.addEventListener('click', (e) => {
+            if (!cascadeState.active) return;
+            if (!zone.contains(e.target)) {
+                resetCascadeState();
+            }
         });
 
         dropCard.addEventListener('keydown', (e) => {
