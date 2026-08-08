@@ -18,36 +18,39 @@
     <div class="ambient-background" aria-hidden="true">
         <svg class="ambient-wallpaper-svg" viewBox="0 0 1600 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <!-- Deep Indigo to Muted Purple Gradient for Secondary Wave -->
+                <!-- Secondary Soft Backing Wave Gradient -->
                 <linearGradient id="waveIndigoBack" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#1e0b4b" stop-opacity="0" />
-                    <stop offset="40%" stop-color="#321773" stop-opacity="0.35" />
-                    <stop offset="80%" stop-color="#5530b8" stop-opacity="0.25" />
-                    <stop offset="100%" stop-color="#2a0e60" stop-opacity="0" />
+                    <stop offset="0%" stop-color="#190840" stop-opacity="0" />
+                    <stop offset="50%" stop-color="#35177a" stop-opacity="0.30" />
+                    <stop offset="100%" stop-color="#1e0a47" stop-opacity="0" />
                 </linearGradient>
 
-                <!-- Soft Luminous Purple to Soft Lavender Gradient for Primary Wave -->
-                <linearGradient id="wavePurpleMain" x1="0%" y1="0%" x2="100%" y2="80%">
-                    <stop offset="0%" stop-color="#2d1366" stop-opacity="0.10" />
-                    <stop offset="35%" stop-color="#5b3ec8" stop-opacity="0.32" />
-                    <stop offset="70%" stop-color="#8d6cf0" stop-opacity="0.22" />
-                    <stop offset="100%" stop-color="#b49aff" stop-opacity="0.05" />
+                <!-- Primary Wave Gradient with soft edge highlight -->
+                <linearGradient id="wavePurpleMain" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#2d1366" stop-opacity="0.15" />
+                    <stop offset="25%" stop-color="#5c3dc9" stop-opacity="0.45" />
+                    <stop offset="60%" stop-color="#8a65f0" stop-opacity="0.35" />
+                    <stop offset="100%" stop-color="#b89dff" stop-opacity="0.10" />
                 </linearGradient>
 
-                <filter id="softWallpaperBlur" x="-10%" y="-10%" width="120%" height="120%">
-                    <feGaussianBlur stdDeviation="16" />
+                <!-- Separate Blur Filters for Backing vs Main Silhouette -->
+                <filter id="softBackBlur" x="-10%" y="-10%" width="120%" height="120%">
+                    <feGaussianBlur stdDeviation="12" />
+                </filter>
+                <filter id="subtleMainBlur" x="-10%" y="-10%" width="120%" height="120%">
+                    <feGaussianBlur stdDeviation="2.5" />
                 </filter>
             </defs>
 
-            <!-- Secondary Soft Deep Wave (Backing Surface) -->
+            <!-- Secondary Soft Deep Wave (Backing Surface - Sitting 20-30px above main wave) -->
             <path class="wallpaper-wave-back"
-                  d="M -100 620 C 350 480, 750 680, 1150 520 C 1450 400, 1680 500, 1750 540 L 1750 950 L -100 950 Z"
-                  fill="url(#waveIndigoBack)" filter="url(#softWallpaperBlur)" />
+                  d="M -100 610 C 320 500, 700 670, 1100 530 C 1420 420, 1650 510, 1750 550 L 1750 950 L -100 950 Z"
+                  fill="url(#waveIndigoBack)" filter="url(#softBackBlur)" />
 
-            <!-- Primary Smooth Flowing Dune Wave (Main Surface) -->
+            <!-- Primary Smooth Flowing Dune Wave (Main Clean Silhouette crossing 65-72% viewport height) -->
             <path class="wallpaper-wave-main"
-                  d="M -100 700 C 300 560, 650 750, 1080 580 C 1400 450, 1650 580, 1750 620 L 1750 950 L -100 950 Z"
-                  fill="url(#wavePurpleMain)" filter="url(#softWallpaperBlur)" />
+                  d="M -100 640 C 350 530, 720 700, 1120 570 C 1420 460, 1650 550, 1750 590 L 1750 950 L -100 950 Z"
+                  fill="url(#wavePurpleMain)" filter="url(#subtleMainBlur)" />
         </svg>
     </div>
 

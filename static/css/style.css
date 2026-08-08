@@ -1349,17 +1349,17 @@ body {
     overflow: hidden;
     background:
         radial-gradient(
-            circle at 75% 85%,
-            rgba(91, 62, 200, 0.18) 0%,
-            rgba(45, 19, 102, 0.10) 40%,
-            transparent 70%
+            circle at 80% 90%,
+            rgba(138, 101, 240, 0.16) 0%,
+            rgba(69, 41, 168, 0.07) 35%,
+            transparent 65%
         ),
         linear-gradient(
             180deg,
-            #0b0417 0%,
-            #110626 45%,
-            #170834 80%,
-            #1c0a3d 100%
+            #080212 0%,
+            #0e051f 40%,
+            #14072b 70%,
+            #1a0937 100%
         );
 }
 
@@ -1367,29 +1367,29 @@ body {
 .ambient-background::before {
     content: "";
     position: absolute;
-    bottom: -10vh;
+    bottom: -12vh;
     left: -5vw;
-    width: 65vw;
-    height: 45vh;
+    width: 60vw;
+    height: 40vh;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(45, 19, 102, 0.25) 0%, rgba(29, 11, 70, 0) 70%);
+    background: radial-gradient(circle, rgba(45, 19, 102, 0.20) 0%, rgba(20, 7, 43, 0) 70%);
     filter: blur(90px);
     pointer-events: none;
     will-change: transform;
     animation: ambient-wallpaper-glow-a 38s ease-in-out infinite;
 }
 
-/* Soft diffused purple/lavender glow on lower-right */
+/* Soft diffused lavender glow concentrated on lower-right */
 .ambient-background::after {
     content: "";
     position: absolute;
-    bottom: -8vh;
+    bottom: -10vh;
     right: -5vw;
-    width: 60vw;
-    height: 50vh;
+    width: 55vw;
+    height: 42vh;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(141, 108, 240, 0.18) 0%, rgba(91, 62, 200, 0) 70%);
-    filter: blur(100px);
+    background: radial-gradient(circle, rgba(138, 101, 240, 0.16) 0%, rgba(91, 61, 200, 0) 70%);
+    filter: blur(95px);
     pointer-events: none;
     will-change: transform;
     animation: ambient-wallpaper-glow-b 32s ease-in-out infinite;
