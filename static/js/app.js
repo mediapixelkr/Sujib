@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const optRenameRegex = document.getElementById('opt-rename-regex');
     const optSubtitles = document.getElementById('opt-subtitles');
     const optSubLang = document.getElementById('opt-sub-lang');
+    const optShowLast = document.getElementById('opt-show-last');
 
     // Playlist Modal Elements
     const playlistModal = document.getElementById('playlist-modal');
@@ -473,7 +474,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 optDownloadDir.value = opt.download_dir || '';
                 optRenameRegex.value = opt.rename_regex || '';
                 optSubtitles.value = opt.subtitles || 0;
-                optSubLang.value = opt.sub_lang || 'en';
+                optSubLang.value = opt.sub_lang || 'fr';
+                optShowLast.value = opt.show_last || 20;
                 optionsModal.classList.remove('hidden');
             }
         });
@@ -487,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const body = {
                 download_dir: optDownloadDir.value.trim(),
                 rename_regex: optRenameRegex.value,
-                show_last: 20,
+                show_last: parseInt(optShowLast.value, 10) || 20,
                 subtitles: parseInt(optSubtitles.value, 10),
                 sub_lang: optSubLang.value.trim()
             };

@@ -42,7 +42,7 @@
                         <circle cx="12" cy="12" r="3"></circle>
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                     </svg>
-                    <span>Options</span>
+                    <span>Configuration</span>
                 </button>
             </div>
         </header>
@@ -105,39 +105,77 @@
         </main>
     </div>
 
-    <!-- Options Modal -->
+    <!-- Options & Configuration Modal (1200px Dashboard) -->
     <div id="options-modal" class="modal-overlay hidden">
-        <div class="modal-card glass">
+        <div class="modal-card glass modal-xl">
             <div class="modal-header">
-                <h3>Options de Configuration</h3>
+                <h3>⚙️ Configuration du Serveur & Module Firefox</h3>
                 <button class="btn-close" id="btn-close-options">&times;</button>
             </div>
-            <form id="options-form" class="modal-body">
-                <div class="form-group">
-                    <label for="opt-download-dir">Dossier de destination (chemin absolu) :</label>
-                    <input type="text" id="opt-download-dir" required class="form-input">
-                </div>
-                <div class="form-group">
-                    <label for="opt-rename-regex">Règles de renommage Regex (motif||remplacement par ligne) :</label>
-                    <textarea id="opt-rename-regex" rows="4" class="form-input code-font" placeholder="/[&quot;']/||\n/\s+/||-"></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="opt-subtitles">Sous-titres :</label>
-                        <select id="opt-subtitles" class="form-select">
-                            <option value="0">Aucun</option>
-                            <option value="1">Fichier .srt externe</option>
-                            <option value="2">Intégrés dans la vidéo</option>
-                        </select>
+            <form id="options-form" class="pm-form-layout">
+                <!-- Column 1: Server Options -->
+                <div class="form-col">
+                    <h4 style="color: var(--accent-blue); margin-bottom: 12px;">📁 Répertoire & Options de Téléchargement</h4>
+                    <div class="form-group">
+                        <label for="opt-download-dir">Dossier de destination par défaut (chemin absolu) :</label>
+                        <input type="text" id="opt-download-dir" required class="form-input">
                     </div>
-                    <div class="form-group half">
-                        <label for="opt-sub-lang">Langue sous-titres (2 lettres ex: fr, en) :</label>
-                        <input type="text" id="opt-sub-lang" maxlength="2" class="form-input">
+                    <div class="form-group">
+                        <label for="opt-rename-regex">Règles de renommage Regex (motif||remplacement par ligne) :</label>
+                        <textarea id="opt-rename-regex" rows="4" class="form-input code-font" placeholder="/[&quot;']/||\n/\s+/||-"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="opt-subtitles">Sous-titres :</label>
+                            <select id="opt-subtitles" class="form-select">
+                                <option value="0">Aucun</option>
+                                <option value="1">Fichier .srt externe</option>
+                                <option value="2">Intégrés dans la vidéo</option>
+                            </select>
+                        </div>
+                        <div class="form-group half">
+                            <label for="opt-sub-lang">Langue sous-titres :</label>
+                            <input type="text" id="opt-sub-lang" maxlength="5" class="form-input" placeholder="ex: fr, en">
+                        </div>
+                    </div>
+                    <div class="form-group half" style="margin-top: 10px;">
+                        <label for="opt-show-last">Nombre d'historiques affichés :</label>
+                        <input type="number" id="opt-show-last" min="5" max="100" class="form-input" value="20">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" id="btn-cancel-options">Annuler</button>
-                    <button type="submit" class="btn-primary">Enregistrer</button>
+
+                <!-- Column 2: Firefox Extension & Installers -->
+                <div class="form-col">
+                    <h4 style="color: #60a5fa; margin-bottom: 12px;">🦊 Extension Firefox & Installateurs 1-Clic</h4>
+                    <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+                        <div>
+                            <strong>Fichiers Extension Firefox :</strong>
+                            <div style="display: flex; gap: 10px; margin-top: 6px;">
+                                <a href="static/sujib-firefox-extension.xpi" class="btn-sm btn-outline" style="text-decoration: none;" download>📦 Paquet .xpi</a>
+                                <a href="static/sujib-firefox-extension.zip" class="btn-sm btn-outline" style="text-decoration: none;" download>📁 Archive .zip</a>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+                            <strong>Installateurs Automatiques 1-Clic :</strong>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 8px 0;">
+                                Installe et active automatiquement l'extension dans Firefox sans blocage ni signature requise.
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <a href="static/installers/install-windows.bat" class="btn-sm btn-primary" style="text-decoration: none; text-align: center;" download>
+                                    💻 Télécharger l'Installateur 1-Clic Windows (.bat)
+                                </a>
+                                <a href="static/installers/install-linux.sh" class="btn-sm btn-outline" style="text-decoration: none; text-align: center;" download>
+                                    🐧 Télécharger l'Installateur 1-Clic Linux (.sh)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="padding: 0; margin-top: 24px; justify-content: flex-end;">
+                        <button type="button" class="btn-secondary" id="btn-cancel-options">Annuler</button>
+                        <button type="submit" class="btn-primary">Enregistrer la Configuration</button>
+                    </div>
                 </div>
             </form>
         </div>
