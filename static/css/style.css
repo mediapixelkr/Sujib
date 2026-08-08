@@ -1397,12 +1397,14 @@ body {
     animation: wallpaper-wave-drift-back 18s ease-in-out infinite;
 }
 
-.wallpaper-wave-main {
+.wallpaper-wave-main,
+.wallpaper-crest-line.main-crest {
     will-change: transform;
     animation: wallpaper-wave-drift-main 14s ease-in-out infinite;
 }
 
-.wallpaper-wave-front {
+.wallpaper-wave-front,
+.wallpaper-crest-line.front-crest {
     will-change: transform;
     animation: wallpaper-wave-drift-front 11s ease-in-out infinite;
 }
@@ -1472,6 +1474,8 @@ body {
     .wallpaper-wave-back,
     .wallpaper-wave-main,
     .wallpaper-wave-front,
+    .wallpaper-crest-line.main-crest,
+    .wallpaper-crest-line.front-crest,
     .ambient-background::before,
     .ambient-background::after {
         animation: none !important;

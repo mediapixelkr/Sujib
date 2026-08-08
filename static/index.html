@@ -41,6 +41,14 @@
                     <stop offset="100%" stop-color="#746fee" stop-opacity="0.08" />
                 </linearGradient>
 
+                <!-- Soft Crest Light Highlight Gradient (Icy Blue-Violet) -->
+                <linearGradient id="crestLineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#a9c8ff" stop-opacity="0" />
+                    <stop offset="25%" stop-color="#a9c8ff" stop-opacity="0.35" />
+                    <stop offset="65%" stop-color="#c6d2ff" stop-opacity="0.40" />
+                    <stop offset="100%" stop-color="#b8c7ff" stop-opacity="0" />
+                </linearGradient>
+
                 <!-- Blur Filters for Backing vs Main vs Front Surfaces -->
                 <filter id="softBackBlur" x="-10%" y="-10%" width="120%" height="120%">
                     <feGaussianBlur stdDeviation="12" />
@@ -50,6 +58,9 @@
                 </filter>
                 <filter id="subtleFrontBlur" x="-10%" y="-10%" width="120%" height="120%">
                     <feGaussianBlur stdDeviation="2.0" />
+                </filter>
+                <filter id="crestSoftBlur" x="-10%" y="-10%" width="120%" height="120%">
+                    <feGaussianBlur stdDeviation="1.5" />
                 </filter>
             </defs>
 
@@ -63,10 +74,20 @@
                   d="M -100 640 C 350 530, 720 700, 1120 570 C 1420 460, 1650 550, 1750 590 L 1750 950 L -100 950 Z"
                   fill="url(#waveBlueMain)" filter="url(#subtleMainBlur)" />
 
-            <!-- Translucent Foreground Wave (Front Surface crossing 75-83% viewport height) -->
+            <!-- Delicate Luminous Crest Light Line on Main Wave -->
+            <path class="wallpaper-crest-line main-crest"
+                  d="M -100 640 C 350 530, 720 700, 1120 570 C 1420 460, 1650 550, 1750 590"
+                  fill="none" stroke="url(#crestLineGrad)" stroke-width="1.5" stroke-linecap="round" filter="url(#crestSoftBlur)" />
+
+            <!-- Translucent Foreground Wave (Front Surface) -->
             <path class="wallpaper-wave-front"
                   d="M -100 760 C 300 695, 650 780, 1020 710 C 1320 650, 1560 715, 1750 750 L 1750 950 L -100 950 Z"
                   fill="url(#waveBlueFront)" filter="url(#subtleFrontBlur)" />
+
+            <!-- Very Subtly Faded Crest Light Line on Foreground Wave -->
+            <path class="wallpaper-crest-line front-crest"
+                  d="M -100 760 C 300 695, 650 780, 1020 710 C 1320 650, 1560 715, 1750 750"
+                  fill="none" stroke="url(#crestLineGrad)" stroke-width="1.2" stroke-linecap="round" opacity="0.5" filter="url(#crestSoftBlur)" />
         </svg>
     </div>
 
