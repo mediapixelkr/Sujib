@@ -388,11 +388,53 @@ body {
 .cascade-panel-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 12px;
     font-size: 0.78rem;
     font-weight: 700;
     color: #94a3b8;
     letter-spacing: 0.06em;
+}
+
+.cascade-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cascade-live-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.25));
+    border: 1px solid rgba(96, 165, 250, 0.4);
+    color: #93c5fd;
+    letter-spacing: normal;
+    text-transform: none;
+    transition: all 0.15s ease;
+}
+
+.cascade-live-summary .summary-prof {
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.cascade-live-summary .summary-dest {
+    font-weight: 600;
+    color: #a7f3d0;
+}
+
+.cascade-live-summary .summary-arrow {
+    color: #60a5fa;
+}
+
+.cascade-live-summary .summary-action {
+    color: #cbd5e1;
+    font-size: 0.74rem;
 }
 
 .cascade-grid {

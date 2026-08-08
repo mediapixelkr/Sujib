@@ -541,6 +541,83 @@ document.addEventListener('DOMContentLoaded', () => {
         return types.includes('text/uri-list') || types.includes('text/plain') || types.includes('text/html') || types.includes('URL');
     }
 
+    function getProfileDisplayLabels(p) {
+        if (!p) return { primary: 'Auto', secondary: 'Best' };
+        const rawName = p.name || '';
+        const maxRes = (p.max_res || '').toLowerCase();
+        const container = (p.container || '').toUpperCase();
+        const isAudio = Boolean(p.audio_only || rawName.toLowerCase().includes('audio') || maxRes === 'audio');
+
+        let primary = rawName;
+        let secondary = '';
+
+        if (isAudio) {
+            primary = 'Audio';
+            if (p.container && p.container.trim() !== '' && p.container.toLowerCase() !== 'audio') {
+                secondary = p.container.toUpperCase();
+            } else if (p.format_spec && p.format_spec.toLowerCase().includes('mp3')) {
+                secondary = 'MP3';
+            } else if (p.format_spec && p.format_spec.toLowerCase().includes('m4a')) {
+                secondary = 'M4A';
+            } else {
+                secondary = 'MP3 / M4A';
+            }
+        } else if (rawName.includes('4K') || maxRes === '2160p') {
+            primary = '4K';
+            secondary = '2160p';
+        } else if (rawName.includes('1440p') || rawName.includes('2K') || maxRes === '1440p') {
+            primary = '2K';
+            secondary = '1440p';
+        } else if (rawName.includes('1080p') || maxRes === '1080p') {
+            primary = '1080p';
+            secondary = 'Full HD';
+        } else if (rawName.includes('720p') || maxRes === '720p') {
+            primary = '720p';
+            secondary = 'HD';
+        } else if (rawName.includes('SD') || rawName.includes('480p') || maxRes === '480p') {
+            primary = 'SD';
+            secondary = '480p';
+        } else {
+            primary = rawName.replace(/\s*\([^)]*\)/g, '').trim() || rawName;
+            secondary = p.max_res || (container !== '' ? container : 'Auto');
+        }
+
+        if (primary.toLowerCase() === secondary.toLowerCase()) {
+            secondary = container !== '' && container !== primary ? container : 'Auto';
+        }
+
+        return { primary, secondary };
+    }
+
+    function updateLiveSelectionSummary() {
+        const summaryDestEl = document.getElementById('cascade-live-summary');
+        const summaryProfEl = document.getElementById('cascade-live-summary-prof');
+
+        if (!cascadeState.active || !cascadeState.selectedProfile) {
+            if (summaryDestEl) { summaryDestEl.classList.add('hidden'); summaryDestEl.textContent = ''; }
+            if (summaryProfEl) { summaryProfEl.classList.add('hidden'); summaryProfEl.textContent = ''; }
+            return;
+        }
+
+        const profDisplay = getProfileDisplayLabels(cascadeState.selectedProfile);
+        const profText = profDisplay.primary;
+        const destText = cascadeState.selectedDest ? cascadeState.selectedDest.label : null;
+
+        if (summaryDestEl) {
+            summaryDestEl.classList.remove('hidden');
+            if (destText) {
+                summaryDestEl.innerHTML = `<span class="summary-prof">${profText}</span> <span class="summary-arrow">→</span> <span class="summary-dest">${destText}</span> <span class="summary-action">· Relâchez pour télécharger</span>`;
+            } else {
+                summaryDestEl.innerHTML = `<span class="summary-prof">${profText}</span> <span class="summary-action">· Choisissez une destination</span>`;
+            }
+        }
+
+        if (summaryProfEl) {
+            summaryProfEl.classList.remove('hidden');
+            summaryProfEl.innerHTML = `<span class="summary-prof">Profil : ${profText}</span>`;
+        }
+    }
+
     function setupDragTarget() {
         const zone = document.getElementById('drag-cascade-zone');
         const dropCard = document.getElementById('drop-target-card');
@@ -663,6 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (profilesPanel) profilesPanel.classList.remove('hidden');
 
         renderCascadeProfiles();
+        updateLiveSelectionSummary();
     }
 
     function renderCascadeProfiles() {
@@ -671,33 +749,30 @@ document.addEventListener('DOMContentLoaded', () => {
         listEl.replaceChildren();
 
         const defaultProfiles = [
-            { id: 1, name: '4K', sub: '2160p' },
-            { id: 2, name: '2.7K', sub: '1440p' },
-            { id: 3, name: '1080p', sub: 'Full HD' },
-            { id: 4, name: '720p', sub: 'HD' },
-            { id: 5, name: 'Audio', sub: 'MP3 / M4A' }
+            { id: 1, name: '4K (2160p)', max_res: '2160p', container: 'mkv' },
+            { id: 2, name: '1440p (2K)', max_res: '1440p', container: 'mkv' },
+            { id: 3, name: '1080p (Full HD)', max_res: '1080p', container: 'mkv' },
+            { id: 4, name: '720p (HD)', max_res: '720p', container: 'mp4' },
+            { id: 5, name: 'Audio Only (MP3)', max_res: 'audio', container: 'mp3', audio_only: 1 }
         ];
 
-        const activeProfiles = profiles.length > 0 ? profiles.map((p, i) => ({
-            id: p.id,
-            name: p.name.split(' ')[0] || p.name,
-            sub: p.max_res || (p.name.includes('Audio') ? 'MP3 / M4A' : 'Auto')
-        })) : defaultProfiles;
+        const activeProfiles = profiles.length > 0 ? profiles : defaultProfiles;
 
         activeProfiles.forEach(prof => {
+            const display = getProfileDisplayLabels(prof);
             const card = document.createElement('div');
             card.className = 'cascade-card profile-card';
             card.tabIndex = 0;
             card.role = 'button';
-            card.setAttribute('aria-label', `Profil ${prof.name}`);
+            card.setAttribute('aria-label', `Profil ${display.primary}`);
 
             if (cascadeState.selectedProfile && cascadeState.selectedProfile.id === prof.id) {
                 card.classList.add('active');
             }
 
             card.innerHTML = `
-                <div class="cascade-card-title">${prof.name}</div>
-                <div class="cascade-card-sub">${prof.sub}</div>
+                <div class="cascade-card-title">${display.primary}</div>
+                <div class="cascade-card-sub">${display.secondary}</div>
             `;
 
             card.addEventListener('dragenter', (e) => {
@@ -715,8 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             card.addEventListener('click', (e) => {
                 e.stopPropagation();
-                cascadeState.selectedProfile = prof;
-                updateProfileCardsSelection(prof);
+                handleProfileHover(prof);
                 revealDestinationPanel();
             });
 
@@ -732,6 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cascadeState.hoveredProfile = prof;
         cascadeState.selectedProfile = prof;
         updateProfileCardsSelection(prof);
+        updateLiveSelectionSummary();
 
         if (cascadeState.hoverTimer) clearTimeout(cascadeState.hoverTimer);
         cascadeState.hoverTimer = setTimeout(() => {
@@ -742,8 +817,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateProfileCardsSelection(selectedProf) {
         const listEl = document.getElementById('drag-profiles-list');
         if (!listEl) return;
+        const selectedLabels = selectedProf ? getProfileDisplayLabels(selectedProf) : null;
         listEl.querySelectorAll('.cascade-card').forEach(card => {
-            if (selectedProf && card.textContent.includes(selectedProf.name)) {
+            if (selectedLabels && card.querySelector('.cascade-card-title')?.textContent === selectedLabels.primary) {
                 card.classList.add('active');
             } else {
                 card.classList.remove('active');
@@ -755,6 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const destsPanel = document.getElementById('cascade-dests-panel');
         if (destsPanel) destsPanel.classList.remove('hidden');
         renderCascadeDestinations();
+        updateLiveSelectionSummary();
     }
 
     function renderCascadeDestinations() {
@@ -812,6 +889,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 cascadeState.selectedDest = dest;
+                updateLiveSelectionSummary();
                 if (cascadeState.url) {
                     await handleDestinationDrop(dest, null);
                 }
@@ -829,6 +907,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cascadeState.hoveredDest = dest;
         cascadeState.selectedDest = dest;
         updateDestCardsSelection(dest);
+        updateLiveSelectionSummary();
     }
 
     function updateDestCardsSelection(selectedDest) {
@@ -859,6 +938,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     url: url,
+                    title: '',
                     profile_id: prof.id,
                     dest_path: destPath
                 })
@@ -906,6 +986,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (dropCard) dropCard.classList.remove('drag-hovering');
         if (profilesPanel) profilesPanel.classList.add('hidden');
         if (destsPanel) destsPanel.classList.add('hidden');
+
+        updateLiveSelectionSummary();
     }
 
     // ─── URL Form Submit ──────────────────────────────────────────────────────
