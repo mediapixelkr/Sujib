@@ -80,19 +80,14 @@ body {
 .brand-logo-img {
     width: 48px;
     height: 48px;
-    border-radius: 14px;
-    object-fit: cover;
-    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.25),
-                0 4px 20px rgba(59, 130, 246, 0.35),
-                0 0 40px rgba(139, 92, 246, 0.15);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 14px rgba(91, 62, 200, 0.45));
+    transition: transform 0.25s ease, filter 0.25s ease;
 }
 
 .brand-logo-img:hover {
     transform: scale(1.08) rotate(-2deg);
-    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5),
-                0 6px 30px rgba(59, 130, 246, 0.5),
-                0 0 60px rgba(139, 92, 246, 0.25);
+    filter: drop-shadow(0 6px 22px rgba(138, 101, 240, 0.65));
 }
 
 .logo-icon {
