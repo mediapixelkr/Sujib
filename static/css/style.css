@@ -1338,7 +1338,7 @@ body {
 }
 
 /* ==========================================================================
-   AMBIENT DARK ANIMATED WAVE BACKGROUND (PLAYSTATION / PSP CONSOLE INSPIRED)
+   AMBIENT DARK PURPLE / INDIGO WALLPAPER BACKGROUND
    ========================================================================== */
 
 .ambient-background {
@@ -1349,49 +1349,53 @@ body {
     overflow: hidden;
     background:
         radial-gradient(
-            ellipse at 50% 120%,
-            rgba(29, 78, 216, 0.14),
-            transparent 60%
+            circle at 75% 85%,
+            rgba(91, 62, 200, 0.18) 0%,
+            rgba(45, 19, 102, 0.10) 40%,
+            transparent 70%
         ),
         linear-gradient(
             180deg,
-            #0c1628 0%,
-            #0a1424 55%,
-            #08111f 100%
+            #0b0417 0%,
+            #110626 45%,
+            #170834 80%,
+            #1c0a3d 100%
         );
 }
 
+/* Subtle deep indigo glow on lower-left */
 .ambient-background::before {
     content: "";
     position: absolute;
-    bottom: -15vh;
-    left: -10vw;
-    width: 70vw;
-    height: 50vh;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(29, 78, 216, 0) 70%);
-    filter: blur(80px);
-    pointer-events: none;
-    will-change: transform;
-    animation: ambient-glow-drift-a 32s ease-in-out infinite;
-}
-
-.ambient-background::after {
-    content: "";
-    position: absolute;
     bottom: -10vh;
-    right: -10vw;
+    left: -5vw;
     width: 65vw;
     height: 45vh;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.10) 0%, rgba(124, 58, 237, 0) 70%);
+    background: radial-gradient(circle, rgba(45, 19, 102, 0.25) 0%, rgba(29, 11, 70, 0) 70%);
     filter: blur(90px);
     pointer-events: none;
     will-change: transform;
-    animation: ambient-glow-drift-b 26s ease-in-out infinite;
+    animation: ambient-wallpaper-glow-a 38s ease-in-out infinite;
 }
 
-.ambient-waves {
+/* Soft diffused purple/lavender glow on lower-right */
+.ambient-background::after {
+    content: "";
+    position: absolute;
+    bottom: -8vh;
+    right: -5vw;
+    width: 60vw;
+    height: 50vh;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(141, 108, 240, 0.18) 0%, rgba(91, 62, 200, 0) 70%);
+    filter: blur(100px);
+    pointer-events: none;
+    will-change: transform;
+    animation: ambient-wallpaper-glow-b 32s ease-in-out infinite;
+}
+
+.ambient-wallpaper-svg {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -1399,59 +1403,59 @@ body {
     pointer-events: none;
 }
 
-.ambient-waves--back {
-    filter: blur(8px);
+.wallpaper-wave-back {
     will-change: transform;
-    animation: wave-drift-back 28s ease-in-out infinite;
+    animation: wallpaper-wave-drift-back 42s ease-in-out infinite;
 }
 
-.ambient-waves--front {
+.wallpaper-wave-main {
     will-change: transform;
-    animation: wave-drift-front 20s ease-in-out infinite;
+    animation: wallpaper-wave-drift-main 34s ease-in-out infinite;
 }
 
-@keyframes wave-drift-back {
+/* Extremely subtle breathing / drift animations */
+@keyframes wallpaper-wave-drift-back {
     0% {
-        transform: translate3d(-2%, 0, 0) scaleY(1);
+        transform: translate3d(-1%, 0, 0) scaleY(1);
     }
     50% {
-        transform: translate3d(2%, -10px, 0) scaleY(1.04);
+        transform: translate3d(1.5%, -8px, 0) scaleY(1.02);
     }
     100% {
-        transform: translate3d(-2%, 0, 0) scaleY(1);
+        transform: translate3d(-1%, 0, 0) scaleY(1);
     }
 }
 
-@keyframes wave-drift-front {
+@keyframes wallpaper-wave-drift-main {
     0% {
-        transform: translate3d(2%, 4px, 0) scaleY(1.02);
+        transform: translate3d(1.5%, 3px, 0) scaleY(1);
     }
     50% {
-        transform: translate3d(-2%, -6px, 0) scaleY(0.98);
+        transform: translate3d(-1%, -6px, 0) scaleY(1.015);
     }
     100% {
-        transform: translate3d(2%, 4px, 0) scaleY(1.02);
+        transform: translate3d(1.5%, 3px, 0) scaleY(1);
     }
 }
 
-@keyframes ambient-glow-drift-a {
+@keyframes ambient-wallpaper-glow-a {
     0% {
         transform: translate3d(0, 0, 0);
     }
     50% {
-        transform: translate3d(3vw, -15px, 0);
+        transform: translate3d(2vw, -10px, 0);
     }
     100% {
         transform: translate3d(0, 0, 0);
     }
 }
 
-@keyframes ambient-glow-drift-b {
+@keyframes ambient-wallpaper-glow-b {
     0% {
         transform: translate3d(0, 0, 0);
     }
     50% {
-        transform: translate3d(-3vw, -12px, 0);
+        transform: translate3d(-2vw, -8px, 0);
     }
     100% {
         transform: translate3d(0, 0, 0);
@@ -1459,8 +1463,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .ambient-waves--back,
-    .ambient-waves--front,
+    .wallpaper-wave-back,
+    .wallpaper-wave-main,
     .ambient-background::before,
     .ambient-background::after {
         animation: none !important;

@@ -14,61 +14,40 @@
     <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
-    <!-- AMBIENT DARK ANIMATED WAVE BACKGROUND (PLAYSTATION / PSP CONSOLE INSPIRED) -->
+    <!-- AMBIENT DARK PURPLE / INDIGO WALLPAPER BACKGROUND -->
     <div class="ambient-background" aria-hidden="true">
-        <!-- SVG LAYER 1: BACK BROAD RIBBONS -->
-        <svg class="ambient-waves ambient-waves--back" viewBox="0 0 1600 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="ambient-wallpaper-svg" viewBox="0 0 1600 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <linearGradient id="waveBlueBack" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#1d4ed8" stop-opacity="0" />
-                    <stop offset="35%" stop-color="#3b82f6" stop-opacity="0.09" />
-                    <stop offset="70%" stop-color="#1d4ed8" stop-opacity="0.05" />
-                    <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+                <!-- Deep Indigo to Muted Purple Gradient for Secondary Wave -->
+                <linearGradient id="waveIndigoBack" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#1e0b4b" stop-opacity="0" />
+                    <stop offset="40%" stop-color="#321773" stop-opacity="0.35" />
+                    <stop offset="80%" stop-color="#5530b8" stop-opacity="0.25" />
+                    <stop offset="100%" stop-color="#2a0e60" stop-opacity="0" />
                 </linearGradient>
-                <linearGradient id="waveVioletBack" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#7c3aed" stop-opacity="0" />
-                    <stop offset="40%" stop-color="#8b5cf6" stop-opacity="0.08" />
-                    <stop offset="80%" stop-color="#6366f1" stop-opacity="0.04" />
-                    <stop offset="100%" stop-color="#7c3aed" stop-opacity="0" />
-                </linearGradient>
-            </defs>
-            <!-- Broad blue ribbon crossing lower viewport -->
-            <path d="M -100 460 C 320 320, 680 530, 1050 380 S 1480 300, 1750 430"
-                  fill="none" stroke="url(#waveBlueBack)" stroke-width="52" stroke-linecap="round" />
-            <!-- Soft violet ribbon crossing lower viewport -->
-            <path d="M -80 520 C 380 400, 720 580, 1120 440 S 1520 350, 1720 490"
-                  fill="none" stroke="url(#waveVioletBack)" stroke-width="40" stroke-linecap="round" />
-        </svg>
 
-        <!-- SVG LAYER 2: FRONT LUMINOUS ACCENT LINES -->
-        <svg class="ambient-waves ambient-waves--front" viewBox="0 0 1600 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="waveCyanFront" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#60a5fa" stop-opacity="0" />
-                    <stop offset="30%" stop-color="#60a5fa" stop-opacity="0.40" />
-                    <stop offset="70%" stop-color="#3b82f6" stop-opacity="0.25" />
-                    <stop offset="100%" stop-color="#60a5fa" stop-opacity="0" />
+                <!-- Soft Luminous Purple to Soft Lavender Gradient for Primary Wave -->
+                <linearGradient id="wavePurpleMain" x1="0%" y1="0%" x2="100%" y2="80%">
+                    <stop offset="0%" stop-color="#2d1366" stop-opacity="0.10" />
+                    <stop offset="35%" stop-color="#5b3ec8" stop-opacity="0.32" />
+                    <stop offset="70%" stop-color="#8d6cf0" stop-opacity="0.22" />
+                    <stop offset="100%" stop-color="#b49aff" stop-opacity="0.05" />
                 </linearGradient>
-                <linearGradient id="waveVioletLine" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#a78bfa" stop-opacity="0" />
-                    <stop offset="45%" stop-color="#c084fc" stop-opacity="0.30" />
-                    <stop offset="85%" stop-color="#818cf8" stop-opacity="0.15" />
-                    <stop offset="100%" stop-color="#a78bfa" stop-opacity="0" />
-                </linearGradient>
-                <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="3.5" result="blur" />
-                    <feMerge>
-                        <feMergeNode in="blur" />
-                        <feMergeNode in="SourceGraphic" />
-                    </feMerge>
+
+                <filter id="softWallpaperBlur" x="-10%" y="-10%" width="120%" height="120%">
+                    <feGaussianBlur stdDeviation="16" />
                 </filter>
             </defs>
-            <!-- Luminous fine blue line with soft glow -->
-            <path d="M -120 430 C 290 270, 650 480, 1020 350 S 1440 260, 1740 390"
-                  fill="none" stroke="url(#waveCyanFront)" stroke-width="2" filter="url(#softGlow)" />
-            <!-- Luminous fine violet accent line -->
-            <path d="M -60 490 C 350 350, 710 540, 1080 400 S 1490 320, 1700 450"
-                  fill="none" stroke="url(#waveVioletLine)" stroke-width="1.8" filter="url(#softGlow)" />
+
+            <!-- Secondary Soft Deep Wave (Backing Surface) -->
+            <path class="wallpaper-wave-back"
+                  d="M -100 620 C 350 480, 750 680, 1150 520 C 1450 400, 1680 500, 1750 540 L 1750 950 L -100 950 Z"
+                  fill="url(#waveIndigoBack)" filter="url(#softWallpaperBlur)" />
+
+            <!-- Primary Smooth Flowing Dune Wave (Main Surface) -->
+            <path class="wallpaper-wave-main"
+                  d="M -100 700 C 300 560, 650 750, 1080 580 C 1400 450, 1650 580, 1750 620 L 1750 950 L -100 950 Z"
+                  fill="url(#wavePurpleMain)" filter="url(#softWallpaperBlur)" />
         </svg>
     </div>
 
