@@ -639,6 +639,27 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Staged Destination Band Reveal (Appears when moving out of profile band toward destination zone)
+        if (profilesPanel) {
+            profilesPanel.addEventListener('dragleave', (e) => {
+                if (cascadeState.active && (!e.relatedTarget || !profilesPanel.contains(e.relatedTarget))) {
+                    revealDestinationPanel();
+                }
+            });
+        }
+
+        if (destsPanel) {
+            destsPanel.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                revealDestinationPanel();
+            });
+            destsPanel.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+                revealDestinationPanel();
+            });
+        }
+
         // Master Zone Drag Enter
         zone.addEventListener('dragenter', (e) => {
             if (!isUrlDragPayload(e)) return;
@@ -817,11 +838,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cascadeState.selectedProfile = prof;
         updateProfileCardsSelection(prof);
         updateLiveSelectionSummary();
-
-        if (cascadeState.hoverTimer) clearTimeout(cascadeState.hoverTimer);
-        cascadeState.hoverTimer = setTimeout(() => {
-            revealDestinationPanel();
-        }, 100);
+        // NOTE: Destination band reveals only when moving downward out of profile band toward destination zone!
     }
 
     function updateProfileCardsSelection(selectedProf) {
@@ -839,8 +856,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function revealDestinationPanel() {
         const destsPanel = document.getElementById('cascade-dests-panel');
-        if (destsPanel) destsPanel.classList.remove('hidden');
-        renderCascadeDestinations();
+        if (!destsPanel) return;
+        if (destsPanel.classList.contains('hidden')) {
+            destsPanel.classList.remove('hidden');
+            renderCascadeDestinations();
+        }
         updateLiveSelectionSummary();
     }
 
@@ -872,9 +892,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             card.innerHTML = `
                 <div class="cascade-card-title">${dest.label}</div>
-                <svg class="cascade-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                </svg>
+                <div class="cascade-card-sub">Dossier</div>
             `;
 
             card.addEventListener('dragenter', (e) => {
