@@ -566,8 +566,8 @@ document.addEventListener('DOMContentLoaded', () => {
             primary = '4K';
             secondary = '2160p';
         } else if (rawName.includes('1440p') || rawName.includes('2K') || maxRes === '1440p') {
-            primary = '2K';
-            secondary = '1440p';
+            primary = '1440p';
+            secondary = 'QHD';
         } else if (rawName.includes('1080p') || maxRes === '1080p') {
             primary = '1080p';
             secondary = 'Full HD';
@@ -591,11 +591,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateLiveSelectionSummary() {
         const summaryDestEl = document.getElementById('cascade-live-summary');
-        const summaryProfEl = document.getElementById('cascade-live-summary-prof');
 
         if (!cascadeState.active || !cascadeState.selectedProfile) {
             if (summaryDestEl) { summaryDestEl.classList.add('hidden'); summaryDestEl.textContent = ''; }
-            if (summaryProfEl) { summaryProfEl.classList.add('hidden'); summaryProfEl.textContent = ''; }
             return;
         }
 
@@ -610,11 +608,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 summaryDestEl.innerHTML = `<span class="summary-prof">${profText}</span> <span class="summary-action">· Choisissez une destination</span>`;
             }
-        }
-
-        if (summaryProfEl) {
-            summaryProfEl.classList.remove('hidden');
-            summaryProfEl.innerHTML = `<span class="summary-prof">Profil : ${profText}</span>`;
         }
     }
 
