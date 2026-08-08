@@ -838,7 +838,12 @@ document.addEventListener('DOMContentLoaded', () => {
         cascadeState.selectedProfile = prof;
         updateProfileCardsSelection(prof);
         updateLiveSelectionSummary();
-        // NOTE: Destination band reveals only when moving downward out of profile band toward destination zone!
+
+        // Reveal destination panel on profile hover so user can fluidly move into destination cards
+        if (cascadeState.hoverTimer) clearTimeout(cascadeState.hoverTimer);
+        cascadeState.hoverTimer = setTimeout(() => {
+            revealDestinationPanel();
+        }, 50);
     }
 
     function updateProfileCardsSelection(selectedProf) {
