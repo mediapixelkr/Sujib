@@ -25,7 +25,8 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "sujib-downloader@mediapixel.kr"
+      "id": "sujib-downloader@mediapixel.kr",
+      "update_url": "http://192.168.200.15/sujib/static/extension-update.json"
     }
   }
 }
