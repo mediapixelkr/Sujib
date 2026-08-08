@@ -677,49 +677,48 @@ document.addEventListener('DOMContentLoaded', () => {
         if (managerProfiles.length === 0) {
             const empty = document.createElement('div');
             empty.className = 'empty-state';
+            empty.style.gridColumn = '1 / -1';
             empty.textContent = 'Aucun profil trouvé.';
             profilesManagerList.appendChild(empty);
             return;
         }
 
         managerProfiles.forEach(prof => {
-            const row = document.createElement('div');
-            row.className = 'playlist-item-row';
-            row.style.justifyContent = 'space-between';
+            const card = document.createElement('div');
+            card.className = 'pm-item-card';
 
-            const info = document.createElement('div');
-            info.style.display = 'flex';
-            info.style.flexDirection = 'column';
-            info.style.gap = '2px';
+            // Top Header
+            const header = document.createElement('div');
+            header.className = 'pm-item-header';
 
-            const titleRow = document.createElement('div');
-            titleRow.style.display = 'flex';
-            titleRow.style.alignItems = 'center';
-            titleRow.style.gap = '8px';
-
-            const name = document.createElement('strong');
-            name.textContent = prof.name;
+            const title = document.createElement('span');
+            title.className = 'pm-item-title';
+            title.textContent = prof.name;
 
             const badge = document.createElement('span');
-            badge.className = 'badge';
-            badge.style.fontSize = '0.72rem';
-            badge.style.backgroundColor = prof.is_active === 1 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)';
-            badge.style.color = prof.is_active === 1 ? '#10b981' : '#ef4444';
+            badge.className = prof.is_active === 1 ? 'pm-badge-active' : 'pm-badge-archived';
             badge.textContent = prof.is_active === 1 ? 'Actif' : 'Archivé';
 
-            titleRow.appendChild(name);
-            titleRow.appendChild(badge);
+            header.appendChild(title);
+            header.appendChild(badge);
 
-            const detail = document.createElement('small');
-            detail.style.color = '#94a3b8';
-            detail.textContent = `${prof.container.toUpperCase()} | ${prof.max_res || 'Auto'} | ${prof.dest_path ? '📁 ' + prof.dest_path : '📁 Dossier par défaut'}`;
+            // Middle Details
+            const details = document.createElement('div');
+            details.className = 'pm-item-details';
 
-            info.appendChild(titleRow);
-            info.appendChild(detail);
+            const specInfo = document.createElement('div');
+            specInfo.innerHTML = `<strong>Conteneur :</strong> ${prof.container.toUpperCase()} &bull; <strong>Résolution :</strong> ${prof.max_res || 'Auto'}`;
 
+            const pathPill = document.createElement('div');
+            pathPill.className = 'pm-path-pill';
+            pathPill.textContent = prof.dest_path ? `📁 ${prof.dest_path}` : '📁 Dossier par défaut (global)';
+
+            details.appendChild(specInfo);
+            details.appendChild(pathPill);
+
+            // Bottom Actions
             const actions = document.createElement('div');
-            actions.style.display = 'flex';
-            actions.style.gap = '6px';
+            actions.className = 'pm-item-actions';
 
             // Edit
             const btnEdit = document.createElement('button');
@@ -746,20 +745,23 @@ document.addEventListener('DOMContentLoaded', () => {
             btnDelete.style.borderColor = 'rgba(239, 68, 68, 0.4)';
             btnDelete.textContent = '🗑️ Supprimer';
             btnDelete.addEventListener('click', async () => {
-                await fetch(`/api/profiles/${prof.id}`, { method: 'DELETE' });
-                showToast('Profil supprimé !', 'info');
-                await loadProfiles();
-                await loadManagerProfiles();
+                if (confirm(`Voulez-vous vraiment supprimer le profil "${prof.name}" ?`)) {
+                    await fetch(`/api/profiles/${prof.id}`, { method: 'DELETE' });
+                    showToast('Profil supprimé !', 'info');
+                    await loadProfiles();
+                    await loadManagerProfiles();
+                }
             });
 
             actions.appendChild(btnEdit);
             actions.appendChild(btnToggle);
             actions.appendChild(btnDelete);
 
-            row.appendChild(info);
-            row.appendChild(actions);
+            card.appendChild(header);
+            card.appendChild(details);
+            card.appendChild(actions);
 
-            profilesManagerList.appendChild(row);
+            profilesManagerList.appendChild(card);
         });
     }
 

@@ -140,15 +140,15 @@
         </div>
     </div>
 
-    <!-- Unified Profile Manager Modal (Single Modal) -->
+    <!-- Unified Profile Manager Modal (1200px Width) -->
     <div id="profiles-manager-modal" class="modal-overlay hidden">
-        <div class="modal-card glass modal-lg">
+        <div class="modal-card glass modal-xl">
             <div class="modal-header">
                 <h3 id="pm-modal-title">Gestionnaire des Profils</h3>
                 <button class="btn-close" id="btn-close-prof-manager">&times;</button>
             </div>
             <div class="modal-body">
-                <!-- VIEW 1: Profiles List -->
+                <!-- VIEW 1: Profiles Grid List -->
                 <div id="pm-view-list">
                     <div class="playlist-controls">
                         <button id="btn-new-profile" class="btn-sm btn-primary">➕ Créer un profil</button>
@@ -156,49 +156,60 @@
                             <input type="checkbox" id="chk-show-archived"> Afficher profils archivés
                         </label>
                     </div>
-                    <div id="profiles-manager-list" class="playlist-items-list" style="max-height: 380px;">
-                        <!-- List rendered dynamically -->
+                    <div id="profiles-manager-list" class="pm-container-grid">
+                        <!-- Grid rendered dynamically -->
                     </div>
                 </div>
 
-                <!-- VIEW 2: Single Inline Profile Form (No Stacked Modals) -->
+                <!-- VIEW 2: Structured 2-Column Profile Form -->
                 <div id="pm-view-form" class="hidden">
                     <div class="pm-form-header">
-                        <button id="btn-back-to-pm-list" class="btn-sm btn-outline">← Retour à la liste</button>
+                        <button id="btn-back-to-pm-list" class="btn-sm btn-outline">← Retour à la liste des profils</button>
                         <span id="pm-form-mode-title" class="pm-mode-title">Nouveau profil</span>
                     </div>
-                    <form id="profile-edit-form" style="margin-top: 14px;">
+                    <form id="profile-edit-form" class="pm-form-layout">
                         <input type="hidden" id="prof-edit-id">
-                        <div class="form-group">
-                            <label for="prof-edit-name">Nom du profil :</label>
-                            <input type="text" id="prof-edit-name" required class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="prof-edit-dest">Dossier de destination spécifique (laisser vide pour dossier par défaut) :</label>
-                            <input type="text" id="prof-edit-dest" class="form-input" placeholder="ex: /var/www/html/sujib/downloads/4K">
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group half">
-                                <label for="prof-edit-container">Format Conteneur :</label>
-                                <select id="prof-edit-container" class="form-select">
-                                    <option value="mkv">MKV</option>
-                                    <option value="mp4">MP4</option>
-                                    <option value="webm">WebM</option>
-                                    <option value="mp3">MP3 (Audio)</option>
-                                </select>
+                        
+                        <!-- Column 1: General & Paths -->
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="prof-edit-name">Nom du profil :</label>
+                                <input type="text" id="prof-edit-name" required class="form-input" placeholder="ex: 1080p (Full HD)">
                             </div>
-                            <div class="form-group half">
-                                <label for="prof-edit-res">Résolution / Tag :</label>
-                                <input type="text" id="prof-edit-res" class="form-input" placeholder="ex: 1080p">
+                            <div class="form-group">
+                                <label for="prof-edit-dest">Dossier de destination spécifique :</label>
+                                <input type="text" id="prof-edit-dest" class="form-input" placeholder="ex: /var/www/html/sujib/downloads/4K (laisser vide pour dossier par défaut)">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label for="prof-edit-container">Format Conteneur :</label>
+                                    <select id="prof-edit-container" class="form-select">
+                                        <option value="mkv">MKV</option>
+                                        <option value="mp4">MP4</option>
+                                        <option value="webm">WebM</option>
+                                        <option value="mp3">MP3 (Audio)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group half">
+                                    <label for="prof-edit-res">Résolution / Tag :</label>
+                                    <input type="text" id="prof-edit-res" class="form-input" placeholder="ex: 1080p">
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="prof-edit-format">Spécification Format yt-dlp :</label>
-                            <input type="text" id="prof-edit-format" required class="form-input code-font">
-                        </div>
-                        <div class="modal-footer" style="padding-right: 0; padding-bottom: 0;">
-                            <button type="button" class="btn-secondary" id="btn-cancel-profile-edit">Annuler</button>
-                            <button type="submit" class="btn-primary">Enregistrer le Profil</button>
+
+                        <!-- Column 2: yt-dlp Formula & Actions -->
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="prof-edit-format">Spécification Format yt-dlp :</label>
+                                <input type="text" id="prof-edit-format" required class="form-input code-font" placeholder="bestvideo[height<=1080]+bestaudio/best">
+                                <small style="color: var(--text-muted); font-size: 0.78rem; margin-top: 4px;">
+                                    Formule passée directement à <code>yt-dlp -f</code> (ex: <code>bestvideo[height&lt;=2160]+bestaudio/best</code>).
+                                </small>
+                            </div>
+                            <div class="modal-footer" style="padding: 0; margin-top: 24px; justify-content: flex-end;">
+                                <button type="button" class="btn-secondary" id="btn-cancel-profile-edit">Annuler</button>
+                                <button type="submit" class="btn-primary">Enregistrer le Profil</button>
+                            </div>
                         </div>
                     </form>
                 </div>
