@@ -15,19 +15,16 @@
 </head>
 <body>
     <div class="app-container">
-        <header class="app-header glass">
-            <div class="header-brand">
-                <img src="static/img/favicon-96.png" alt="Sujib logo" class="brand-logo">
-                <div>
-                    <span class="brand-name">SUJIB</span>
-                    <span class="brand-tagline">수집 2.0</span>
-                </div>
+        <header class="navbar glass">
+            <div class="brand">
+                <img src="static/img/favicon-96.png" alt="Sujib logo" class="brand-logo-img">
+                <span class="brand-name">SUJIB</span>
+                <span class="brand-badge">수집 2.0</span>
             </div>
-            <div class="header-actions">
-                <div class="status-pill">
+            <div class="status-bar">
+                <div class="status-item">
                     <span class="status-dot"></span>
-                    <span class="status-label">yt-dlp:</span>
-                    <span id="ytdlp-ver-text" class="status-value">--</span>
+                    <span>yt-dlp: <strong id="ytdlp-ver-text">--</strong></span>
                 </div>
                 <button id="btn-update-ytdlp" class="btn-sm btn-outline" title="Mettre à jour yt-dlp">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
