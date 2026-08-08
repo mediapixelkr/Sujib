@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Sujib Downloader</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 16px;
+      width: 320px;
+      margin: 0;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .brand {
+      font-weight: 700;
+      color: #3b82f6;
+      font-size: 1rem;
+    }
+    .btn-options {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .field {
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+    input, select {
+      padding: 8px 10px;
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: white;
+      font-size: 0.85rem;
+    }
+    button.btn-send {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+    }
+    button.btn-send:hover {
+      opacity: 0.9;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      text-align: center;
+    }
+    .status.success { color: #10b981; }
+    .status.error { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="brand">SUJIB 수집</span>
+    <button id="btn-open-options" class="btn-options">⚙️ Options</button>
+  </div>
+
+  <div class="field">
+    <label for="video-url">URL de la vidéo / playlist :</label>
+    <input type="url" id="video-url" placeholder="https://www.youtube.com/watch?v=..." required>
+  </div>
+
+  <div class="field">
+    <label for="profile-select">Profil de qualité :</label>
+    <select id="profile-select">
+      <option value="1">4K (2160p)</option>
+      <option value="2">1440p (2K)</option>
+      <option value="3">1080p (Full HD)</option>
+      <option value="4">720p (HD)</option>
+      <option value="5">SD (480p)</option>
+      <option value="6">Audio Only (MP3)</option>
+    </select>
+  </div>
+
+  <button id="btn-send" class="btn-send">Télécharger avec Sujib</button>
+  <div id="status" class="status"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

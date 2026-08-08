@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Options Sujib Extension</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 20px;
+      width: 380px;
+    }
+    h2 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: #3b82f6;
+    }
+    .field {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    input, select {
+      padding: 8px 12px;
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: white;
+      font-size: 0.9rem;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    .status.success { color: #10b981; }
+    .status.error { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <h2>Paramètres du serveur Sujib</h2>
+  <div class="field">
+    <label for="server-url">URL du serveur Sujib :</label>
+    <input type="url" id="server-url" placeholder="http://192.168.200.15/sujib" required>
+  </div>
+  <div class="field">
+    <label for="auth-user">Utilisateur Auth Basic (Optionnel) :</label>
+    <input type="text" id="auth-user" placeholder="ex: mick">
+  </div>
+  <div class="field">
+    <label for="auth-pass">Mot de passe Auth Basic (Optionnel) :</label>
+    <input type="password" id="auth-pass">
+  </div>
+  <div class="field">
+    <label for="default-profile">Profil par défaut :</label>
+    <select id="default-profile">
+      <option value="1">4K (2160p)</option>
+      <option value="2">1440p (2K)</option>
+      <option value="3">1080p (Full HD)</option>
+      <option value="4">720p (HD)</option>
+      <option value="5">SD (480p)</option>
+      <option value="6">Audio Only (MP3)</option>
+    </select>
+  </div>
+  <button id="btn-save">Enregistrer</button>
+  <div id="status" class="status"></div>
+
+  <script src="options.js"></script>
+</body>
+</html>
