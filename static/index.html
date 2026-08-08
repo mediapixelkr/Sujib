@@ -33,12 +33,23 @@
                     <stop offset="100%" stop-color="#6c74f0" stop-opacity="0.15" />
                 </linearGradient>
 
-                <!-- Separate Blur Filters for Backing vs Main Silhouette -->
+                <!-- Translucent Foreground Wave Gradient (Soft Blue-Violet Accent) -->
+                <linearGradient id="waveBlueFront" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#284496" stop-opacity="0.10" />
+                    <stop offset="40%" stop-color="#496bd4" stop-opacity="0.26" />
+                    <stop offset="75%" stop-color="#6677e6" stop-opacity="0.20" />
+                    <stop offset="100%" stop-color="#746fee" stop-opacity="0.08" />
+                </linearGradient>
+
+                <!-- Blur Filters for Backing vs Main vs Front Surfaces -->
                 <filter id="softBackBlur" x="-10%" y="-10%" width="120%" height="120%">
                     <feGaussianBlur stdDeviation="12" />
                 </filter>
                 <filter id="subtleMainBlur" x="-10%" y="-10%" width="120%" height="120%">
                     <feGaussianBlur stdDeviation="2.5" />
+                </filter>
+                <filter id="subtleFrontBlur" x="-10%" y="-10%" width="120%" height="120%">
+                    <feGaussianBlur stdDeviation="2.0" />
                 </filter>
             </defs>
 
@@ -51,6 +62,11 @@
             <path class="wallpaper-wave-main"
                   d="M -100 640 C 350 530, 720 700, 1120 570 C 1420 460, 1650 550, 1750 590 L 1750 950 L -100 950 Z"
                   fill="url(#waveBlueMain)" filter="url(#subtleMainBlur)" />
+
+            <!-- Translucent Foreground Wave (Front Surface crossing 75-83% viewport height) -->
+            <path class="wallpaper-wave-front"
+                  d="M -100 760 C 300 695, 650 780, 1020 710 C 1320 650, 1560 715, 1750 750 L 1750 950 L -100 950 Z"
+                  fill="url(#waveBlueFront)" filter="url(#subtleFrontBlur)" />
         </svg>
     </div>
 
