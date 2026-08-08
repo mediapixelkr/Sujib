@@ -545,8 +545,30 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupDragTarget() {
         const zone = document.getElementById('drag-cascade-zone');
         const dropCard = document.getElementById('drop-target-card');
+        const profilesPanel = document.getElementById('cascade-profiles-panel');
+        const destsPanel = document.getElementById('cascade-dests-panel');
 
         if (!zone || !dropCard) return;
+
+        // Panel Drag Over listeners to clear leaveTimer instantly when mouse crosses gap into panel
+        [profilesPanel, destsPanel].forEach(panel => {
+            if (!panel) return;
+            panel.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                if (cascadeState.leaveTimer) {
+                    clearTimeout(cascadeState.leaveTimer);
+                    cascadeState.leaveTimer = null;
+                }
+            });
+            panel.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+                if (cascadeState.leaveTimer) {
+                    clearTimeout(cascadeState.leaveTimer);
+                    cascadeState.leaveTimer = null;
+                }
+            });
+        });
 
         // Master Zone Drag Enter
         zone.addEventListener('dragenter', (e) => {
@@ -575,13 +597,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Master Zone Drag Leave
         zone.addEventListener('dragleave', (e) => {
+            // If the drag target is still inside the master zone, ignore dragleave
+            if (e.relatedTarget && zone.contains(e.relatedTarget)) {
+                return;
+            }
             cascadeState.dragDepth = Math.max(0, cascadeState.dragDepth - 1);
             if (cascadeState.dragDepth === 0 && cascadeState.mode === 'dragging') {
+                if (cascadeState.leaveTimer) clearTimeout(cascadeState.leaveTimer);
                 cascadeState.leaveTimer = setTimeout(() => {
                     if (cascadeState.dragDepth === 0 && cascadeState.mode === 'dragging') {
                         resetCascadeState();
                     }
-                }, 200);
+                }, 600); // 600ms grace period so moving across gaps never collapses panel
             }
         });
 
@@ -684,6 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 e.stopPropagation();
                 e.dataTransfer.dropEffect = 'copy';
+                handleProfileHover(prof);
             });
 
             card.addEventListener('click', (e) => {
@@ -698,6 +726,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleProfileHover(prof) {
+        if (cascadeState.leaveTimer) {
+            clearTimeout(cascadeState.leaveTimer);
+            cascadeState.leaveTimer = null;
+        }
         cascadeState.hoveredProfile = prof;
         cascadeState.selectedProfile = prof;
         updateProfileCardsSelection(prof);
@@ -769,6 +801,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 e.stopPropagation();
                 e.dataTransfer.dropEffect = 'copy';
+                handleDestHover(dest);
             });
 
             card.addEventListener('drop', async (e) => {
@@ -790,6 +823,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleDestHover(dest) {
+        if (cascadeState.leaveTimer) {
+            clearTimeout(cascadeState.leaveTimer);
+            cascadeState.leaveTimer = null;
+        }
         cascadeState.hoveredDest = dest;
         cascadeState.selectedDest = dest;
         updateDestCardsSelection(dest);
