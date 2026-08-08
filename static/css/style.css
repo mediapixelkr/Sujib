@@ -704,76 +704,283 @@ body {
     color: var(--text-muted);
 }
 
-/* Queue List Cards */
+/* Section Headers & Badges */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.section-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.count-chip {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+}
+
+.status-badge-compact {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.status-dot.green {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+/* Queue & History Card Containers */
 .queue-list, .history-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.empty-state {
-    padding: 24px;
+/* Empty State Card */
+.empty-state-card {
+    padding: 32px 20px;
     text-align: center;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: var(--radius-sm);
-    border: 1px dashed var(--border-color);
+    border-radius: 14px;
+    background: rgba(22, 33, 54, 0.4);
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #94a3b8;
 }
 
-.item-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: 14px 18px;
+.empty-state-card svg {
+    stroke: #64748b;
+}
+
+.empty-state-card .empty-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #cbd5e1;
+}
+
+.empty-state-card .empty-sub {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+/* Modern Download Card Component */
+.download-card {
+    background: rgba(22, 33, 54, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 16px 18px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    gap: 16px;
+    align-items: flex-start;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
 }
 
-/* Filling Progress Effect */
-.item-card .progress-bg {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
-    transition: width 0.3s ease;
-    z-index: 1;
+.download-card:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.35);
 }
 
-.item-content {
-    position: relative;
-    z-index: 2;
+/* Card Thumbnail */
+.download-thumb {
+    width: 130px;
+    height: 73px; /* 16:9 ratio */
+    border-radius: 8px;
+    object-fit: cover;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    overflow: hidden;
+}
+
+.download-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Card Details Body */
+.download-body {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    max-width: 75%;
+    gap: 6px;
 }
 
-.item-title {
+.download-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.download-title {
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.96rem;
+    color: #ffffff;
+    line-height: 1.35;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.item-meta {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    display: flex;
-    gap: 12px;
-}
-
-.item-actions {
-    position: relative;
-    z-index: 2;
+/* Metadata Chips Row */
+.chips-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.meta-chip {
+    font-size: 0.74rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+}
+
+/* Status Pill Badges */
+.status-pill {
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.status-pill.status-pending {
+    background: rgba(148, 163, 184, 0.12);
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.status-pill.status-downloading {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.status-pill.status-processing {
+    background: rgba(139, 92, 246, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(139, 92, 246, 0.35);
+}
+
+.status-pill.status-completed {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.status-pill.status-failed {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.status-pill.status-cancelled {
+    background: rgba(255, 255, 255, 0.06);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Thin Sleek Progress Bar */
+.progress-bar-container {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.progress-track {
+    height: 5px;
+    width: 100%;
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.7);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    border-radius: 4px;
+    transition: width 0.25s ease-out;
+}
+
+.progress-stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.76rem;
+    color: #94a3b8;
+    font-variant-numeric: tabular-nums;
+    margin-top: 4px;
+}
+
+/* Destination Line & Action Row */
+.download-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.download-dest-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.download-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
 }
 
 /* Modals */

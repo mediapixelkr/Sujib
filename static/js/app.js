@@ -183,6 +183,57 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ─── Thumbnail & SVG Helpers ──────────────────────────────────────────────
+    function getFallbackSvg() {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', '24');
+        svg.setAttribute('height', '24');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-width', '1.5');
+        svg.innerHTML = '<path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>';
+        return svg;
+    }
+
+    function createThumbnailElement(videoId) {
+        const thumbDiv = document.createElement('div');
+        thumbDiv.className = 'download-thumb';
+        if (videoId && videoId.length >= 4) {
+            const img = document.createElement('img');
+            img.src = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+            img.alt = 'Thumbnail';
+            img.onerror = () => {
+                thumbDiv.replaceChildren(getFallbackSvg());
+            };
+            thumbDiv.appendChild(img);
+        } else {
+            thumbDiv.appendChild(getFallbackSvg());
+        }
+        return thumbDiv;
+    }
+
+    function getLocalizedStatusInfo(statusStr) {
+        switch ((statusStr || '').toLowerCase()) {
+            case 'pending':
+                return { text: 'En attente', class: 'status-pending' };
+            case 'downloading':
+                return { text: 'Téléchargement', class: 'status-downloading' };
+            case 'processing':
+            case 'merging':
+                return { text: 'Traitement', class: 'status-processing' };
+            case 'completed':
+                return { text: 'Terminé', class: 'status-completed' };
+            case 'failed':
+            case 'error':
+                return { text: 'Échec', class: 'status-failed' };
+            case 'cancelled':
+                return { text: 'Annulé', class: 'status-cancelled' };
+            default:
+                return { text: statusStr || 'Inconnu', class: 'status-pending' };
+        }
+    }
+
     // ─── API: Queue ───────────────────────────────────────────────────────────
     async function loadQueue() {
         try {
@@ -193,45 +244,115 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderQueue() {
         queueList.replaceChildren();
-        const active = queueItems.filter(i => ['pending','downloading'].includes(i.status));
+        const active = queueItems.filter(i => ['pending','downloading','processing'].includes(i.status));
         queueCountBadge.textContent = active.length;
 
-        if (queueItems.length === 0) { queueList.appendChild(queueEmpty); return; }
+        if (queueItems.length === 0) {
+            queueList.appendChild(queueEmpty);
+            return;
+        }
 
         queueItems.forEach(item => {
-            const row = document.createElement('div');
-            row.className = 'queue-item';
+            const card = document.createElement('div');
+            card.className = 'download-card';
 
-            const info = document.createElement('div');
-            info.className = 'queue-info';
+            // Thumbnail
+            const thumb = createThumbnailElement(item.video_id);
+            card.appendChild(thumb);
 
-            const title = document.createElement('span');
-            title.className = 'queue-title';
-            title.textContent = item.title || item.url;
+            // Body
+            const body = document.createElement('div');
+            body.className = 'download-body';
 
-            const meta = document.createElement('span');
-            meta.className = 'queue-meta';
-            meta.textContent = `${item.profile_name || ''} · ${item.status}`;
+            // Header Row: Title & Status Pill
+            const headerRow = document.createElement('div');
+            headerRow.className = 'download-header-row';
 
-            const progressBar = document.createElement('div');
-            progressBar.className = 'queue-progress';
-            if (item.status === 'downloading') {
-                const fill = document.createElement('div');
-                fill.className = 'queue-progress-fill';
-                fill.style.width = `${item.progress_pct || 0}%`;
-                progressBar.appendChild(fill);
+            const title = document.createElement('div');
+            title.className = 'download-title';
+            title.textContent = item.title || item.url || 'Sans titre';
+            title.title = item.title || item.url || '';
+
+            const statusInfo = getLocalizedStatusInfo(item.status);
+            const statusPill = document.createElement('span');
+            statusPill.className = `status-pill ${statusInfo.class}`;
+            statusPill.textContent = statusInfo.text;
+
+            headerRow.appendChild(title);
+            headerRow.appendChild(statusPill);
+            body.appendChild(headerRow);
+
+            // Metadata Chips Row
+            const chipsRow = document.createElement('div');
+            chipsRow.className = 'chips-row';
+
+            const sourceChip = document.createElement('span');
+            sourceChip.className = 'meta-chip';
+            sourceChip.textContent = 'YouTube';
+            chipsRow.appendChild(sourceChip);
+
+            if (item.profile_name) {
+                const profChip = document.createElement('span');
+                profChip.className = 'meta-chip';
+                profChip.textContent = item.profile_name;
+                chipsRow.appendChild(profChip);
             }
 
-            info.appendChild(title);
-            info.appendChild(meta);
-            if (item.status === 'downloading') info.appendChild(progressBar);
+            body.appendChild(chipsRow);
 
-            const actions = document.createElement('div');
-            actions.className = 'queue-actions';
+            // Progress Bar (when downloading or pending)
+            if (['downloading', 'pending'].includes(item.status)) {
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'progress-bar-container';
 
-            if (['pending','downloading'].includes(item.status)) {
+                const track = document.createElement('div');
+                track.className = 'progress-track';
+
+                const fill = document.createElement('div');
+                fill.className = 'progress-fill';
+                const pct = item.status === 'downloading' ? (item.progress_pct || 0) : 0;
+                fill.style.width = `${pct}%`;
+                track.appendChild(fill);
+                progressContainer.appendChild(track);
+
+                if (item.status === 'downloading') {
+                    const statsRow = document.createElement('div');
+                    statsRow.className = 'progress-stats-row';
+
+                    const speedEtaText = [item.speed, item.eta ? `~${item.eta}` : null].filter(Boolean).join(' · ');
+                    const statsLeft = document.createElement('span');
+                    statsLeft.textContent = speedEtaText || 'Téléchargement...';
+
+                    const statsRight = document.createElement('span');
+                    statsRight.textContent = `${pct.toFixed(0)}%`;
+
+                    statsRow.appendChild(statsLeft);
+                    statsRow.appendChild(statsRight);
+                    progressContainer.appendChild(statsRow);
+                }
+
+                body.appendChild(progressContainer);
+            }
+
+            // Footer Row: Destination & Actions
+            const footerRow = document.createElement('div');
+            footerRow.className = 'download-footer-row';
+
+            const destInfo = document.createElement('div');
+            destInfo.className = 'download-dest-info';
+            const destPath = item.dest_path ? item.dest_path : 'Dossier par défaut';
+            destInfo.innerHTML = `<span>📁</span> <span>${destPath}</span>`;
+            destInfo.title = destPath;
+
+            footerRow.appendChild(destInfo);
+
+            if (['pending', 'downloading'].includes(item.status)) {
+                const actions = document.createElement('div');
+                actions.className = 'download-actions';
+
                 const btnCancel = document.createElement('button');
                 btnCancel.className = 'btn-sm btn-outline';
+                btnCancel.style.cssText = 'color:#f87171;border-color:rgba(239,68,68,0.3);';
                 btnCancel.textContent = 'Annuler';
                 btnCancel.addEventListener('click', async () => {
                     await fetch(apiPath(`/queue/${item.id}`), { method: 'DELETE' });
@@ -239,11 +360,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     loadQueue();
                 });
                 actions.appendChild(btnCancel);
+                footerRow.appendChild(actions);
             }
 
-            row.appendChild(info);
-            row.appendChild(actions);
-            queueList.appendChild(row);
+            body.appendChild(footerRow);
+            card.appendChild(body);
+            queueList.appendChild(card);
         });
     }
 
@@ -259,29 +381,79 @@ document.addEventListener('DOMContentLoaded', () => {
         historyList.replaceChildren();
         historyCountBadge.textContent = historyItems.length;
 
-        if (historyItems.length === 0) { historyList.appendChild(historyEmpty); return; }
+        if (historyItems.length === 0) {
+            historyList.appendChild(historyEmpty);
+            return;
+        }
 
         historyItems.forEach(item => {
-            const row = document.createElement('div');
-            row.className = 'history-item';
+            const card = document.createElement('div');
+            card.className = 'download-card';
 
-            const info = document.createElement('div');
-            info.className = 'history-info';
+            // Thumbnail
+            const thumb = createThumbnailElement(item.video_id);
+            card.appendChild(thumb);
 
-            const title = document.createElement('span');
-            title.className = 'history-title';
-            title.textContent = item.title || item.filename;
+            // Body
+            const body = document.createElement('div');
+            body.className = 'download-body';
 
-            const meta = document.createElement('span');
-            meta.className = 'history-meta';
-            const size = item.filesize ? `${(item.filesize / 1024 / 1024).toFixed(1)} MB` : '';
-            meta.textContent = [item.resolution, item.format_info, size].filter(Boolean).join(' · ');
+            // Header Row: Title & Status Pill
+            const headerRow = document.createElement('div');
+            headerRow.className = 'download-header-row';
 
-            info.appendChild(title);
-            info.appendChild(meta);
+            const title = document.createElement('div');
+            title.className = 'download-title';
+            title.textContent = item.title || item.filename || 'Téléchargement';
+            title.title = item.title || item.filename || '';
+
+            const statusPill = document.createElement('span');
+            statusPill.className = 'status-pill status-completed';
+            statusPill.textContent = 'Terminé';
+
+            headerRow.appendChild(title);
+            headerRow.appendChild(statusPill);
+            body.appendChild(headerRow);
+
+            // Chips Row
+            const chipsRow = document.createElement('div');
+            chipsRow.className = 'chips-row';
+
+            if (item.resolution) {
+                const resChip = document.createElement('span');
+                resChip.className = 'meta-chip';
+                resChip.textContent = item.resolution;
+                chipsRow.appendChild(resChip);
+            }
+
+            if (item.format_info) {
+                const fmtChip = document.createElement('span');
+                fmtChip.className = 'meta-chip';
+                fmtChip.textContent = item.format_info;
+                chipsRow.appendChild(fmtChip);
+            }
+
+            if (item.filesize) {
+                const sizeChip = document.createElement('span');
+                sizeChip.className = 'meta-chip';
+                sizeChip.textContent = `${(item.filesize / 1024 / 1024).toFixed(1)} MB`;
+                chipsRow.appendChild(sizeChip);
+            }
+
+            body.appendChild(chipsRow);
+
+            // Footer Row: Destination & Delete Button
+            const footerRow = document.createElement('div');
+            footerRow.className = 'download-footer-row';
+
+            const destInfo = document.createElement('div');
+            destInfo.className = 'download-dest-info';
+            const filepath = item.filepath || item.filename || 'Stockage local';
+            destInfo.innerHTML = `<span>📁</span> <span>${filepath}</span>`;
+            destInfo.title = filepath;
 
             const actions = document.createElement('div');
-            actions.className = 'history-actions';
+            actions.className = 'download-actions';
 
             const btnDel = document.createElement('button');
             btnDel.className = 'btn-sm btn-outline';
@@ -293,9 +465,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             actions.appendChild(btnDel);
 
-            row.appendChild(info);
-            row.appendChild(actions);
-            historyList.appendChild(row);
+            footerRow.appendChild(destInfo);
+            footerRow.appendChild(actions);
+            body.appendChild(footerRow);
+
+            card.appendChild(body);
+            historyList.appendChild(card);
         });
     }
 
