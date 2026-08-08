@@ -111,6 +111,29 @@ def init_db():
             default_profiles
         )
 
+    # Preset Paths table (for multi-layer destination dropdowns)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS preset_paths (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        label TEXT NOT NULL,
+        path TEXT NOT NULL,
+        icon TEXT DEFAULT '📁'
+    );
+    """)
+
+    cursor.execute("SELECT COUNT(*) FROM preset_paths")
+    if cursor.fetchone()[0] == 0:
+        default_paths = [
+            ("Dossier par défaut (Global)", "", "📁"),
+            ("Albums US", "/var/www/html/sujib/downloads/Albums_US", "💿"),
+            ("MV K-Pop", "/var/www/html/sujib/downloads/KPop_MV", "🎵"),
+            ("Musique / EDM", "/var/www/html/sujib/downloads/EDM", "🎧")
+        ]
+        cursor.executemany(
+            "INSERT INTO preset_paths (label, path, icon) VALUES (?, ?, ?)",
+            default_paths
+        )
+
     conn.commit()
     conn.close()
 
@@ -229,3 +252,36 @@ def remove_downloaded(item_id: int) -> Optional[str]:
     conn.commit()
     conn.close()
     return filepath
+
+def get_preset_paths() -> List[Dict[str, Any]]:
+    conn = get_db_connection()
+    rows = conn.execute("SELECT * FROM preset_paths ORDER BY id ASC").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def add_preset_path(label: str, path: str, icon: str = '📁') -> int:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO preset_paths (label, path, icon) VALUES (?, ?, ?)",
+        (label, path, icon)
+    )
+    pid = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return pid
+
+def update_preset_path(preset_id: int, label: str, path: str, icon: str = '📁'):
+    conn = get_db_connection()
+    conn.execute(
+        "UPDATE preset_paths SET label = ?, path = ?, icon = ? WHERE id = ?",
+        (label, path, icon, preset_id)
+    )
+    conn.commit()
+    conn.close()
+
+def delete_preset_path(preset_id: int):
+    conn = get_db_connection()
+    conn.execute("DELETE FROM preset_paths WHERE id = ?", (preset_id,))
+    conn.commit()
+    conn.close()

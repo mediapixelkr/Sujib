@@ -49,35 +49,57 @@
 
         <!-- Main Content Area -->
         <main class="content">
-            <!-- URL Input Bar -->
-            <section class="url-section">
-                <div class="url-card glass">
-                    <form id="url-form" class="url-form">
-                        <div class="input-wrapper">
-                            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            <!-- Top Section: 2 Side-by-Side Cards -->
+            <section class="top-cards-section">
+                <div class="top-cards-container">
+                    
+                    <!-- LEFT CARD (1/3 Width): Interactive Multi-Layer Drag & Drop Target -->
+                    <div id="drop-target-card" class="card-drag-target glass">
+                        <div id="drop-normal-state" class="drop-normal-state">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
                             </svg>
-                            <input type="url" id="url-input" placeholder="Coller une URL YouTube (vidéo ou playlist)..." required autocomplete="off">
-                            <button type="submit" id="btn-submit-url" class="btn-gradient">
-                                <span>Analyser / Télécharger</span>
-                            </button>
+                            <div class="drop-label-group">
+                                <span class="drop-main-label">Glisser un lien YouTube ici</span>
+                                <span class="drop-sub-label">Survolez pour choisir profil & dossier</span>
+                            </div>
                         </div>
-                    </form>
-                    <p class="drop-hint">💡 Astuce : Vous pouvez aussi glisser-déposer un lien YouTube directement sur l'une des cartes de profil ci-dessous !</p>
-                </div>
-            </section>
 
-            <!-- Profiles Grid (Target Cards for Drag & Drop or Default selection) -->
-            <section class="profiles-section">
-                <div class="section-header">
-                    <h2 class="section-title">Profils de Qualité (Drag & Drop)</h2>
-                    <button id="btn-manage-profiles" class="btn-sm btn-outline">
-                        ⚙️ Éditeur de Profils
-                    </button>
-                </div>
-                <div id="profiles-grid" class="profiles-grid">
-                    <!-- Profile cards rendered dynamically -->
+                        <!-- Multi-layer Drop Zone: Appears on Drag Over -->
+                        <div id="drop-expanded-layer" class="drop-expanded-layer hidden">
+                            <div class="drop-layer-title">🎯 Glissez sur la qualité souhaitée :</div>
+                            <div id="drag-profiles-list" class="drag-profiles-list">
+                                <!-- Profile pills rendered dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Flyout preset path menu -->
+                        <div id="drag-paths-flyout" class="drag-paths-flyout hidden">
+                            <div id="flyout-profile-title" class="flyout-header">Dossier de destination :</div>
+                            <div id="flyout-paths-list" class="flyout-paths-list">
+                                <!-- Paths rendered dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT CARD (2/3 Width): URL Input Form -->
+                    <div class="card-url-input glass">
+                        <form id="url-form" class="url-form">
+                            <div class="input-wrapper">
+                                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                </svg>
+                                <input type="url" id="url-input" placeholder="Coller une URL YouTube (vidéo ou playlist)..." required autocomplete="off">
+                                <button type="submit" id="btn-submit-url" class="btn-gradient">
+                                    <span>Analyser / Télécharger</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
                 </div>
             </section>
 
@@ -92,7 +114,7 @@
                 </div>
             </section>
 
-            <!-- Downloaded History Section -->
+            <!-- History Section -->
             <section class="history-section">
                 <div class="section-header">
                     <h2 class="section-title">Historique des Fichiers Téléchargés</h2>
@@ -105,79 +127,131 @@
         </main>
     </div>
 
-    <!-- Options & Configuration Modal (1200px Dashboard) -->
+    <!-- Options & Configuration Modal (1200px Accordion Dashboard) -->
     <div id="options-modal" class="modal-overlay hidden">
         <div class="modal-card glass modal-xl">
             <div class="modal-header">
-                <h3>⚙️ Configuration du Serveur & Module Firefox</h3>
+                <h3>⚙️ Panneau de Configuration Sujib 2.0</h3>
                 <button class="btn-close" id="btn-close-options">&times;</button>
             </div>
-            <form id="options-form" class="pm-form-layout">
-                <!-- Column 1: Server Options -->
-                <div class="form-col">
-                    <h4 style="color: var(--accent-blue); margin-bottom: 12px;">📁 Répertoire & Options de Téléchargement</h4>
-                    <div class="form-group">
-                        <label for="opt-download-dir">Dossier de destination par défaut (chemin absolu) :</label>
-                        <input type="text" id="opt-download-dir" required class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="opt-rename-regex">Règles de renommage Regex (motif||remplacement par ligne) :</label>
-                        <textarea id="opt-rename-regex" rows="4" class="form-input code-font" placeholder="/[&quot;']/||\n/\s+/||-"></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group half">
-                            <label for="opt-subtitles">Sous-titres :</label>
-                            <select id="opt-subtitles" class="form-select">
-                                <option value="0">Aucun</option>
-                                <option value="1">Fichier .srt externe</option>
-                                <option value="2">Intégrés dans la vidéo</option>
-                            </select>
-                        </div>
-                        <div class="form-group half">
-                            <label for="opt-sub-lang">Langue sous-titres :</label>
-                            <input type="text" id="opt-sub-lang" maxlength="5" class="form-input" placeholder="ex: fr, en">
-                        </div>
-                    </div>
-                    <div class="form-group half" style="margin-top: 10px;">
-                        <label for="opt-show-last">Nombre d'historiques affichés :</label>
-                        <input type="number" id="opt-show-last" min="5" max="100" class="form-input" value="20">
-                    </div>
-                </div>
-
-                <!-- Column 2: Firefox Extension & Installers -->
-                <div class="form-col">
-                    <h4 style="color: #60a5fa; margin-bottom: 12px;">🦊 Extension Firefox & Installateurs 1-Clic</h4>
-                    <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; gap: 12px;">
-                        <div>
-                            <strong>Fichiers Extension Firefox :</strong>
-                            <div style="display: flex; gap: 10px; margin-top: 6px;">
-                                <a href="static/sujib-firefox-extension.xpi" class="btn-sm btn-outline" style="text-decoration: none;" download>📦 Paquet .xpi</a>
-                                <a href="static/sujib-firefox-extension.zip" class="btn-sm btn-outline" style="text-decoration: none;" download>📁 Archive .zip</a>
+            
+            <div class="accordion-container">
+                <!-- Accordion 1: Preset Destination Paths -->
+                <div class="accordion-item active">
+                    <button class="accordion-header" type="button">
+                        <span>📁 1. Chemins & Dossiers Prédéfinis (Albums US, MV K-Pop, EDM...)</span>
+                        <span class="accordion-icon">▲</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="preset-paths-manager">
+                            <p class="section-desc">Ajoutez vos dossiers de destination personnalisés. Ils s'afficheront au survol dans le menu Drag & Drop !</p>
+                            <div class="preset-add-form">
+                                <input type="text" id="preset-new-label" placeholder="Libellé (ex: MV K-Pop)" class="form-input" style="flex: 1;">
+                                <input type="text" id="preset-new-path" placeholder="Dossier absolu (ex: /var/www/html/sujib/downloads/KPop)" class="form-input" style="flex: 2;">
+                                <button id="btn-add-preset" class="btn-sm btn-primary" type="button">➕ Ajouter le dossier</button>
                             </div>
-                        </div>
-
-                        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
-                            <strong>Installateurs Automatiques 1-Clic :</strong>
-                            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 8px 0;">
-                                Installe et active automatiquement l'extension dans Firefox sans blocage ni signature requise.
-                            </p>
-                            <div style="display: flex; flex-direction: column; gap: 8px;">
-                                <a href="static/installers/install-windows.bat" class="btn-sm btn-primary" style="text-decoration: none; text-align: center;" download>
-                                    💻 Télécharger l'Installateur 1-Clic Windows (.bat)
-                                </a>
-                                <a href="static/installers/install-linux.sh" class="btn-sm btn-outline" style="text-decoration: none; text-align: center;" download>
-                                    🐧 Télécharger l'Installateur 1-Clic Linux (.sh)
-                                </a>
+                            <div id="preset-paths-list" class="preset-paths-list">
+                                <!-- Preset path items rendered dynamically -->
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="modal-footer" style="padding: 0; margin-top: 24px; justify-content: flex-end;">
-                        <button type="button" class="btn-secondary" id="btn-cancel-options">Annuler</button>
-                        <button type="submit" class="btn-primary">Enregistrer la Configuration</button>
+                <!-- Accordion 2: Quality Profiles -->
+                <div class="accordion-item">
+                    <button class="accordion-header" type="button">
+                        <span>🎛️ 2. Gestion des Profils de Qualité (4K, 1080p, MP3...)</span>
+                        <span class="accordion-icon">▼</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="playlist-controls" style="margin-bottom: 14px;">
+                            <button id="btn-new-profile" class="btn-sm btn-primary" type="button">➕ Créer un profil</button>
+                            <label class="selected-counter">
+                                <input type="checkbox" id="chk-show-archived"> Afficher profils archivés
+                            </label>
+                        </div>
+                        <div id="profiles-manager-list" class="pm-container-grid">
+                            <!-- Grid rendered dynamically -->
+                        </div>
                     </div>
                 </div>
-            </form>
+
+                <!-- Accordion 3: System Options -->
+                <div class="accordion-item">
+                    <button class="accordion-header" type="button">
+                        <span>⚙️ 3. Règles de Renommage & Options Système</span>
+                        <span class="accordion-icon">▼</span>
+                    </button>
+                    <div class="accordion-content">
+                        <form id="options-form" class="pm-form-layout">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="opt-download-dir">Dossier de destination par défaut (chemin absolu) :</label>
+                                    <input type="text" id="opt-download-dir" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="opt-rename-regex">Règles de renommage Regex (motif||remplacement par ligne) :</label>
+                                    <textarea id="opt-rename-regex" rows="4" class="form-input code-font"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-row">
+                                    <div class="form-group half">
+                                        <label for="opt-subtitles">Sous-titres :</label>
+                                        <select id="opt-subtitles" class="form-select">
+                                            <option value="0">Aucun</option>
+                                            <option value="1">Fichier .srt externe</option>
+                                            <option value="2">Intégrés dans la vidéo</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group half">
+                                        <label for="opt-sub-lang">Langue sous-titres :</label>
+                                        <input type="text" id="opt-sub-lang" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-group half">
+                                    <label for="opt-show-last">Historique affiché :</label>
+                                    <input type="number" id="opt-show-last" class="form-input">
+                                </div>
+                                <div class="modal-footer" style="padding: 0; margin-top: 20px; justify-content: flex-end;">
+                                    <button type="submit" class="btn-primary">Enregistrer les options</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Accordion 4: Firefox Extension & Installers -->
+                <div class="accordion-item">
+                    <button class="accordion-header" type="button">
+                        <span>🦊 4. Module Firefox & Installateurs 1-Clic</span>
+                        <span class="accordion-icon">▼</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 250px;">
+                                <strong>Paquets d'extension Firefox :</strong>
+                                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                                    <a href="static/sujib-firefox-extension.xpi" class="btn-sm btn-outline" style="text-decoration: none;" download>📦 Paquet .xpi</a>
+                                    <a href="static/sujib-firefox-extension.zip" class="btn-sm btn-outline" style="text-decoration: none;" download>📁 Archive .zip</a>
+                                </div>
+                            </div>
+                            <div style="flex: 2; min-width: 280px;">
+                                <strong>Installateurs Automatiques 1-Clic :</strong>
+                                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                                    <a href="static/installers/install-windows.bat" class="btn-sm btn-primary" style="text-decoration: none;" download>💻 Installateur Windows (.bat)</a>
+                                    <a href="static/installers/install-linux.sh" class="btn-sm btn-outline" style="text-decoration: none;" download>🐧 Installateur Linux (.sh)</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="modal-footer" style="margin-top: 16px;">
+                <button type="button" class="btn-secondary" id="btn-done-options">Fermer</button>
+            </div>
         </div>
     </div>
 

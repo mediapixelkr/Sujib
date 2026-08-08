@@ -7,10 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // State
     let profiles = [];
+    let presetPaths = [];
     let queueItems = [];
     let historyItems = [];
     let currentPlaylistData = null;
     let selectedProfileId = 1;
+    let hoveredDragProfile = null;
 
     // DOM Elements
     const ytdlpVerText = document.getElementById('ytdlp-ver-text');
@@ -18,6 +20,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnOpenOptions = document.getElementById('btn-open-options');
     const urlForm = document.getElementById('url-form');
     const urlInput = document.getElementById('url-input');
+
+    // Interactive Drag Target Elements
+    const dropTargetCard = document.getElementById('drop-target-card');
+    const dropNormalState = document.getElementById('drop-normal-state');
+    const dropExpandedLayer = document.getElementById('drop-expanded-layer');
+    const dragProfilesList = document.getElementById('drag-profiles-list');
+    const dragPathsFlyout = document.getElementById('drag-paths-flyout');
+    const flyoutProfileTitle = document.getElementById('flyout-profile-title');
+    const flyoutPathsList = document.getElementById('flyout-paths-list');
+
+    // Preset Paths Elements
+    const presetNewLabel = document.getElementById('preset-new-label');
+    const presetNewPath = document.getElementById('preset-new-path');
+    const btnAddPreset = document.getElementById('btn-add-preset');
+    const presetPathsList = document.getElementById('preset-paths-list');
+    const btnDoneOptions = document.getElementById('btn-done-options');
     const profilesGrid = document.getElementById('profiles-grid');
     const queueList = document.getElementById('queue-list');
     const queueEmpty = document.getElementById('queue-empty');
@@ -83,10 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
     async function init() {
         await loadStatus();
         await loadProfiles();
+        await loadPresetPaths();
         await loadQueue();
         await loadHistory();
         setupSSE();
         setupEventListeners();
+        setupAccordion();
+        setupDragTarget();
     }
 
     // Helper: Toast Notifications
@@ -149,6 +170,228 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.error('Error loading history', err);
         }
+    }
+
+    async function loadPresetPaths() {
+        try {
+            const res = await fetch(apiPath('/preset-paths'));
+            if (res.ok) {
+                presetPaths = await res.json();
+                renderPresetPathsList();
+            }
+        } catch (err) {
+            console.error('Error loading preset paths', err);
+        }
+    }
+
+    function renderPresetPathsList() {
+        if (!presetPathsList) return;
+        presetPathsList.replaceChildren();
+
+        if (presetPaths.length === 0) {
+            presetPathsList.innerHTML = '<div class="empty-state">Aucun dossier pré-enregistré.</div>';
+            return;
+        }
+
+        presetPaths.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'preset-path-row';
+
+            const info = document.createElement('div');
+            info.innerHTML = `<strong>${item.icon || '📁'} ${item.label}</strong> <span style="font-size:0.8rem; color:var(--text-muted); margin-left:8px;">${item.path || 'Dossier par défaut'}</span>`;
+
+            const btnDel = document.createElement('button');
+            btnDel.className = 'btn-sm btn-outline';
+            btnDel.style.color = '#ef4444';
+            btnDel.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            btnDel.textContent = '🗑️ Supprimer';
+            btnDel.addEventListener('click', async () => {
+                await fetch(apiPath(`/preset-paths/${item.id}`), { method: 'DELETE' });
+                showToast('Dossier supprimé', 'info');
+                await loadPresetPaths();
+            });
+
+            row.appendChild(info);
+            row.appendChild(btnDel);
+            presetPathsList.appendChild(row);
+        });
+    }
+
+    // Accordion Control
+    function setupAccordion() {
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                const isActive = item.classList.contains('active');
+                
+                document.querySelectorAll('.accordion-item').forEach(i => {
+                    i.classList.remove('active');
+                    const icon = i.querySelector('.accordion-icon');
+                    if (icon) icon.textContent = '▼';
+                });
+
+                if (!isActive) {
+                    item.classList.add('active');
+                    const icon = header.querySelector('.accordion-icon');
+                    if (icon) icon.textContent = '▲';
+                }
+            });
+        });
+    }
+
+    // Multi-Layer Interactive Drag Target Setup
+    function setupDragTarget() {
+        if (!dropTargetCard) return;
+
+        let dragLeaveTimer = null;
+
+        const expandTargetCard = () => {
+            dropTargetCard.classList.add('expanded');
+            dropNormalState.classList.add('hidden');
+            dropExpandedLayer.classList.remove('hidden');
+            renderDragProfilePills();
+        };
+
+        const resetTargetCard = () => {
+            dropTargetCard.classList.remove('expanded');
+            dropNormalState.classList.remove('hidden');
+            dropExpandedLayer.classList.add('hidden');
+            if (dragPathsFlyout) dragPathsFlyout.classList.add('hidden');
+            hoveredDragProfile = null;
+        };
+
+        dropTargetCard.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+            if (dragLeaveTimer) clearTimeout(dragLeaveTimer);
+            if (!dropTargetCard.classList.contains('expanded')) {
+                expandTargetCard();
+            }
+        });
+
+        dropTargetCard.addEventListener('dragleave', (e) => {
+            dragLeaveTimer = setTimeout(() => {
+                resetTargetCard();
+            }, 400);
+        });
+
+        dropTargetCard.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            const text = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list');
+            resetTargetCard();
+
+            if (!text) {
+                showToast('Aucun lien valide détecté', 'error');
+                return;
+            }
+
+            const urlMatch = text.match(/https?:\/\/[^\s]+/);
+            const targetUrl = urlMatch ? urlMatch[0] : text.trim();
+
+            if (!targetUrl.startsWith('http')) {
+                showToast('URL invalide', 'error');
+                return;
+            }
+
+            const activeProf = hoveredDragProfile || profiles[0];
+            const profId = activeProf ? activeProf.id : 1;
+
+            showToast(`Lancement du téléchargement (${activeProf ? activeProf.name : '4K'})...`, 'info');
+
+            await fetch(apiPath('/download'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    url: targetUrl,
+                    profile_id: profId
+                })
+            });
+
+            loadQueue();
+        });
+    }
+
+    function renderDragProfilePills() {
+        if (!dragProfilesList) return;
+        dragProfilesList.replaceChildren();
+
+        profiles.forEach(prof => {
+            const pill = document.createElement('div');
+            pill.className = 'drag-profile-pill';
+            pill.textContent = `${prof.name} (${prof.container ? prof.container.toUpperCase() : 'MKV'})`;
+
+            pill.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                document.querySelectorAll('.drag-profile-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                hoveredDragProfile = prof;
+                showFlyoutPaths(prof);
+            });
+
+            dragProfilesList.appendChild(pill);
+        });
+    }
+
+    function showFlyoutPaths(profile) {
+        if (!dragPathsFlyout) return;
+        flyoutProfileTitle.textContent = `📁 Dossier pour ${profile.name} :`;
+        flyoutPathsList.replaceChildren();
+
+        presetPaths.forEach(pathItem => {
+            const pathPill = document.createElement('div');
+            pathPill.className = 'flyout-path-item';
+            pathPill.innerHTML = `<span>${pathItem.icon || '📁'} <strong>${pathItem.label}</strong></span> <span style="font-size:0.75rem; color:var(--text-muted);">${pathItem.path ? 'Dossier dédié' : 'Dossier par défaut'}</span>`;
+
+            pathPill.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                document.querySelectorAll('.flyout-path-item').forEach(pi => pi.classList.remove('drag-over'));
+                pathPill.classList.add('drag-over');
+            });
+
+            pathPill.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const text = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list');
+                dropTargetCard.classList.remove('expanded');
+                dropNormalState.classList.remove('hidden');
+                dropExpandedLayer.classList.add('hidden');
+                dragPathsFlyout.classList.add('hidden');
+
+                if (!text) {
+                    showToast('Aucun lien valide détecté', 'error');
+                    return;
+                }
+
+                const urlMatch = text.match(/https?:\/\/[^\s]+/);
+                const targetUrl = urlMatch ? urlMatch[0] : text.trim();
+
+                if (!targetUrl.startsWith('http')) {
+                    showToast('URL invalide', 'error');
+                    return;
+                }
+
+                showToast(`🚀 Téléchargement lancé : ${profile.name} → ${pathItem.label}...`, 'success');
+
+                await fetch(apiPath('/download'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        url: targetUrl,
+                        profile_id: profile.id,
+                        dest_path: pathItem.path || ''
+                    })
+                });
+
+                loadQueue();
+            });
+
+            flyoutPathsList.appendChild(pathPill);
+        });
+
+        dragPathsFlyout.classList.remove('hidden');
     }
 
     // SSE Connection for Live Progress
@@ -488,7 +731,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const closeOptions = () => optionsModal.classList.add('hidden');
         btnCloseOptions.addEventListener('click', closeOptions);
-        btnCancelOptions.addEventListener('click', closeOptions);
+        if (btnDoneOptions) btnDoneOptions.addEventListener('click', closeOptions);
+
+        if (btnAddPreset) {
+            btnAddPreset.addEventListener('click', async () => {
+                const label = presetNewLabel.value.trim();
+                const path = presetNewPath.value.trim();
+                if (!label) {
+                    showToast('Veuillez saisir un libellé', 'info');
+                    return;
+                }
+                await fetch(apiPath('/preset-paths'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ label, path, icon: '📁' })
+                });
+                presetNewLabel.value = '';
+                presetNewPath.value = '';
+                showToast('Nouveau dossier ajouté avec succès !', 'success');
+                await loadPresetPaths();
+            });
+        }
 
         optionsForm.addEventListener('submit', async (e) => {
             e.preventDefault();

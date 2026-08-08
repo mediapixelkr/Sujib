@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <!-- Cyan gradient for upper bar -->
+    <linearGradient id="cyanGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00e5ff" />
+      <stop offset="100%" stop-color="#0099ff" />
+    </linearGradient>
+    
+    <!-- Purple gradient for main L-hook -->
+    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc" />
+      <stop offset="50%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#7e22ce" />
+    </linearGradient>
+
+    <!-- Soft glow filter -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <g filter="url(#softGlow)">
+    <!-- Top Cyan Accent Bar -->
+    <path d="M 35 34 H 135 C 142 34 147 39 147 46 C 147 53 142 58 135 58 H 35 C 28 58 23 53 23 46 C 23 39 28 34 35 34 Z" fill="url(#cyanGradient)" />
+
+    <!-- Main Purple Curved L-Hook Bar -->
+    <path d="M 52 52 H 135 C 158 52 176 70 176 93 V 162 C 176 170 170 176 162 176 C 154 176 148 170 148 162 V 93 C 148 86 142 80 135 80 H 52 C 44 80 38 74 38 66 C 38 58 44 52 52 52 Z" fill="url(#purpleGradient)" />
+  </g>
+</svg>

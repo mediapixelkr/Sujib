@@ -10,6 +10,8 @@ from pydantic import BaseModel, HttpUrl
 
 from database import (
     init_db, get_options, update_options, get_profiles, update_profile,
+    add_profile, delete_profile, toggle_profile_active,
+    get_preset_paths, add_preset_path, update_preset_path, delete_preset_path,
     get_queue, add_to_queue, remove_queue_item,
     get_downloaded, remove_downloaded
 )
@@ -56,6 +58,12 @@ class ProfileUpdateModel(BaseModel):
     max_res: Optional[str] = ""
     dest_path: Optional[str] = ""
     audio_only: int = 0
+    is_active: int = 1
+
+class PresetPathModel(BaseModel):
+    label: str
+    path: str
+    icon: Optional[str] = "📁"
 
 class AnalyzeModel(BaseModel):
     url: str
@@ -65,6 +73,7 @@ class DownloadRequestModel(BaseModel):
     title: Optional[str] = "Sans titre"
     video_id: Optional[str] = ""
     profile_id: int = 1
+    dest_path: Optional[str] = ""
 
 class RenameFileModel(BaseModel):
     new_name: str
@@ -84,6 +93,25 @@ async def get_status():
         "downloaded_count": len(downloaded),
         "options": options
     }
+
+@app.get("/api/preset-paths")
+async def get_preset_paths_api():
+    return get_preset_paths()
+
+@app.post("/api/preset-paths")
+async def create_preset_path_api(data: PresetPathModel):
+    pid = add_preset_path(data.label.strip(), data.path.strip(), data.icon or "📁")
+    return {"success": True, "id": pid, "preset_paths": get_preset_paths()}
+
+@app.put("/api/preset-paths/{preset_id}")
+async def update_preset_path_api(preset_id: int, data: PresetPathModel):
+    update_preset_path(preset_id, data.label.strip(), data.path.strip(), data.icon or "📁")
+    return {"success": True, "preset_paths": get_preset_paths()}
+
+@app.delete("/api/preset-paths/{preset_id}")
+async def delete_preset_path_api(preset_id: int):
+    delete_preset_path(preset_id)
+    return {"success": True, "preset_paths": get_preset_paths()}
 
 @app.get("/api/options")
 async def get_options_api():
@@ -137,13 +165,17 @@ async def analyze_url_api(data: AnalyzeModel):
 
 @app.post("/api/download")
 async def add_download_api(data: DownloadRequestModel):
-    profiles = get_profiles()
+    profiles = get_profiles(include_archived=True)
     selected_profile = next((p for p in profiles if p["id"] == data.profile_id), None)
     if not selected_profile:
         raise HTTPException(status_code=400, detail="Profil de téléchargement invalide")
 
     options = get_options()
-    dest_path = options.get("download_dir", "/tmp")
+    dest = data.dest_path.strip() if data.dest_path and data.dest_path.strip() else selected_profile.get("dest_path", "")
+    if not dest:
+        dest = options.get("download_dir", "/var/www/html/sujib/downloads")
+    
+    os.makedirs(dest, exist_ok=True)
 
     qid = add_to_queue(
         video_id=data.video_id or "video",
@@ -151,14 +183,15 @@ async def add_download_api(data: DownloadRequestModel):
         url=data.url,
         profile_id=selected_profile["id"],
         profile_name=selected_profile["name"],
-        dest_path=dest_path
+        dest_path=dest
     )
 
     task_info = {
         "url": data.url,
         "video_id": data.video_id,
         "title": data.title,
-        "profile": selected_profile
+        "profile": selected_profile,
+        "dest_path": dest
     }
 
     await queue_manager.add_job(qid, task_info)
