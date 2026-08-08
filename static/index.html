@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sujib (수집) - YouTube Video Download Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header / Navigation Bar -->
+        <header class="navbar">
+            <div class="brand">
+                <div class="logo-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">SUJIB</span>
+                    <span class="brand-badge">수집 2.0</span>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-dot online"></span>
+                    <span class="status-label">yt-dlp:</span>
+                    <span id="ytdlp-ver-text" class="status-value">--</span>
+                </div>
+                <button id="btn-update-ytdlp" class="btn-sm btn-outline" title="Mettre à jour yt-dlp">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                    </svg>
+                    <span>Update</span>
+                </button>
+                <button id="btn-open-options" class="btn-sm btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>Options</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <!-- URL Input Bar -->
+            <section class="url-section">
+                <div class="url-card glass">
+                    <form id="url-form" class="url-form">
+                        <div class="input-wrapper">
+                            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                            <input type="url" id="url-input" placeholder="Coller une URL YouTube (vidéo ou playlist)..." required autocomplete="off">
+                            <button type="submit" id="btn-submit-url" class="btn-gradient">
+                                <span>Analyser / Télécharger</span>
+                            </button>
+                        </div>
+                    </form>
+                    <p class="drop-hint">💡 Astuce : Vous pouvez aussi glisser-déposer un lien YouTube directement sur l'une des cartes de profil ci-dessous !</p>
+                </div>
+            </section>
+
+            <!-- Profiles Grid (Target Cards for Drag & Drop or Default selection) -->
+            <section class="profiles-section">
+                <h2 class="section-title">Profils de Qualité (Drag & Drop)</h2>
+                <div id="profiles-grid" class="profiles-grid">
+                    <!-- Profile cards rendered dynamically -->
+                </div>
+            </section>
+
+            <!-- Active Queue Section -->
+            <section class="queue-section">
+                <div class="section-header">
+                    <h2 class="section-title">File de Téléchargement En Cours</h2>
+                    <span id="queue-count-badge" class="badge">0</span>
+                </div>
+                <div id="queue-list" class="queue-list">
+                    <div class="empty-state" id="queue-empty">Aucun téléchargement en cours.</div>
+                </div>
+            </section>
+
+            <!-- Downloaded History Section -->
+            <section class="history-section">
+                <div class="section-header">
+                    <h2 class="section-title">Historique des Fichiers Téléchargés</h2>
+                    <span id="history-count-badge" class="badge">0</span>
+                </div>
+                <div id="history-list" class="history-list">
+                    <div class="empty-state" id="history-empty">Aucun fichier dans l'historique.</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Options Modal -->
+    <div id="options-modal" class="modal-overlay hidden">
+        <div class="modal-card glass">
+            <div class="modal-header">
+                <h3>Options de Configuration</h3>
+                <button class="btn-close" id="btn-close-options">&times;</button>
+            </div>
+            <form id="options-form" class="modal-body">
+                <div class="form-group">
+                    <label for="opt-download-dir">Dossier de destination (chemin absolu) :</label>
+                    <input type="text" id="opt-download-dir" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="opt-rename-regex">Règles de renommage Regex (motif||remplacement par ligne) :</label>
+                    <textarea id="opt-rename-regex" rows="4" class="form-input code-font" placeholder="/[&quot;']/||\n/\s+/||-"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="opt-subtitles">Sous-titres :</label>
+                        <select id="opt-subtitles" class="form-select">
+                            <option value="0">Aucun</option>
+                            <option value="1">Fichier .srt externe</option>
+                            <option value="2">Intégrés dans la vidéo</option>
+                        </select>
+                    </div>
+                    <div class="form-group half">
+                        <label for="opt-sub-lang">Langue sous-titres (2 lettres ex: fr, en) :</label>
+                        <input type="text" id="opt-sub-lang" maxlength="2" class="form-input">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="btn-cancel-options">Annuler</button>
+                    <button type="submit" class="btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Playlist Selection Modal -->
+    <div id="playlist-modal" class="modal-overlay hidden">
+        <div class="modal-card glass modal-lg">
+            <div class="modal-header">
+                <h3 id="playlist-title">Playlist YouTube détectée</h3>
+                <button class="btn-close" id="btn-close-playlist">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Sélectionnez les vidéos de la playlist que vous souhaitez télécharger :</p>
+                <div class="playlist-controls">
+                    <button id="btn-select-all" class="btn-sm btn-outline">Tout sélectionner</button>
+                    <button id="btn-deselect-all" class="btn-sm btn-outline">Tout désélectionner</button>
+                    <span id="playlist-selected-count" class="selected-counter">0 sélectionné(s)</span>
+                </div>
+                <div id="playlist-items-list" class="playlist-items-list">
+                    <!-- Playlist items rendered dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="btn-cancel-playlist">Annuler</button>
+                <button type="button" class="btn-primary" id="btn-confirm-playlist">Télécharger la sélection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Database & Downloads
+db.sqlite
+downloads/
+cache/
+*.log
+
+# IDE
+.idea/
+.vscode/
