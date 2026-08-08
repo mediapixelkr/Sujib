@@ -82,12 +82,6 @@ body {
     height: 48px;
     object-fit: contain;
     filter: drop-shadow(0 4px 14px rgba(91, 62, 200, 0.45));
-    transition: transform 0.25s ease, filter 0.25s ease;
-}
-
-.brand-logo-img:hover {
-    transform: scale(1.08) rotate(-2deg);
-    filter: drop-shadow(0 6px 22px rgba(138, 101, 240, 0.65));
 }
 
 .logo-icon {
