@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl
 
 from database import (
-    init_db, get_options, update_options, get_profiles,
+    init_db, get_options, update_options, get_profiles, update_profile,
     get_queue, add_to_queue, remove_queue_item,
     get_downloaded, remove_downloaded
 )
@@ -48,6 +48,14 @@ class OptionsUpdateModel(BaseModel):
     show_last: int = 20
     subtitles: int = 0
     sub_lang: str = "en"
+
+class ProfileUpdateModel(BaseModel):
+    name: str
+    format_spec: str
+    container: str = "mkv"
+    max_res: Optional[str] = ""
+    dest_path: Optional[str] = ""
+    audio_only: int = 0
 
 class AnalyzeModel(BaseModel):
     url: str
@@ -92,6 +100,14 @@ async def update_options_api(data: OptionsUpdateModel):
 @app.get("/api/profiles")
 async def get_profiles_api():
     return get_profiles()
+
+@app.post("/api/profiles/{profile_id}")
+async def update_profile_api(profile_id: int, data: ProfileUpdateModel):
+    dest = data.dest_path.strip() if data.dest_path else ""
+    if dest:
+        os.makedirs(dest, exist_ok=True)
+    update_profile(profile_id, data.name, data.format_spec, data.container, data.max_res or "", dest, data.audio_only)
+    return {"success": True, "profiles": get_profiles()}
 
 @app.post("/api/analyze")
 async def analyze_url_api(data: AnalyzeModel):

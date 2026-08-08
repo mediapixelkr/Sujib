@@ -41,6 +41,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const playlistSelectedCount = document.getElementById('playlist-selected-count');
     const playlistItemsList = document.getElementById('playlist-items-list');
 
+    // Profile Edit Modal Elements
+    const profileEditModal = document.getElementById('profile-edit-modal');
+    const profileEditForm = document.getElementById('profile-edit-form');
+    const btnCloseProfileEdit = document.getElementById('btn-close-profile-edit');
+    const btnCancelProfileEdit = document.getElementById('btn-cancel-profile-edit');
+    const profEditId = document.getElementById('prof-edit-id');
+    const profEditName = document.getElementById('prof-edit-name');
+    const profEditDest = document.getElementById('prof-edit-dest');
+    const profEditContainer = document.getElementById('prof-edit-container');
+    const profEditRes = document.getElementById('prof-edit-res');
+    const profEditFormat = document.getElementById('prof-edit-format');
+
     // Toast Container
     const toastContainer = document.getElementById('toast-container');
 
@@ -145,6 +157,16 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = `profile-card ${profile.id === selectedProfileId ? 'selected' : ''}`;
             card.dataset.profileId = profile.id;
 
+            // Edit button top corner
+            const editBtn = document.createElement('button');
+            editBtn.className = 'btn-profile-edit';
+            editBtn.title = 'Éditer ce profil (Dossier, Qualité, Conteneur)';
+            editBtn.innerHTML = '⚙️';
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openProfileEditModal(profile);
+            });
+
             const iconDiv = document.createElement('div');
             iconDiv.className = 'profile-icon';
             iconDiv.innerHTML = profile.audio_only === 1
@@ -159,9 +181,16 @@ document.addEventListener('DOMContentLoaded', () => {
             subDiv.className = 'profile-sub';
             subDiv.textContent = profile.container ? profile.container.toUpperCase() : 'MKV';
 
+            const destDiv = document.createElement('div');
+            destDiv.className = 'profile-dest-badge';
+            destDiv.title = profile.dest_path ? `Chemin spécifique: ${profile.dest_path}` : 'Dossier de destination par défaut';
+            destDiv.textContent = profile.dest_path ? `📁 ${profile.dest_path}` : '📁 Dossier par défaut';
+
+            card.appendChild(editBtn);
             card.appendChild(iconDiv);
             card.appendChild(nameDiv);
             card.appendChild(subDiv);
+            card.appendChild(destDiv);
 
             // Click handler
             card.addEventListener('click', () => {
@@ -529,5 +558,47 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Toutes les vidéos sélectionnées ont été ajoutées !', 'success');
             loadQueue();
         });
+
+        // Profile Edit Modal Actions
+        const closeProfileEdit = () => profileEditModal.classList.add('hidden');
+        btnCloseProfileEdit.addEventListener('click', closeProfileEdit);
+        btnCancelProfileEdit.addEventListener('click', closeProfileEdit);
+
+        profileEditForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pid = parseInt(profEditId.value, 10);
+            const body = {
+                name: profEditName.value.trim(),
+                dest_path: profEditDest.value.trim(),
+                container: profEditContainer.value,
+                max_res: profEditRes.value.trim(),
+                format_spec: profEditFormat.value.trim(),
+                audio_only: profEditContainer.value === 'mp3' ? 1 : 0
+            };
+
+            const res = await fetch(`/api/profiles/${pid}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (res.ok) {
+                showToast('Profil mis à jour avec succès !', 'success');
+                closeProfileEdit();
+                await loadProfiles();
+            } else {
+                showToast('Erreur lors de la mise à jour du profil', 'error');
+            }
+        });
+    }
+
+    function openProfileEditModal(profile) {
+        profEditId.value = profile.id;
+        profEditName.value = profile.name || '';
+        profEditDest.value = profile.dest_path || '';
+        profEditContainer.value = profile.container || 'mkv';
+        profEditRes.value = profile.max_res || '';
+        profEditFormat.value = profile.format_spec || '';
+        profileEditModal.classList.remove('hidden');
     }
 });

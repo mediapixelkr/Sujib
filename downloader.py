@@ -145,9 +145,13 @@ class DownloadQueueManager:
     async def _execute_download(self, qid: int, task_info: Dict[str, Any]):
         url = task_info['url']
         profile = task_info['profile']
-        options = get_options()
+        # Use profile-specific dest_path if specified, otherwise fallback to options download_dir
+        profile_dest = profile.get('dest_path', '')
+        if profile_dest and profile_dest.strip():
+            download_dir = profile_dest.strip()
+        else:
+            download_dir = options.get('download_dir', '/tmp')
 
-        download_dir = options.get('download_dir', '/tmp')
         os.makedirs(download_dir, exist_ok=True)
 
         update_queue_status(qid, status="downloading", progress_pct=0.0, speed="Initialisation...", eta="--")

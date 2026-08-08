@@ -22,10 +22,17 @@ def init_db():
         format_spec TEXT NOT NULL,
         container TEXT NOT NULL DEFAULT 'mkv',
         max_res TEXT,
+        dest_path TEXT DEFAULT '',
         audio_only INTEGER DEFAULT 0,
         is_default INTEGER DEFAULT 0
     );
     """)
+
+    # Ensure dest_path column exists if migrating from older db
+    cursor.execute("PRAGMA table_info(profiles)")
+    columns = [col[1] for col in cursor.fetchall()]
+    if 'dest_path' not in columns:
+        cursor.execute("ALTER TABLE profiles ADD COLUMN dest_path TEXT DEFAULT ''")
 
     # Options table
     cursor.execute("""
@@ -132,6 +139,15 @@ def get_queue() -> List[Dict[str, Any]]:
     rows = conn.execute("SELECT * FROM queue ORDER BY id DESC").fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+def update_profile(profile_id: int, name: str, format_spec: str, container: str, max_res: str, dest_path: str, audio_only: int):
+    conn = get_db_connection()
+    conn.execute(
+        "UPDATE profiles SET name = ?, format_spec = ?, container = ?, max_res = ?, dest_path = ?, audio_only = ? WHERE id = ?",
+        (name, format_spec, container, max_res, dest_path, audio_only, profile_id)
+    )
+    conn.commit()
+    conn.close()
 
 def add_to_queue(video_id: str, title: str, url: str, profile_id: int, profile_name: str, dest_path: str) -> int:
     conn = get_db_connection()

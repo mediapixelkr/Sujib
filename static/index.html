@@ -15,7 +15,7 @@
         <!-- Header / Navigation Bar -->
         <header class="navbar">
             <div class="brand">
-                <img src="/static/img/logo.png" alt="Sujib Logo" class="brand-logo-img">
+                <img src="/static/img/logo.svg" alt="Sujib Logo" class="brand-logo-img">
                 <div class="brand-text">
                     <span class="brand-name">SUJIB</span>
                     <span class="brand-badge">수집 2.0</span>
@@ -130,6 +130,50 @@
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" id="btn-cancel-options">Annuler</button>
                     <button type="submit" class="btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Edit Modal -->
+    <div id="profile-edit-modal" class="modal-overlay hidden">
+        <div class="modal-card glass">
+            <div class="modal-header">
+                <h3>Édition du Profil</h3>
+                <button class="btn-close" id="btn-close-profile-edit">&times;</button>
+            </div>
+            <form id="profile-edit-form" class="modal-body">
+                <input type="hidden" id="prof-edit-id">
+                <div class="form-group">
+                    <label for="prof-edit-name">Nom du profil :</label>
+                    <input type="text" id="prof-edit-name" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="prof-edit-dest">Dossier de destination spécifique (optionnel) :</label>
+                    <input type="text" id="prof-edit-dest" class="form-input" placeholder="ex: /var/www/html/sujib/downloads/4K (laisser vide pour dossier par défaut)">
+                </div>
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="prof-edit-container">Format Conteneur :</label>
+                        <select id="prof-edit-container" class="form-select">
+                            <option value="mkv">MKV</option>
+                            <option value="mp4">MP4</option>
+                            <option value="webm">WebM</option>
+                            <option value="mp3">MP3 (Audio)</option>
+                        </select>
+                    </div>
+                    <div class="form-group half">
+                        <label for="prof-edit-res">Résolution / Tag :</label>
+                        <input type="text" id="prof-edit-res" class="form-input" placeholder="ex: 1080p">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="prof-edit-format">Spécification Format yt-dlp :</label>
+                    <input type="text" id="prof-edit-format" required class="form-input code-font">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="btn-cancel-profile-edit">Annuler</button>
+                    <button type="submit" class="btn-primary">Enregistrer Profil</button>
                 </div>
             </form>
         </div>
