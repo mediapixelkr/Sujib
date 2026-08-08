@@ -704,12 +704,22 @@ body {
     color: var(--text-muted);
 }
 
+/* Section Spacing */
+.top-cards-section,
+.queue-section {
+    margin-bottom: 26px;
+}
+
+.history-section {
+    margin-bottom: 26px;
+}
+
 /* Section Headers & Badges */
 .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .section-title-group {
@@ -763,7 +773,7 @@ body {
 
 /* Empty State Card */
 .empty-state-card {
-    padding: 32px 20px;
+    padding: 36px 20px;
     text-align: center;
     border-radius: 14px;
     background: rgba(22, 33, 54, 0.4);
@@ -816,13 +826,13 @@ body {
     height: 73px; /* 16:9 ratio */
     border-radius: 8px;
     object-fit: cover;
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(59, 130, 246, 0.2);
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #64748b;
+    color: #60a5fa;
     overflow: hidden;
 }
 
@@ -838,7 +848,7 @@ body {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px; /* Slightly increased micro-spacing for breathing room */
 }
 
 .download-header-row {
@@ -925,17 +935,18 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Thin Sleek Progress Bar */
+/* Thin Sleek Progress Bar with Defined Track */
 .progress-bar-container {
     width: 100%;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .progress-track {
-    height: 5px;
+    height: 6px;
     width: 100%;
     border-radius: 4px;
-    background: rgba(15, 23, 42, 0.7);
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     overflow: hidden;
 }
 
@@ -962,18 +973,23 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-top: 4px;
+    margin-top: 6px;
 }
 
 .download-dest-info {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.78rem;
-    color: #94a3b8;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #cbd5e1; /* Increased readability */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.download-dest-info span:first-child {
+    opacity: 0.85;
 }
 
 .download-actions {
@@ -981,6 +997,25 @@ body {
     align-items: center;
     gap: 8px;
     margin-left: auto;
+}
+
+/* Quiet Ghost-Danger Cancel Button */
+.btn-cancel-ghost {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #f87171;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-cancel-ghost:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.45);
+    color: #ffffff;
 }
 
 /* Modals */

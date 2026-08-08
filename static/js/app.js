@@ -186,13 +186,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── Thumbnail & SVG Helpers ──────────────────────────────────────────────
     function getFallbackSvg() {
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('width', '24');
-        svg.setAttribute('height', '24');
+        svg.setAttribute('width', '26');
+        svg.setAttribute('height', '26');
         svg.setAttribute('viewBox', '0 0 24 24');
         svg.setAttribute('fill', 'none');
-        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke', '#60a5fa');
         svg.setAttribute('stroke-width', '1.5');
-        svg.innerHTML = '<path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>';
+        svg.innerHTML = '<rect x="2" y="4" width="20" height="16" rx="4" fill="rgba(59, 130, 246, 0.15)"></rect><polygon points="10 8 16 12 10 16 10 8" fill="#60a5fa" stroke="none"></polygon>';
         return svg;
     }
 
@@ -351,8 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 actions.className = 'download-actions';
 
                 const btnCancel = document.createElement('button');
-                btnCancel.className = 'btn-sm btn-outline';
-                btnCancel.style.cssText = 'color:#f87171;border-color:rgba(239,68,68,0.3);';
+                btnCancel.className = 'btn-cancel-ghost';
                 btnCancel.textContent = 'Annuler';
                 btnCancel.addEventListener('click', async () => {
                     await fetch(apiPath(`/queue/${item.id}`), { method: 'DELETE' });
