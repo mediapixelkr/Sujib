@@ -61,6 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnNewProfile = document.getElementById('btn-new-profile');
     const chkShowArchived = document.getElementById('chk-show-archived');
     const profilesManagerList = document.getElementById('profiles-manager-list');
+    const pmViewList = document.getElementById('pm-view-list');
+    const pmViewForm = document.getElementById('pm-view-form');
+    const btnBackToPmList = document.getElementById('btn-back-to-pm-list');
+    const pmFormModeTitle = document.getElementById('pm-form-mode-title');
+    const pmModalTitle = document.getElementById('pm-modal-title');
 
     // Toast Container
     const toastContainer = document.getElementById('toast-container');
@@ -568,10 +573,40 @@ document.addEventListener('DOMContentLoaded', () => {
             loadQueue();
         });
 
-        // Profile Edit Modal Actions
-        const closeProfileEdit = () => profileEditModal.classList.add('hidden');
-        btnCloseProfileEdit.addEventListener('click', closeProfileEdit);
-        btnCancelProfileEdit.addEventListener('click', closeProfileEdit);
+        // Profile Form Actions (Single Modal View Switching)
+        const showPmListView = () => {
+            pmViewForm.classList.add('hidden');
+            pmViewList.classList.remove('hidden');
+            pmModalTitle.textContent = "Gestionnaire des Profils";
+            btnDoneProfManager.style.display = 'inline-block';
+        };
+
+        const showPmFormView = (profile) => {
+            pmViewList.classList.add('hidden');
+            pmViewForm.classList.remove('hidden');
+            pmModalTitle.textContent = profile ? `Édition du profil : ${profile.name}` : "Nouveau profil";
+            pmFormModeTitle.textContent = profile ? `Édition du profil : ${profile.name}` : "Création d'un profil";
+            btnDoneProfManager.style.display = 'none';
+
+            if (profile) {
+                profEditId.value = profile.id;
+                profEditName.value = profile.name || '';
+                profEditDest.value = profile.dest_path || '';
+                profEditContainer.value = profile.container || 'mkv';
+                profEditRes.value = profile.max_res || '';
+                profEditFormat.value = profile.format_spec || '';
+            } else {
+                profEditId.value = '';
+                profEditName.value = '';
+                profEditDest.value = '';
+                profEditContainer.value = 'mkv';
+                profEditRes.value = '1080p';
+                profEditFormat.value = 'bestvideo[height<=1080]+bestaudio/best';
+            }
+        };
+
+        btnBackToPmList.addEventListener('click', showPmListView);
+        btnCancelProfileEdit.addEventListener('click', showPmListView);
 
         profileEditForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -596,27 +631,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (res.ok) {
                 showToast(pid > 0 ? 'Profil mis à jour !' : 'Nouveau profil créé !', 'success');
-                closeProfileEdit();
+                showPmListView();
                 await loadProfiles();
-                if (!profilesManagerModal.classList.contains('hidden')) {
-                    await loadManagerProfiles();
-                }
+                await loadManagerProfiles();
             } else {
                 showToast('Erreur lors de l\'enregistrement du profil', 'error');
             }
         });
 
         // Profile Manager Modal Actions
-        const closeProfManager = () => profilesManagerModal.classList.add('hidden');
+        const closeProfManager = () => {
+            profilesManagerModal.classList.add('hidden');
+            showPmListView();
+        };
+
         btnManageProfiles.addEventListener('click', async () => {
             await loadManagerProfiles();
+            showPmListView();
             profilesManagerModal.classList.remove('hidden');
         });
         btnCloseProfManager.addEventListener('click', closeProfManager);
         btnDoneProfManager.addEventListener('click', closeProfManager);
 
         btnNewProfile.addEventListener('click', () => {
-            openProfileEditModal(null);
+            showPmFormView(null);
         });
 
         chkShowArchived.addEventListener('change', () => {
@@ -687,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const btnEdit = document.createElement('button');
             btnEdit.className = 'btn-sm btn-outline';
             btnEdit.textContent = '✏️ Éditer';
-            btnEdit.addEventListener('click', () => openProfileEditModal(prof));
+            btnEdit.addEventListener('click', () => showPmFormView(prof));
 
             // Archive / Restore toggle
             const btnToggle = document.createElement('button');
@@ -726,22 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openProfileEditModal(profile) {
-        if (profile) {
-            profEditId.value = profile.id;
-            profEditName.value = profile.name || '';
-            profEditDest.value = profile.dest_path || '';
-            profEditContainer.value = profile.container || 'mkv';
-            profEditRes.value = profile.max_res || '';
-            profEditFormat.value = profile.format_spec || '';
-        } else {
-            // New profile creation
-            profEditId.value = '';
-            profEditName.value = '';
-            profEditDest.value = '';
-            profEditContainer.value = 'mkv';
-            profEditRes.value = '1080p';
-            profEditFormat.value = 'bestvideo[height<=1080]+bestaudio/best';
-        }
-        profileEditModal.classList.remove('hidden');
+        profilesManagerModal.classList.remove('hidden');
+        showPmFormView(profile);
     }
 });

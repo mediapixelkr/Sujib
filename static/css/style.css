@@ -321,6 +321,20 @@ body {
     max-width: 100%;
 }
 
+.pm-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.pm-mode-title {
+    font-weight: 600;
+    color: var(--accent-blue);
+    font-size: 0.95rem;
+}
+
 .profile-card:hover, .profile-card.drag-over {
     border-color: var(--accent-blue);
     background: rgba(59, 130, 246, 0.12);
