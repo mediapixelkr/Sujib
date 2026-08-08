@@ -14,6 +14,64 @@
     <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
+    <!-- AMBIENT DARK ANIMATED WAVE BACKGROUND (PLAYSTATION / PSP CONSOLE INSPIRED) -->
+    <div class="ambient-background" aria-hidden="true">
+        <!-- SVG LAYER 1: BACK BROAD RIBBONS -->
+        <svg class="ambient-waves ambient-waves--back" viewBox="0 0 1600 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="waveBlueBack" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#1d4ed8" stop-opacity="0" />
+                    <stop offset="35%" stop-color="#3b82f6" stop-opacity="0.14" />
+                    <stop offset="70%" stop-color="#1d4ed8" stop-opacity="0.08" />
+                    <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="waveVioletBack" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#7c3aed" stop-opacity="0" />
+                    <stop offset="40%" stop-color="#8b5cf6" stop-opacity="0.12" />
+                    <stop offset="80%" stop-color="#6366f1" stop-opacity="0.06" />
+                    <stop offset="100%" stop-color="#7c3aed" stop-opacity="0" />
+                </linearGradient>
+            </defs>
+            <!-- Broad blue ribbon crossing lower-middle viewport -->
+            <path d="M -100 420 C 320 280, 680 490, 1050 340 S 1480 260, 1750 390"
+                  fill="none" stroke="url(#waveBlueBack)" stroke-width="48" stroke-linecap="round" />
+            <!-- Soft violet ribbon crossing lower viewport -->
+            <path d="M -80 480 C 380 360, 720 540, 1120 400 S 1520 310, 1720 450"
+                  fill="none" stroke="url(#waveVioletBack)" stroke-width="36" stroke-linecap="round" />
+        </svg>
+
+        <!-- SVG LAYER 2: FRONT LUMINOUS ACCENT LINES -->
+        <svg class="ambient-waves ambient-waves--front" viewBox="0 0 1600 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="waveCyanFront" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#60a5fa" stop-opacity="0" />
+                    <stop offset="30%" stop-color="#60a5fa" stop-opacity="0.40" />
+                    <stop offset="70%" stop-color="#3b82f6" stop-opacity="0.25" />
+                    <stop offset="100%" stop-color="#60a5fa" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="waveVioletLine" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#a78bfa" stop-opacity="0" />
+                    <stop offset="45%" stop-color="#c084fc" stop-opacity="0.30" />
+                    <stop offset="85%" stop-color="#818cf8" stop-opacity="0.15" />
+                    <stop offset="100%" stop-color="#a78bfa" stop-opacity="0" />
+                </linearGradient>
+                <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3.5" result="blur" />
+                    <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+            <!-- Luminous fine blue line with soft glow -->
+            <path d="M -120 390 C 290 230, 650 440, 1020 310 S 1440 220, 1740 350"
+                  fill="none" stroke="url(#waveCyanFront)" stroke-width="2" filter="url(#softGlow)" />
+            <!-- Luminous fine violet accent line -->
+            <path d="M -60 450 C 350 310, 710 500, 1080 360 S 1490 280, 1700 410"
+                  fill="none" stroke="url(#waveVioletLine)" stroke-width="1.8" filter="url(#softGlow)" />
+        </svg>
+    </div>
+
     <div class="app-container">
         <!-- HEADER -->
         <header class="navbar glass">

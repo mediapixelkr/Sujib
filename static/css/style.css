@@ -36,6 +36,8 @@ body {
 }
 
 .app-container {
+    position: relative;
+    z-index: 1;
     width: 100%;
     max-width: 1200px;
     padding: 20px;
@@ -1333,4 +1335,133 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   AMBIENT DARK ANIMATED WAVE BACKGROUND (PLAYSTATION / PSP CONSOLE INSPIRED)
+   ========================================================================== */
+
+.ambient-background {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background:
+        radial-gradient(
+            ellipse at 50% 120%,
+            rgba(29, 78, 216, 0.14),
+            transparent 60%
+        ),
+        linear-gradient(
+            180deg,
+            #0c1628 0%,
+            #0a1424 55%,
+            #08111f 100%
+        );
+}
+
+.ambient-background::before {
+    content: "";
+    position: absolute;
+    bottom: -15vh;
+    left: -10vw;
+    width: 70vw;
+    height: 50vh;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(29, 78, 216, 0) 70%);
+    filter: blur(80px);
+    pointer-events: none;
+    will-change: transform;
+    animation: ambient-glow-drift-a 32s ease-in-out infinite;
+}
+
+.ambient-background::after {
+    content: "";
+    position: absolute;
+    bottom: -10vh;
+    right: -10vw;
+    width: 65vw;
+    height: 45vh;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.10) 0%, rgba(124, 58, 237, 0) 70%);
+    filter: blur(90px);
+    pointer-events: none;
+    will-change: transform;
+    animation: ambient-glow-drift-b 26s ease-in-out infinite;
+}
+
+.ambient-waves {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.ambient-waves--back {
+    will-change: transform;
+    animation: wave-drift-back 28s ease-in-out infinite;
+}
+
+.ambient-waves--front {
+    will-change: transform;
+    animation: wave-drift-front 20s ease-in-out infinite;
+}
+
+@keyframes wave-drift-back {
+    0% {
+        transform: translate3d(-2%, 0, 0) scaleY(1);
+    }
+    50% {
+        transform: translate3d(2%, -10px, 0) scaleY(1.04);
+    }
+    100% {
+        transform: translate3d(-2%, 0, 0) scaleY(1);
+    }
+}
+
+@keyframes wave-drift-front {
+    0% {
+        transform: translate3d(2%, 4px, 0) scaleY(1.02);
+    }
+    50% {
+        transform: translate3d(-2%, -6px, 0) scaleY(0.98);
+    }
+    100% {
+        transform: translate3d(2%, 4px, 0) scaleY(1.02);
+    }
+}
+
+@keyframes ambient-glow-drift-a {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    50% {
+        transform: translate3d(3vw, -15px, 0);
+    }
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes ambient-glow-drift-b {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    50% {
+        transform: translate3d(-3vw, -12px, 0);
+    }
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ambient-waves--back,
+    .ambient-waves--front,
+    .ambient-background::before,
+    .ambient-background::after {
+        animation: none !important;
+    }
 }
