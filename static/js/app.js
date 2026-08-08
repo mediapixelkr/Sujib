@@ -370,8 +370,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupDragTarget() {
         const zone = document.getElementById('drag-cascade-zone');
         const dropCard = document.getElementById('drop-target-card');
-        const panel = document.getElementById('drag-cascade-panel');
-        const btnCancel = document.getElementById('btn-cascade-cancel');
 
         if (!zone || !dropCard) return;
 
@@ -408,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (cascadeState.dragDepth === 0 && cascadeState.mode === 'dragging') {
                         resetCascadeState();
                     }
-                }, 150);
+                }, 200);
             }
         });
 
@@ -430,18 +428,16 @@ document.addEventListener('DOMContentLoaded', () => {
             cascadeState.url = extracted;
             cascadeState.mode = 'click_pending';
             activateCascadeDrag(extracted);
-            revealDestinationRow();
-            showToast('Lien enregistré ! Cliquez sur un profil puis un dossier.', 'info');
+            showToast('Lien enregistré ! Choisissez un profil puis un dossier.', 'info');
         });
 
-        // Drop Card Click Support (for direct click or keyboard)
+        // Drop Card Click Support
         dropCard.addEventListener('click', (e) => {
             if (cascadeState.active && cascadeState.mode === 'click_pending') {
                 return;
             }
             cascadeState.mode = 'click_pending';
             activateCascadeDrag();
-            revealDestinationRow();
         });
 
         dropCard.addEventListener('keydown', (e) => {
@@ -450,14 +446,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 dropCard.click();
             }
         });
-
-        // Cancel button
-        if (btnCancel) {
-            btnCancel.addEventListener('click', (e) => {
-                e.stopPropagation();
-                resetCascadeState();
-            });
-        }
     }
 
     function activateCascadeDrag(initialUrl = null) {
@@ -467,16 +455,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (initialUrl) cascadeState.url = initialUrl;
 
-        const container = document.getElementById('top-cards-container');
         const dropCard = document.getElementById('drop-target-card');
-        const expandedContent = document.getElementById('card-expanded-content');
+        const profilesPanel = document.getElementById('cascade-profiles-panel');
 
-        if (container) container.classList.add('drag-expanded');
         if (dropCard) dropCard.classList.add('drag-hovering');
-        if (expandedContent) expandedContent.classList.remove('hidden');
+        if (profilesPanel) profilesPanel.classList.remove('hidden');
 
         renderCascadeProfiles();
-        updateSummaryText();
     }
 
     function renderCascadeProfiles() {
@@ -484,121 +469,86 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!listEl) return;
         listEl.replaceChildren();
 
-        const activeProfiles = profiles.length > 0 ? profiles : [
-            { id: 1, name: '4K (2160p)', max_res: '2160p', container: 'mkv' },
-            { id: 2, name: '1440p (2K)', max_res: '1440p', container: 'mkv' },
-            { id: 3, name: '1080p (Full HD)', max_res: '1080p', container: 'mkv' },
-            { id: 4, name: '720p (HD)', max_res: '720p', container: 'mp4' },
-            { id: 5, name: 'Audio Only (MP3)', max_res: 'audio', container: 'mp3' }
+        const defaultProfiles = [
+            { id: 1, name: '4K', sub: '2160p' },
+            { id: 2, name: '2.7K', sub: '1440p' },
+            { id: 3, name: '1080p', sub: 'Full HD' },
+            { id: 4, name: '720p', sub: 'HD' },
+            { id: 5, name: 'Audio', sub: 'MP3 / M4A' }
         ];
 
+        const activeProfiles = profiles.length > 0 ? profiles.map((p, i) => ({
+            id: p.id,
+            name: p.name.split(' ')[0] || p.name,
+            sub: p.max_res || (p.name.includes('Audio') ? 'MP3 / M4A' : 'Auto')
+        })) : defaultProfiles;
+
         activeProfiles.forEach(prof => {
-            const pill = document.createElement('div');
-            pill.className = 'cascade-pill profile-pill';
-            pill.tabIndex = 0;
-            pill.role = 'button';
-            pill.setAttribute('aria-label', `Profil ${prof.name}`);
+            const card = document.createElement('div');
+            card.className = 'cascade-card profile-card';
+            card.tabIndex = 0;
+            card.role = 'button';
+            card.setAttribute('aria-label', `Profil ${prof.name}`);
 
             if (cascadeState.selectedProfile && cascadeState.selectedProfile.id === prof.id) {
-                pill.classList.add('active');
+                card.classList.add('active');
             }
 
-            pill.innerHTML = `
-                <span>${prof.name}</span>
-                <span class="cascade-pill-tag">${(prof.container || 'mkv').toUpperCase()}</span>
+            card.innerHTML = `
+                <div class="cascade-card-title">${prof.name}</div>
+                <div class="cascade-card-sub">${prof.sub}</div>
             `;
 
-            // Drag Enter / Over
-            pill.addEventListener('dragenter', (e) => {
+            card.addEventListener('dragenter', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 handleProfileHover(prof);
             });
 
-            pill.addEventListener('dragover', (e) => {
+            card.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 e.dataTransfer.dropEffect = 'copy';
             });
 
-            // Early Drop on Profile
-            pill.addEventListener('drop', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const url = extractUrl(e) || cascadeState.url;
-                if (!url) {
-                    showToast('Aucun lien valide détecté', 'error');
-                    return;
-                }
-                cascadeState.url = url;
-                cascadeState.selectedProfile = prof;
-                cascadeState.mode = 'click_pending';
-                updateProfilePillsSelection(prof.id);
-                revealDestinationRow();
-                showToast(`Profil ${prof.name} sélectionné. Survolez ou cliquez sur un dossier pour lancer.`, 'info');
-            });
-
-            // Click Support
-            pill.addEventListener('click', (e) => {
+            card.addEventListener('click', (e) => {
                 e.stopPropagation();
                 cascadeState.selectedProfile = prof;
-                updateProfilePillsSelection(prof.id);
-                revealDestinationRow();
+                updateProfileCardsSelection(prof);
+                revealDestinationPanel();
             });
 
-            // Keyboard Focus & Keydown Support
-            pill.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    pill.click();
-                }
-            });
-
-            listEl.appendChild(pill);
+            listEl.appendChild(card);
         });
     }
 
     function handleProfileHover(prof) {
         cascadeState.hoveredProfile = prof;
         cascadeState.selectedProfile = prof;
-
-        updateProfilePillsSelection(prof.id);
-        updateSummaryText();
+        updateProfileCardsSelection(prof);
 
         if (cascadeState.hoverTimer) clearTimeout(cascadeState.hoverTimer);
         cascadeState.hoverTimer = setTimeout(() => {
-            revealDestinationRow();
-        }, 120); // 100-150ms delay
+            revealDestinationPanel();
+        }, 100);
     }
 
-    function updateProfilePillsSelection(selectedId) {
+    function updateProfileCardsSelection(selectedProf) {
         const listEl = document.getElementById('drag-profiles-list');
         if (!listEl) return;
-        const activeProfiles = profiles.length > 0 ? profiles : [
-            { id: 1, name: '4K (2160p)' }, { id: 2, name: '1440p (2K)' },
-            { id: 3, name: '1080p (Full HD)' }, { id: 4, name: '720p (HD)' }, { id: 5, name: 'Audio Only (MP3)' }
-        ];
-
-        listEl.querySelectorAll('.cascade-pill').forEach((pill, idx) => {
-            const p = activeProfiles[idx];
-            if (p && p.id === selectedId) {
-                pill.classList.add('active');
+        listEl.querySelectorAll('.cascade-card').forEach(card => {
+            if (selectedProf && card.textContent.includes(selectedProf.name)) {
+                card.classList.add('active');
             } else {
-                pill.classList.remove('active');
+                card.classList.remove('active');
             }
         });
     }
 
-    function revealDestinationRow() {
-        const flyout = document.getElementById('drag-paths-flyout');
-        const flyoutTitle = document.getElementById('flyout-profile-title');
-        const profName = cascadeState.selectedProfile ? cascadeState.selectedProfile.name : 'Profil';
-
-        if (flyoutTitle) flyoutTitle.textContent = `📁 Dossier de destination pour « ${profName} » :`;
-        if (flyout) flyout.classList.remove('hidden');
-
+    function revealDestinationPanel() {
+        const destsPanel = document.getElementById('cascade-dests-panel');
+        if (destsPanel) destsPanel.classList.remove('hidden');
         renderCascadeDestinations();
-        updateSummaryText();
     }
 
     function renderCascadeDestinations() {
@@ -606,108 +556,84 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!listEl) return;
         listEl.replaceChildren();
 
-        const activeDests = presetPaths.length > 0 ? presetPaths : [
-            { id: 1, label: 'Dossier par défaut (Global)', path: '', icon: '📁' },
-            { id: 2, label: 'Albums US', path: '/var/www/html/sujib/downloads/Albums_US', icon: '💿' },
-            { id: 3, label: 'MV K-Pop', path: '/var/www/html/sujib/downloads/KPop_MV', icon: '🎵' },
-            { id: 4, label: 'Musique / EDM', path: '/var/www/html/sujib/downloads/EDM', icon: '🎧' }
+        const defaultDests = [
+            { id: 1, label: 'Albums américains', path: '/var/www/html/sujib/downloads/Albums_US' },
+            { id: 2, label: 'MV K-pop', path: '/var/www/html/sujib/downloads/KPop_MV' },
+            { id: 3, label: 'EDM', path: '/var/www/html/sujib/downloads/EDM' },
+            { id: 4, label: 'Playlists', path: '/var/www/html/sujib/downloads/Playlists' },
+            { id: 5, label: 'Divers', path: '' }
         ];
 
+        const activeDests = presetPaths.length > 0 ? presetPaths : defaultDests;
+
         activeDests.forEach(dest => {
-            const pill = document.createElement('div');
-            pill.className = 'cascade-pill dest-pill';
-            pill.tabIndex = 0;
-            pill.role = 'button';
-            pill.setAttribute('aria-label', `Dossier ${dest.label}`);
+            const card = document.createElement('div');
+            card.className = 'cascade-card dest-card';
+            card.tabIndex = 0;
+            card.role = 'button';
+            card.setAttribute('aria-label', `Dossier ${dest.label}`);
 
             if (cascadeState.selectedDest && (cascadeState.selectedDest.id === dest.id || cascadeState.selectedDest.path === dest.path)) {
-                pill.classList.add('active');
+                card.classList.add('active');
             }
 
-            const pathDisplay = dest.path ? dest.path : '— Dossier par défaut (Global)';
-
-            pill.innerHTML = `
-                <div style="display:flex;align-items:center;justify-content:space-between;font-weight:600;">
-                    <span>${dest.icon || '📁'} ${dest.label}</span>
-                </div>
-                <div style="font-size:0.75rem;color:var(--text-muted);word-break:break-all;">${pathDisplay}</div>
+            card.innerHTML = `
+                <div class="cascade-card-title">${dest.label}</div>
+                <svg class="cascade-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
             `;
 
-            // Drag Enter / Over
-            pill.addEventListener('dragenter', (e) => {
+            card.addEventListener('dragenter', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 handleDestHover(dest);
             });
 
-            pill.addEventListener('dragover', (e) => {
+            card.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 e.dataTransfer.dropEffect = 'copy';
             });
 
-            // Drop on Destination Pill -> Instant Launch Download!
-            pill.addEventListener('drop', async (e) => {
+            card.addEventListener('drop', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 await handleDestinationDrop(dest, e);
             });
 
-            // Click Support
-            pill.addEventListener('click', async (e) => {
+            card.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 cascadeState.selectedDest = dest;
-                updateDestPillsSelection(dest.id || dest.path);
-
                 if (cascadeState.url) {
                     await handleDestinationDrop(dest, null);
-                } else {
-                    showToast(`Dossier « ${dest.label} » sélectionné. Collez une URL dans la barre de droite pour lancer.`, 'info');
                 }
             });
 
-            pill.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    pill.click();
-                }
-            });
-
-            listEl.appendChild(pill);
+            listEl.appendChild(card);
         });
     }
 
     function handleDestHover(dest) {
         cascadeState.hoveredDest = dest;
         cascadeState.selectedDest = dest;
-
-        updateDestPillsSelection(dest.id || dest.path);
-        updateSummaryText();
+        updateDestCardsSelection(dest);
     }
 
-    function updateDestPillsSelection(selectedKey) {
+    function updateDestCardsSelection(selectedDest) {
         const listEl = document.getElementById('drag-dests-list');
         if (!listEl) return;
-        const activeDests = presetPaths.length > 0 ? presetPaths : [
-            { id: 1, label: 'Dossier par défaut (Global)', path: '', icon: '📁' },
-            { id: 2, label: 'Albums US', path: '/var/www/html/sujib/downloads/Albums_US', icon: '💿' },
-            { id: 3, label: 'MV K-Pop', path: '/var/www/html/sujib/downloads/KPop_MV', icon: '🎵' },
-            { id: 4, label: 'Musique / EDM', path: '/var/www/html/sujib/downloads/EDM', icon: '🎧' }
-        ];
-
-        listEl.querySelectorAll('.cascade-pill').forEach((pill, idx) => {
-            const d = activeDests[idx];
-            if (d && (d.id === selectedKey || d.path === selectedKey)) {
-                pill.classList.add('active');
+        listEl.querySelectorAll('.cascade-card').forEach(card => {
+            if (selectedDest && card.textContent.includes(selectedDest.label)) {
+                card.classList.add('active');
             } else {
-                pill.classList.remove('active');
+                card.classList.remove('active');
             }
         });
     }
 
     async function handleDestinationDrop(dest, e) {
         const url = (e ? extractUrl(e) : null) || cascadeState.url;
-
         if (!url) {
             showToast('Aucun lien YouTube valide détecté', 'error');
             return;
@@ -715,9 +641,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const prof = cascadeState.selectedProfile || profiles[0] || { id: 1, name: 'Default' };
         const destPath = dest.path || '';
-        const destLabel = dest.label || 'Dossier par défaut';
-
-        showToast(`🚀 Téléchargement : ${prof.name} ➔ ${destLabel}`, 'success');
 
         try {
             const res = await fetch(apiPath('/download'), {
@@ -731,7 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (res.ok) {
-                showToast('Ajouté à la file de téléchargement !', 'success');
+                showSuccessBanner();
                 loadQueue();
             } else {
                 showToast('Erreur lors de l\'ajout à la file', 'error');
@@ -743,24 +666,13 @@ document.addEventListener('DOMContentLoaded', () => {
         resetCascadeState();
     }
 
-    function updateSummaryText() {
-        const summaryEl = document.getElementById('cascade-summary-text');
-        if (!summaryEl) return;
-
-        const profName = cascadeState.selectedProfile ? cascadeState.selectedProfile.name : null;
-        const destLabel = cascadeState.selectedDest ? cascadeState.selectedDest.label : null;
-        const destPath = cascadeState.selectedDest ? cascadeState.selectedDest.path : null;
-
-        if (profName && destLabel) {
-            const pathDesc = destPath ? ` (${destPath})` : '';
-            summaryEl.innerHTML = `<span class="status-icon">🚀</span> <strong>${profName}</strong> ➔ <strong>${destLabel}</strong><span style="color:var(--text-muted);">${pathDesc}</span> &mdash; Relâchez pour lancer.`;
-        } else if (profName) {
-            summaryEl.innerHTML = `<span class="status-icon">🎯</span> Profil <strong>${profName}</strong> &mdash; Survolez ou cliquez sur un dossier de destination ci-dessous.`;
-        } else if (cascadeState.url) {
-            summaryEl.innerHTML = `<span class="status-icon">🔗</span> URL enregistrée &mdash; Choisissez un profil puis un dossier.`;
-        } else {
-            summaryEl.innerHTML = `<span class="status-icon">💡</span> Survolez un profil, puis un dossier de destination, et relâchez le clic.`;
-        }
+    function showSuccessBanner() {
+        const banner = document.getElementById('cascade-success-banner');
+        if (!banner) return;
+        banner.classList.remove('hidden');
+        setTimeout(() => {
+            banner.classList.add('hidden');
+        }, 6000);
     }
 
     function resetCascadeState() {
@@ -776,15 +688,13 @@ document.addEventListener('DOMContentLoaded', () => {
         cascadeState.selectedDest = null;
         cascadeState.dragDepth = 0;
 
-        const container = document.getElementById('top-cards-container');
         const dropCard = document.getElementById('drop-target-card');
-        const expandedContent = document.getElementById('card-expanded-content');
-        const flyout = document.getElementById('drag-paths-flyout');
+        const profilesPanel = document.getElementById('cascade-profiles-panel');
+        const destsPanel = document.getElementById('cascade-dests-panel');
 
-        if (container) container.classList.remove('drag-expanded');
         if (dropCard) dropCard.classList.remove('drag-hovering');
-        if (expandedContent) expandedContent.classList.add('hidden');
-        if (flyout) flyout.classList.add('hidden');
+        if (profilesPanel) profilesPanel.classList.add('hidden');
+        if (destsPanel) destsPanel.classList.add('hidden');
     }
 
     // ─── URL Form Submit ──────────────────────────────────────────────────────

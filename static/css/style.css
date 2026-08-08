@@ -272,20 +272,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 2fr;
     gap: 16px;
-    transition: grid-template-columns 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-}
-
-.top-cards-container.drag-expanded {
-    grid-template-columns: 1fr 0fr;
-}
-
-.top-cards-container.drag-expanded .card-url-input {
-    overflow: hidden;
-    padding: 0;
-    opacity: 0;
-    pointer-events: none;
-    width: 0;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Right Card (2/3 width) */
@@ -299,35 +286,34 @@ body {
     overflow: hidden;
 }
 
-/* Left Card (1/3 width): Expands inline to 100% width on drag */
+/* Left Card (1/3 width): Drag Target */
 .card-drag-target {
     min-height: 72px;
     border: 2px dashed rgba(59, 130, 246, 0.4);
     border-radius: var(--radius-md);
     padding: 12px 18px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     overflow: visible;
-    z-index: 100;
 }
 
 .card-drag-target:hover,
 .card-drag-target:focus-visible {
     border-color: rgba(96, 165, 250, 0.7);
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.25);
+    box-shadow: 0 0 18px rgba(59, 130, 246, 0.3);
     outline: none;
 }
 
 .card-drag-target.drag-hovering {
     border-style: solid;
     border-color: var(--accent-blue);
-    background: rgba(15, 23, 42, 0.96);
-    box-shadow: 0 0 25px rgba(59, 130, 246, 0.45), inset 0 0 15px rgba(59, 130, 246, 0.15);
+    background: rgba(15, 23, 42, 0.95);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), inset 0 0 15px rgba(59, 130, 246, 0.2);
     transform: translateY(-2px);
 }
 
@@ -337,7 +323,7 @@ body {
     inset: 0;
     border-radius: var(--radius-md);
     background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    border: 1px solid rgba(59, 130, 246, 0.35);
     pointer-events: none;
     opacity: 0;
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
@@ -345,16 +331,16 @@ body {
 }
 
 .card-drag-target.drag-hovering .layer-1 {
-    opacity: 0.8;
-    transform: translateY(5px) scale(0.98);
+    opacity: 0.85;
+    transform: translateY(6px) scale(0.98);
 }
 .card-drag-target.drag-hovering .layer-2 {
-    opacity: 0.5;
-    transform: translateY(10px) scale(0.96);
+    opacity: 0.55;
+    transform: translateY(12px) scale(0.96);
 }
 .card-drag-target.drag-hovering .layer-3 {
-    opacity: 0.25;
-    transform: translateY(15px) scale(0.94);
+    opacity: 0.3;
+    transform: translateY(18px) scale(0.94);
 }
 
 .drop-normal-state {
@@ -371,130 +357,147 @@ body {
 
 .drop-main-label {
     font-weight: 600;
-    font-size: 0.92rem;
+    font-size: 0.94rem;
     color: #ffffff;
-    white-space: nowrap;
 }
 
 .drop-sub-label {
-    font-size: 0.75rem;
+    font-size: 0.76rem;
     color: var(--text-muted);
     margin-top: 2px;
-    white-space: nowrap;
 }
 
-/* Inline Right Content Inside Left Card When Expanded */
-.card-expanded-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-left: auto;
-    animation: fadeIn 0.15s ease-out;
-}
-
-.inline-profiles-header {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #60a5fa;
-    white-space: nowrap;
-}
-
-.drag-profiles-list {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.cascade-pill.profile-pill {
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 0.84rem;
-    font-weight: 600;
-    color: white;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.cascade-pill.profile-pill:hover,
-.cascade-pill.profile-pill.active {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(139, 92, 246, 0.45));
-    border-color: #60a5fa;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-    transform: translateY(-1px);
-}
-
-/* FLYOUT DRAWER FOR DESTINATION PATHS ATTACHED BELOW EXPANDED CARD */
-.drag-paths-flyout {
-    position: absolute;
-    top: calc(100% + 10px);
-    left: 0;
-    right: 0;
-    background: rgba(10, 18, 36, 0.98);
-    border: 1px solid rgba(59, 130, 246, 0.5);
-    border-radius: var(--radius-md);
-    padding: 16px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 25px rgba(59, 130, 246, 0.2);
-    z-index: 250;
+/* CASCADING PANELS MATCHING MOCKUP DIAGRAM */
+.cascade-panel {
+    margin-top: 16px;
+    padding: 20px 24px;
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
     animation: slideDown 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-.flyout-top-bar {
+.cascade-panel-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.flyout-header {
-    font-size: 0.84rem;
-    font-weight: 700;
-    color: #60a5fa;
-    letter-spacing: 0.02em;
-}
-
-.flyout-paths-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.06em;
 }
 
-.cascade-pill.dest-pill {
-    padding: 10px 14px;
-    background: rgba(30, 41, 59, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 8px;
-    font-size: 0.84rem;
-    color: white;
-    cursor: pointer;
+.cascade-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+}
+
+/* Big Cards for Profiles and Destinations */
+.cascade-card {
+    background: rgba(30, 41, 59, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 20px 14px;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.cascade-card:hover,
+.cascade-card.active,
+.cascade-card.drag-over {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    border-color: #60a5fa;
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.45);
+    transform: translateY(-3px);
+}
+
+.cascade-card:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 2px;
+}
+
+.cascade-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.cascade-card-sub {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+.cascade-card.active .cascade-card-sub,
+.cascade-card:hover .cascade-card-sub {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.cascade-card-icon {
+    margin-top: 8px;
+    width: 22px;
+    height: 22px;
+    stroke: #94a3b8;
     transition: all 0.15s ease;
 }
 
-.cascade-pill.dest-pill:hover,
-.cascade-pill.dest-pill.active,
-.cascade-pill.dest-pill.drag-over {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(139, 92, 246, 0.35));
-    border-color: #60a5fa;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-    transform: translateY(-1px);
+.cascade-card.active .cascade-card-icon,
+.cascade-card:hover .cascade-card-icon {
+    stroke: #ffffff;
+}
+
+/* SUCCESS LAUNCH BANNER */
+.cascade-success-banner {
+    margin-top: 16px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    box-shadow: 0 8px 30px rgba(34, 197, 94, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: fadeIn 0.2s ease;
+}
+
+.success-icon-badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.15);
+    border: 2px solid #22c55e;
+    color: #22c55e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.success-banner-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.88rem;
+    color: #f1f5f9;
+}
+
+.success-banner-text span {
+    font-size: 0.78rem;
+    color: var(--text-muted);
 }
 
 .cascade-summary-text {

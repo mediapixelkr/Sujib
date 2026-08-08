@@ -44,19 +44,19 @@
 
         <main class="content">
 
-            <!-- TOP SECTION: 2 cards with inline expanding left card -->
+            <!-- TOP SECTION: 2 cards (1/3 + 2/3) + Cascading Panels below -->
             <section id="drag-cascade-zone" class="top-cards-section">
+                <!-- TOP 2 CARDS -->
                 <div id="top-cards-container" class="top-cards-container">
 
-                    <!-- LEFT CARD: Expands inline from 1/3 to 100% width on drag -->
+                    <!-- LEFT CARD: 1/3 width -->
                     <div id="drop-target-card" class="card-drag-target glass" tabindex="0" role="button" aria-label="Glisser un lien ici">
                         <div class="card-stack-layer layer-3"></div>
                         <div class="card-stack-layer layer-2"></div>
                         <div class="card-stack-layer layer-1"></div>
 
-                        <!-- Left side label & icon -->
                         <div id="drop-normal-state" class="drop-normal-state">
-                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                 <polyline points="17 8 12 3 7 8"></polyline>
                                 <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -66,28 +66,9 @@
                                 <span class="drop-sub-label">Choisir profil &amp; dossier au survol</span>
                             </div>
                         </div>
-
-                        <!-- Right side revealed inline inside left card when expanded -->
-                        <div id="card-expanded-content" class="card-expanded-content hidden">
-                            <span class="inline-profiles-header">🎯 Choisir profil :</span>
-                            <div id="drag-profiles-list" class="drag-profiles-list" role="radiogroup" aria-label="Profils de Qualité"></div>
-                        </div>
-
-                        <!-- Flyout drawer for destination paths attached directly below expanded card -->
-                        <div id="drag-paths-flyout" class="drag-paths-flyout glass hidden">
-                            <div class="flyout-top-bar">
-                                <span id="flyout-profile-title" class="flyout-header">📁 Dossier de destination :</span>
-                                <button id="btn-cascade-cancel" class="btn-sm btn-outline btn-cascade-close" type="button" title="Fermer">✕</button>
-                            </div>
-                            <div id="drag-dests-list" class="flyout-paths-list" role="radiogroup" aria-label="Dossiers de Destination"></div>
-                            <div id="cascade-summary-text" class="cascade-summary-text">
-                                <span class="status-icon">💡</span>
-                                <span class="status-msg">Survolez une destination et relâchez le clic pour lancer.</span>
-                            </div>
-                        </div>
                     </div>
 
-                    <!-- RIGHT CARD: URL input -->
+                    <!-- RIGHT CARD: 2/3 width -->
                     <div class="card-url-input glass">
                         <form id="url-form" class="url-form">
                             <div class="input-wrapper">
@@ -95,7 +76,7 @@
                                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                                 </svg>
-                                <input type="url" id="url-input" placeholder="Coller une URL YouTube (vidéo ou playlist)..." required autocomplete="off">
+                                <input type="url" id="url-input" placeholder="Coller une URL vidéo (ou playlist)..." required autocomplete="off">
                                 <button type="submit" id="btn-submit-url" class="btn-gradient">
                                     <span>Analyser / Télécharger</span>
                                 </button>
@@ -103,6 +84,37 @@
                         </form>
                     </div>
 
+                </div>
+
+                <!-- CASCADING PANEL 1: CHOISIR UN PROFIL (Revealed when URL is dragged over top left card) -->
+                <div id="cascade-profiles-panel" class="cascade-panel glass hidden">
+                    <div class="cascade-panel-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        <span>CHOISIR UN PROFIL</span>
+                    </div>
+                    <div id="drag-profiles-list" class="cascade-grid profiles-grid" role="radiogroup" aria-label="Profils"></div>
+                </div>
+
+                <!-- CASCADING PANEL 2: CHOISIR UN DOSSIER DE DESTINATION (Revealed ONLY when a profile is hovered/selected) -->
+                <div id="cascade-dests-panel" class="cascade-panel glass hidden">
+                    <div class="cascade-panel-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <span>CHOISIR UN DOSSIER DE DESTINATION</span>
+                    </div>
+                    <div id="drag-dests-list" class="cascade-grid dests-grid" role="radiogroup" aria-label="Dossiers"></div>
+                </div>
+
+                <!-- SUCCESS / LAUNCH NOTIFICATION BANNER -->
+                <div id="cascade-success-banner" class="cascade-success-banner hidden">
+                    <div class="success-icon-badge">✓</div>
+                    <div class="success-banner-text">
+                        <strong>Le téléchargement démarre avec le profil et le chemin sélectionnés.</strong>
+                        <span>Vous pouvez suivre la progression dans la file d'attente.</span>
+                    </div>
                 </div>
             </section>
 
