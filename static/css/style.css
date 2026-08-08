@@ -1400,6 +1400,7 @@ body {
 }
 
 .ambient-waves--back {
+    filter: blur(8px);
     will-change: transform;
     animation: wave-drift-back 28s ease-in-out infinite;
 }
