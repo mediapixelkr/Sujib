@@ -67,7 +67,12 @@
 
             <!-- Profiles Grid (Target Cards for Drag & Drop or Default selection) -->
             <section class="profiles-section">
-                <h2 class="section-title">Profils de Qualité (Drag & Drop)</h2>
+                <div class="section-header">
+                    <h2 class="section-title">Profils de Qualité (Drag & Drop)</h2>
+                    <button id="btn-manage-profiles" class="btn-sm btn-outline">
+                        ⚙️ Éditeur de Profils
+                    </button>
+                </div>
                 <div id="profiles-grid" class="profiles-grid">
                     <!-- Profile cards rendered dynamically -->
                 </div>
@@ -176,6 +181,30 @@
                     <button type="submit" class="btn-primary">Enregistrer Profil</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Profile Manager Modal -->
+    <div id="profiles-manager-modal" class="modal-overlay hidden">
+        <div class="modal-card glass modal-lg">
+            <div class="modal-header">
+                <h3>Gestionnaire complet des Profils</h3>
+                <button class="btn-close" id="btn-close-prof-manager">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="playlist-controls">
+                    <button id="btn-new-profile" class="btn-sm btn-primary">➕ Créer un nouveau profil</button>
+                    <label class="selected-counter">
+                        <input type="checkbox" id="chk-show-archived"> Afficher profils archivés
+                    </label>
+                </div>
+                <div id="profiles-manager-list" class="playlist-items-list" style="max-height: 380px;">
+                    <!-- Profiles list rendered dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="btn-done-prof-manager">Fermer</button>
+            </div>
         </div>
     </div>
 

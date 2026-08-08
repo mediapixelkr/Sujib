@@ -98,16 +98,34 @@ async def update_options_api(data: OptionsUpdateModel):
     return {"success": True, "options": get_options()}
 
 @app.get("/api/profiles")
-async def get_profiles_api():
-    return get_profiles()
+async def get_profiles_api(include_archived: bool = False):
+    return get_profiles(include_archived=include_archived)
+
+@app.post("/api/profiles")
+async def create_profile_api(data: ProfileUpdateModel):
+    dest = data.dest_path.strip() if data.dest_path else ""
+    if dest:
+        os.makedirs(dest, exist_ok=True)
+    pid = add_profile(data.name, data.format_spec, data.container, data.max_res or "", dest, data.audio_only)
+    return {"success": True, "profile_id": pid, "profiles": get_profiles(include_archived=True)}
 
 @app.post("/api/profiles/{profile_id}")
 async def update_profile_api(profile_id: int, data: ProfileUpdateModel):
     dest = data.dest_path.strip() if data.dest_path else ""
     if dest:
         os.makedirs(dest, exist_ok=True)
-    update_profile(profile_id, data.name, data.format_spec, data.container, data.max_res or "", dest, data.audio_only)
-    return {"success": True, "profiles": get_profiles()}
+    update_profile(profile_id, data.name, data.format_spec, data.container, data.max_res or "", dest, data.audio_only, data.is_active)
+    return {"success": True, "profiles": get_profiles(include_archived=True)}
+
+@app.delete("/api/profiles/{profile_id}")
+async def delete_profile_api(profile_id: int):
+    delete_profile(profile_id)
+    return {"success": True, "profiles": get_profiles(include_archived=True)}
+
+@app.post("/api/profiles/{profile_id}/toggle-active")
+async def toggle_profile_active_api(profile_id: int, is_active: int = 1):
+    toggle_profile_active(profile_id, is_active)
+    return {"success": True, "profiles": get_profiles(include_archived=True)}
 
 @app.post("/api/analyze")
 async def analyze_url_api(data: AnalyzeModel):

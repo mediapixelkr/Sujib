@@ -24,15 +24,18 @@ def init_db():
         max_res TEXT,
         dest_path TEXT DEFAULT '',
         audio_only INTEGER DEFAULT 0,
-        is_default INTEGER DEFAULT 0
+        is_default INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1
     );
     """)
 
-    # Ensure dest_path column exists if migrating from older db
+    # Ensure dest_path and is_active columns exist if migrating from older db
     cursor.execute("PRAGMA table_info(profiles)")
     columns = [col[1] for col in cursor.fetchall()]
     if 'dest_path' not in columns:
         cursor.execute("ALTER TABLE profiles ADD COLUMN dest_path TEXT DEFAULT ''")
+    if 'is_active' not in columns:
+        cursor.execute("ALTER TABLE profiles ADD COLUMN is_active INTEGER DEFAULT 1")
 
     # Options table
     cursor.execute("""
@@ -128,9 +131,12 @@ def update_options(download_dir: str, rename_regex: str, show_last: int, subtitl
     conn.commit()
     conn.close()
 
-def get_profiles() -> List[Dict[str, Any]]:
+def get_profiles(include_archived: bool = False) -> List[Dict[str, Any]]:
     conn = get_db_connection()
-    rows = conn.execute("SELECT * FROM profiles ORDER BY id ASC").fetchall()
+    if include_archived:
+        rows = conn.execute("SELECT * FROM profiles ORDER BY id ASC").fetchall()
+    else:
+        rows = conn.execute("SELECT * FROM profiles WHERE is_active = 1 ORDER BY id ASC").fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
@@ -140,12 +146,36 @@ def get_queue() -> List[Dict[str, Any]]:
     conn.close()
     return [dict(r) for r in rows]
 
-def update_profile(profile_id: int, name: str, format_spec: str, container: str, max_res: str, dest_path: str, audio_only: int):
+def add_profile(name: str, format_spec: str, container: str, max_res: str, dest_path: str, audio_only: int) -> int:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO profiles (name, format_spec, container, max_res, dest_path, audio_only, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)",
+        (name, format_spec, container, max_res, dest_path, audio_only)
+    )
+    pid = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return pid
+
+def update_profile(profile_id: int, name: str, format_spec: str, container: str, max_res: str, dest_path: str, audio_only: int, is_active: int = 1):
     conn = get_db_connection()
     conn.execute(
-        "UPDATE profiles SET name = ?, format_spec = ?, container = ?, max_res = ?, dest_path = ?, audio_only = ? WHERE id = ?",
-        (name, format_spec, container, max_res, dest_path, audio_only, profile_id)
+        "UPDATE profiles SET name = ?, format_spec = ?, container = ?, max_res = ?, dest_path = ?, audio_only = ?, is_active = ? WHERE id = ?",
+        (name, format_spec, container, max_res, dest_path, audio_only, is_active, profile_id)
     )
+    conn.commit()
+    conn.close()
+
+def delete_profile(profile_id: int):
+    conn = get_db_connection()
+    conn.execute("DELETE FROM profiles WHERE id = ?", (profile_id,))
+    conn.commit()
+    conn.close()
+
+def toggle_profile_active(profile_id: int, is_active: int):
+    conn = get_db_connection()
+    conn.execute("UPDATE profiles SET is_active = ? WHERE id = ?", (is_active, profile_id))
     conn.commit()
     conn.close()
 

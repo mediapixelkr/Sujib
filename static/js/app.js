@@ -53,6 +53,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const profEditRes = document.getElementById('prof-edit-res');
     const profEditFormat = document.getElementById('prof-edit-format');
 
+    // Profile Manager Elements
+    const btnManageProfiles = document.getElementById('btn-manage-profiles');
+    const profilesManagerModal = document.getElementById('profiles-manager-modal');
+    const btnCloseProfManager = document.getElementById('btn-close-prof-manager');
+    const btnDoneProfManager = document.getElementById('btn-done-prof-manager');
+    const btnNewProfile = document.getElementById('btn-new-profile');
+    const chkShowArchived = document.getElementById('chk-show-archived');
+    const profilesManagerList = document.getElementById('profiles-manager-list');
+
     // Toast Container
     const toastContainer = document.getElementById('toast-container');
 
@@ -566,39 +575,173 @@ document.addEventListener('DOMContentLoaded', () => {
 
         profileEditForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const pid = parseInt(profEditId.value, 10);
+            const pidStr = profEditId.value;
+            const pid = pidStr ? parseInt(pidStr, 10) : 0;
             const body = {
                 name: profEditName.value.trim(),
                 dest_path: profEditDest.value.trim(),
                 container: profEditContainer.value,
                 max_res: profEditRes.value.trim(),
                 format_spec: profEditFormat.value.trim(),
-                audio_only: profEditContainer.value === 'mp3' ? 1 : 0
+                audio_only: profEditContainer.value === 'mp3' ? 1 : 0,
+                is_active: 1
             };
 
-            const res = await fetch(`/api/profiles/${pid}`, {
+            const url = pid > 0 ? `/api/profiles/${pid}` : '/api/profiles';
+            const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
 
             if (res.ok) {
-                showToast('Profil mis à jour avec succès !', 'success');
+                showToast(pid > 0 ? 'Profil mis à jour !' : 'Nouveau profil créé !', 'success');
                 closeProfileEdit();
                 await loadProfiles();
+                if (!profilesManagerModal.classList.contains('hidden')) {
+                    await loadManagerProfiles();
+                }
             } else {
-                showToast('Erreur lors de la mise à jour du profil', 'error');
+                showToast('Erreur lors de l\'enregistrement du profil', 'error');
             }
+        });
+
+        // Profile Manager Modal Actions
+        const closeProfManager = () => profilesManagerModal.classList.add('hidden');
+        btnManageProfiles.addEventListener('click', async () => {
+            await loadManagerProfiles();
+            profilesManagerModal.classList.remove('hidden');
+        });
+        btnCloseProfManager.addEventListener('click', closeProfManager);
+        btnDoneProfManager.addEventListener('click', closeProfManager);
+
+        btnNewProfile.addEventListener('click', () => {
+            openProfileEditModal(null);
+        });
+
+        chkShowArchived.addEventListener('change', () => {
+            loadManagerProfiles();
+        });
+    }
+
+    async function loadManagerProfiles() {
+        const includeArchived = chkShowArchived.checked;
+        const res = await fetch(`/api/profiles?include_archived=${includeArchived}`);
+        if (res.ok) {
+            const list = await res.json();
+            renderProfilesManagerList(list);
+        }
+    }
+
+    function renderProfilesManagerList(managerProfiles) {
+        profilesManagerList.replaceChildren();
+
+        if (managerProfiles.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'empty-state';
+            empty.textContent = 'Aucun profil trouvé.';
+            profilesManagerList.appendChild(empty);
+            return;
+        }
+
+        managerProfiles.forEach(prof => {
+            const row = document.createElement('div');
+            row.className = 'playlist-item-row';
+            row.style.justifyContent = 'space-between';
+
+            const info = document.createElement('div');
+            info.style.display = 'flex';
+            info.style.flexDirection = 'column';
+            info.style.gap = '2px';
+
+            const titleRow = document.createElement('div');
+            titleRow.style.display = 'flex';
+            titleRow.style.alignItems = 'center';
+            titleRow.style.gap = '8px';
+
+            const name = document.createElement('strong');
+            name.textContent = prof.name;
+
+            const badge = document.createElement('span');
+            badge.className = 'badge';
+            badge.style.fontSize = '0.72rem';
+            badge.style.backgroundColor = prof.is_active === 1 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)';
+            badge.style.color = prof.is_active === 1 ? '#10b981' : '#ef4444';
+            badge.textContent = prof.is_active === 1 ? 'Actif' : 'Archivé';
+
+            titleRow.appendChild(name);
+            titleRow.appendChild(badge);
+
+            const detail = document.createElement('small');
+            detail.style.color = '#94a3b8';
+            detail.textContent = `${prof.container.toUpperCase()} | ${prof.max_res || 'Auto'} | ${prof.dest_path ? '📁 ' + prof.dest_path : '📁 Dossier par défaut'}`;
+
+            info.appendChild(titleRow);
+            info.appendChild(detail);
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.gap = '6px';
+
+            // Edit
+            const btnEdit = document.createElement('button');
+            btnEdit.className = 'btn-sm btn-outline';
+            btnEdit.textContent = '✏️ Éditer';
+            btnEdit.addEventListener('click', () => openProfileEditModal(prof));
+
+            // Archive / Restore toggle
+            const btnToggle = document.createElement('button');
+            btnToggle.className = 'btn-sm btn-outline';
+            btnToggle.textContent = prof.is_active === 1 ? '📦 Archiver' : '🔄 Restaurer';
+            btnToggle.addEventListener('click', async () => {
+                const newActive = prof.is_active === 1 ? 0 : 1;
+                await fetch(`/api/profiles/${prof.id}/toggle-active?is_active=${newActive}`, { method: 'POST' });
+                showToast(newActive === 1 ? 'Profil restauré !' : 'Profil archivé !', 'success');
+                await loadProfiles();
+                await loadManagerProfiles();
+            });
+
+            // Delete
+            const btnDelete = document.createElement('button');
+            btnDelete.className = 'btn-sm btn-outline';
+            btnDelete.style.color = '#ef4444';
+            btnDelete.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            btnDelete.textContent = '🗑️ Supprimer';
+            btnDelete.addEventListener('click', async () => {
+                await fetch(`/api/profiles/${prof.id}`, { method: 'DELETE' });
+                showToast('Profil supprimé !', 'info');
+                await loadProfiles();
+                await loadManagerProfiles();
+            });
+
+            actions.appendChild(btnEdit);
+            actions.appendChild(btnToggle);
+            actions.appendChild(btnDelete);
+
+            row.appendChild(info);
+            row.appendChild(actions);
+
+            profilesManagerList.appendChild(row);
         });
     }
 
     function openProfileEditModal(profile) {
-        profEditId.value = profile.id;
-        profEditName.value = profile.name || '';
-        profEditDest.value = profile.dest_path || '';
-        profEditContainer.value = profile.container || 'mkv';
-        profEditRes.value = profile.max_res || '';
-        profEditFormat.value = profile.format_spec || '';
+        if (profile) {
+            profEditId.value = profile.id;
+            profEditName.value = profile.name || '';
+            profEditDest.value = profile.dest_path || '';
+            profEditContainer.value = profile.container || 'mkv';
+            profEditRes.value = profile.max_res || '';
+            profEditFormat.value = profile.format_spec || '';
+        } else {
+            // New profile creation
+            profEditId.value = '';
+            profEditName.value = '';
+            profEditDest.value = '';
+            profEditContainer.value = 'mkv';
+            profEditRes.value = '1080p';
+            profEditFormat.value = 'bestvideo[height<=1080]+bestaudio/best';
+        }
         profileEditModal.classList.remove('hidden');
     }
 });
