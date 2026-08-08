@@ -53,6 +53,10 @@ body {
     border-radius: var(--radius-md);
 }
 
+.hidden {
+    display: none !important;
+}
+
 /* Navbar */
 .navbar {
     display: flex;
