@@ -467,13 +467,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (initialUrl) cascadeState.url = initialUrl;
 
+        const container = document.getElementById('top-cards-container');
         const dropCard = document.getElementById('drop-target-card');
-        const panel = document.getElementById('drag-cascade-panel');
-        const profileRow = document.getElementById('cascade-profile-row');
+        const expandedContent = document.getElementById('card-expanded-content');
 
+        if (container) container.classList.add('drag-expanded');
         if (dropCard) dropCard.classList.add('drag-hovering');
-        if (panel) panel.classList.remove('hidden');
-        if (profileRow) profileRow.classList.remove('hidden');
+        if (expandedContent) expandedContent.classList.remove('hidden');
 
         renderCascadeProfiles();
         updateSummaryText();
@@ -504,11 +504,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             pill.innerHTML = `
-                <div class="cascade-pill-header">
-                    <span>${prof.name}</span>
-                    <span class="cascade-pill-tag">${(prof.container || 'mkv').toUpperCase()}</span>
-                </div>
-                <div class="cascade-pill-sub">${prof.max_res || 'Auto'}</div>
+                <span>${prof.name}</span>
+                <span class="cascade-pill-tag">${(prof.container || 'mkv').toUpperCase()}</span>
             `;
 
             // Drag Enter / Over
@@ -538,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cascadeState.mode = 'click_pending';
                 updateProfilePillsSelection(prof.id);
                 revealDestinationRow();
-                showToast(`Profil ${prof.name} sélectionné. Cliquez sur un dossier pour lancer.`, 'info');
+                showToast(`Profil ${prof.name} sélectionné. Survolez ou cliquez sur un dossier pour lancer.`, 'info');
             });
 
             // Click Support
@@ -593,8 +590,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function revealDestinationRow() {
-        const destRow = document.getElementById('cascade-dest-row');
-        if (destRow) destRow.classList.remove('hidden');
+        const flyout = document.getElementById('drag-paths-flyout');
+        const flyoutTitle = document.getElementById('flyout-profile-title');
+        const profName = cascadeState.selectedProfile ? cascadeState.selectedProfile.name : 'Profil';
+
+        if (flyoutTitle) flyoutTitle.textContent = `📁 Dossier de destination pour « ${profName} » :`;
+        if (flyout) flyout.classList.remove('hidden');
+
         renderCascadeDestinations();
         updateSummaryText();
     }
@@ -625,10 +627,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const pathDisplay = dest.path ? dest.path : '— Dossier par défaut (Global)';
 
             pill.innerHTML = `
-                <div class="cascade-pill-header">
+                <div style="display:flex;align-items:center;justify-content:space-between;font-weight:600;">
                     <span>${dest.icon || '📁'} ${dest.label}</span>
                 </div>
-                <div class="cascade-pill-sub">${pathDisplay}</div>
+                <div style="font-size:0.75rem;color:var(--text-muted);word-break:break-all;">${pathDisplay}</div>
             `;
 
             // Drag Enter / Over
@@ -751,7 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (profName && destLabel) {
             const pathDesc = destPath ? ` (${destPath})` : '';
-            summaryEl.innerHTML = `<span class="status-icon">🚀</span> Sélection : <strong>${profName}</strong> ➔ <strong>${destLabel}</strong><span style="color:var(--text-muted);">${pathDesc}</span> &mdash; Relâchez le clic pour lancer.`;
+            summaryEl.innerHTML = `<span class="status-icon">🚀</span> <strong>${profName}</strong> ➔ <strong>${destLabel}</strong><span style="color:var(--text-muted);">${pathDesc}</span> &mdash; Relâchez pour lancer.`;
         } else if (profName) {
             summaryEl.innerHTML = `<span class="status-icon">🎯</span> Profil <strong>${profName}</strong> &mdash; Survolez ou cliquez sur un dossier de destination ci-dessous.`;
         } else if (cascadeState.url) {
@@ -774,13 +776,15 @@ document.addEventListener('DOMContentLoaded', () => {
         cascadeState.selectedDest = null;
         cascadeState.dragDepth = 0;
 
+        const container = document.getElementById('top-cards-container');
         const dropCard = document.getElementById('drop-target-card');
-        const panel = document.getElementById('drag-cascade-panel');
-        const destRow = document.getElementById('cascade-dest-row');
+        const expandedContent = document.getElementById('card-expanded-content');
+        const flyout = document.getElementById('drag-paths-flyout');
 
+        if (container) container.classList.remove('drag-expanded');
         if (dropCard) dropCard.classList.remove('drag-hovering');
-        if (panel) panel.classList.add('hidden');
-        if (destRow) destRow.classList.add('hidden');
+        if (expandedContent) expandedContent.classList.add('hidden');
+        if (flyout) flyout.classList.add('hidden');
     }
 
     // ─── URL Form Submit ──────────────────────────────────────────────────────

@@ -272,7 +272,20 @@ body {
     display: grid;
     grid-template-columns: 1fr 2fr;
     gap: 16px;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: grid-template-columns 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.top-cards-container.drag-expanded {
+    grid-template-columns: 1fr 0fr;
+}
+
+.top-cards-container.drag-expanded .card-url-input {
+    overflow: hidden;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
 }
 
 /* Right Card (2/3 width) */
@@ -286,20 +299,21 @@ body {
     overflow: hidden;
 }
 
-/* Left Card (1/3 width): Drag Target */
+/* Left Card (1/3 width): Expands inline to 100% width on drag */
 .card-drag-target {
     min-height: 72px;
     border: 2px dashed rgba(59, 130, 246, 0.4);
     border-radius: var(--radius-md);
     padding: 12px 18px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
     position: relative;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     overflow: visible;
+    z-index: 100;
 }
 
 .card-drag-target:hover,
@@ -312,7 +326,7 @@ body {
 .card-drag-target.drag-hovering {
     border-style: solid;
     border-color: var(--accent-blue);
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(15, 23, 42, 0.96);
     box-shadow: 0 0 25px rgba(59, 130, 246, 0.45), inset 0 0 15px rgba(59, 130, 246, 0.15);
     transform: translateY(-2px);
 }
@@ -359,164 +373,137 @@ body {
     font-weight: 600;
     font-size: 0.92rem;
     color: #ffffff;
+    white-space: nowrap;
 }
 
 .drop-sub-label {
     font-size: 0.75rem;
     color: var(--text-muted);
     margin-top: 2px;
+    white-space: nowrap;
 }
 
-/* FULL-WIDTH CASCADING SELECTOR PANEL */
-.drag-cascade-panel {
-    width: 100%;
-    margin-top: 16px;
-    padding: 18px 20px;
-    border-radius: var(--radius-md);
-    background: rgba(15, 23, 42, 0.96);
-    border: 1px solid rgba(59, 130, 246, 0.45);
-    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.65), 0 0 30px rgba(59, 130, 246, 0.15);
+/* Inline Right Content Inside Left Card When Expanded */
+.card-expanded-content {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
-    animation: cascadeExpand 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+    animation: fadeIn 0.15s ease-out;
 }
 
-@keyframes cascadeExpand {
-    from { opacity: 0; transform: translateY(-8px) scale(0.99); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
+.inline-profiles-header {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #60a5fa;
+    white-space: nowrap;
 }
 
-.cascade-row {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    animation: fadeInRow 0.15s ease-out;
-}
-
-@keyframes fadeInRow {
-    from { opacity: 0; transform: translateY(-4px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-.cascade-row-header {
+.drag-profiles-list {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.86rem;
-    font-weight: 600;
+    flex-wrap: wrap;
 }
 
-.cascade-row-step {
+.cascade-pill.profile-pill {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: rgba(59, 130, 246, 0.25);
-    border: 1px solid rgba(96, 165, 250, 0.5);
-    color: #60a5fa;
-    font-size: 0.78rem;
-    font-weight: 700;
+    gap: 6px;
 }
 
-.cascade-row-title {
-    color: #f8fafc;
-    font-weight: 600;
+.cascade-pill.profile-pill:hover,
+.cascade-pill.profile-pill.active {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(139, 92, 246, 0.45));
+    border-color: #60a5fa;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
 }
 
-.cascade-row-hint {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    margin-left: auto;
-}
-
-/* Grids for Pills */
-.drag-profiles-list, .drag-dests-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 10px;
-}
-
-/* Pill Component */
-.cascade-pill {
-    background: rgba(30, 41, 59, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 10px;
-    padding: 10px 14px;
+/* FLYOUT DRAWER FOR DESTINATION PATHS ATTACHED BELOW EXPANDED CARD */
+.drag-paths-flyout {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    background: rgba(10, 18, 36, 0.98);
+    border: 1px solid rgba(59, 130, 246, 0.5);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 25px rgba(59, 130, 246, 0.2);
+    z-index: 250;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    cursor: pointer;
-    user-select: none;
-    transition: all 0.15s ease;
-    position: relative;
+    gap: 12px;
+    animation: slideDown 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.cascade-pill:hover,
-.cascade-pill.active,
-.cascade-pill.drag-over {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(139, 92, 246, 0.4));
-    border-color: #60a5fa;
-    box-shadow: 0 4px 18px rgba(59, 130, 246, 0.35);
-    transform: translateY(-2px);
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-.cascade-pill:focus-visible {
-    outline: 2px solid #60a5fa;
-    outline-offset: 2px;
-}
-
-.cascade-pill-header {
+.flyout-top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #ffffff;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.cascade-pill-sub {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    word-break: break-all;
+.flyout-header {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #60a5fa;
+    letter-spacing: 0.02em;
 }
 
-.cascade-pill-tag {
-    font-size: 0.72rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #94a3b8;
-    font-weight: 500;
+.flyout-paths-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
 }
 
-.cascade-pill.active .cascade-pill-tag,
-.cascade-pill.drag-over .cascade-pill-tag {
-    background: rgba(59, 130, 246, 0.45);
-    color: #ffffff;
-}
-
-/* LIVE SUMMARY BAR */
-.cascade-summary-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 16px;
-    background: rgba(15, 23, 42, 0.7);
-    border: 1px solid rgba(59, 130, 246, 0.35);
+.cascade-pill.dest-pill {
+    padding: 10px 14px;
+    background: rgba(30, 41, 59, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 8px;
-    font-size: 0.85rem;
-    color: #e2e8f0;
-    margin-top: 4px;
+    font-size: 0.84rem;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    transition: all 0.15s ease;
+}
+
+.cascade-pill.dest-pill:hover,
+.cascade-pill.dest-pill.active,
+.cascade-pill.dest-pill.drag-over {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(139, 92, 246, 0.35));
+    border-color: #60a5fa;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
 }
 
 .cascade-summary-text {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: #e2e8f0;
+    padding-top: 4px;
 }
 
 .btn-cascade-close {
