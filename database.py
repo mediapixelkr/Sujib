@@ -252,9 +252,16 @@ def get_downloaded(limit: int = 50) -> List[Dict[str, Any]]:
 
 def remove_downloaded(item_id: int) -> Optional[str]:
     conn = get_db_connection()
-    row = conn.execute("SELECT filepath FROM downloaded WHERE id = ?", (item_id,)).fetchone()
+    row = conn.execute("SELECT video_id, filename, filepath FROM downloaded WHERE id = ?", (item_id,)).fetchone()
     filepath = row["filepath"] if row else None
+    vid = row["video_id"] if row else None
+    fn = row["filename"] if row else None
+
     conn.execute("DELETE FROM downloaded WHERE id = ?", (item_id,))
+    if vid:
+        conn.execute("DELETE FROM queue WHERE video_id = ? AND status = 'completed'", (vid,))
+    if fn:
+        conn.execute("DELETE FROM queue WHERE filename = ? AND status = 'completed'", (fn,))
     conn.commit()
     conn.close()
     return filepath
@@ -302,6 +309,7 @@ def clear_downloaded_history(delete_files: bool = False):
                 except Exception:
                     pass
     conn.execute("DELETE FROM downloaded")
+    conn.execute("DELETE FROM queue WHERE status IN ('completed', 'failed', 'cancelled')")
     conn.commit()
     conn.close()
 
