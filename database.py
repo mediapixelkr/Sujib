@@ -214,12 +214,18 @@ def add_to_queue(video_id: str, title: str, url: str, profile_id: int, profile_n
     conn.close()
     return qid
 
-def update_queue_status(qid: int, status: str, progress_pct: float = 0.0, speed: str = "", eta: str = "", filename: str = "", error_msg: str = ""):
+def update_queue_status(qid: int, status: str, progress_pct: float = 0.0, speed: str = "", eta: str = "", filename: str = "", error_msg: str = "", title: str = ""):
     conn = get_db_connection()
-    conn.execute(
-        "UPDATE queue SET status = ?, progress_pct = ?, speed = ?, eta = ?, filename = ?, error_msg = ? WHERE id = ?",
-        (status, progress_pct, speed, eta, filename, error_msg, qid)
-    )
+    if title:
+        conn.execute(
+            "UPDATE queue SET status = ?, progress_pct = ?, speed = ?, eta = ?, filename = ?, error_msg = ?, title = ? WHERE id = ?",
+            (status, progress_pct, speed, eta, filename, error_msg, title, qid)
+        )
+    else:
+        conn.execute(
+            "UPDATE queue SET status = ?, progress_pct = ?, speed = ?, eta = ?, filename = ?, error_msg = ? WHERE id = ?",
+            (status, progress_pct, speed, eta, filename, error_msg, qid)
+        )
     conn.commit()
     conn.close()
 

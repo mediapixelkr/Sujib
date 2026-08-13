@@ -455,6 +455,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 chipsRow.appendChild(fmtChip);
             }
 
+            if (item.duration && item.duration !== '--') {
+                const durChip = document.createElement('span');
+                durChip.className = 'meta-chip';
+                durChip.textContent = `⏱️ ${item.duration}`;
+                chipsRow.appendChild(durChip);
+            }
+
             if (item.filesize) {
                 const sizeChip = document.createElement('span');
                 sizeChip.className = 'meta-chip';

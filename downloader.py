@@ -228,14 +228,26 @@ class DownloadQueueManager:
                 prepared_fn = ydl.prepare_filename(info)
                 vid = info.get('id', '') if isinstance(info, dict) else ''
                 vtitle = info.get('title', '') if isinstance(info, dict) else ''
-                return prepared_fn, vid, vtitle
+
+                dur_sec = info.get('duration') if isinstance(info, dict) else None
+                if dur_sec:
+                    m, s = divmod(int(dur_sec), 60)
+                    h, m = divmod(m, 60)
+                    vduration = f"{h:02d}:{m:02d}:{s:02d}" if h else f"{m:02d}:{s:02d}"
+                else:
+                    vduration = "--"
+
+                height = info.get('height') if isinstance(info, dict) else None
+                vres = f"{height}p" if height else (profile.get('max_res', 'auto'))
+
+                return prepared_fn, vid, vtitle, vduration, vres
 
         try:
             download_result = await loop.run_in_executor(None, sync_download)
             if isinstance(download_result, tuple):
-                final_filepath, extracted_vid, extracted_title = download_result
+                final_filepath, extracted_vid, extracted_title, extracted_duration, extracted_res = download_result
             else:
-                final_filepath, extracted_vid, extracted_title = download_result, '', ''
+                final_filepath, extracted_vid, extracted_title, extracted_duration, extracted_res = download_result, '', '', '--', profile.get('max_res', 'auto')
 
             if not os.path.exists(final_filepath):
                 # Try finding matched file in dir if extension changed during merge
@@ -259,22 +271,29 @@ class DownloadQueueManager:
 
             filesize = os.path.getsize(final_filepath) if os.path.exists(final_filepath) else 0
 
-            # Store in downloaded database
+            # Prioritize extracted real video title over generic fallback titles
+            raw_req_title = task_info.get('title', '')
+            if extracted_title and extracted_title.strip():
+                final_title = extracted_title
+            elif raw_req_title and raw_req_title != "Vidéo YouTube":
+                final_title = raw_req_title
+            else:
+                final_title = os.path.splitext(final_filename)[0]
+
             final_vid = extracted_vid or task_info.get('video_id', '') or ''
-            final_title = task_info.get('title') or extracted_title or final_filename
 
             add_downloaded(
                 video_id=final_vid,
                 title=final_title,
-                resolution=profile.get('max_res', 'auto'),
+                resolution=extracted_res or profile.get('max_res', 'auto'),
                 format_info=profile.get('name', 'Custom'),
-                duration="--",
+                duration=extracted_duration,
                 filename=final_filename,
                 filepath=final_filepath,
                 filesize=filesize
             )
 
-            update_queue_status(qid, status="completed", progress_pct=100.0, filename=final_filename)
+            update_queue_status(qid, status="completed", progress_pct=100.0, filename=final_filename, title=final_title)
             await broadcaster.broadcast({"event": "completed", "qid": qid, "filename": final_filename})
 
         except asyncio.CancelledError:
