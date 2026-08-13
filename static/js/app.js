@@ -196,15 +196,38 @@ document.addEventListener('DOMContentLoaded', () => {
         return svg;
     }
 
-    function createThumbnailElement(videoId) {
+    function extractYouTubeId(str) {
+        if (!str || typeof str !== 'string') return '';
+        const trimmed = str.trim();
+        if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
+            return trimmed;
+        }
+        const match = trimmed.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
+        if (match) return match[1];
+
+        const bracketMatch = trimmed.match(/\[([a-zA-Z0-9_-]{11})\]/);
+        if (bracketMatch) return bracketMatch[1];
+
+        return '';
+    }
+
+    function createThumbnailElement(videoId, fallbackSource = '') {
         const thumbDiv = document.createElement('div');
         thumbDiv.className = 'download-thumb';
-        if (videoId && videoId.length >= 4) {
+
+        let vid = extractYouTubeId(videoId) || extractYouTubeId(fallbackSource);
+
+        if (vid) {
             const img = document.createElement('img');
-            img.src = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+            img.referrerPolicy = 'no-referrer';
+            img.src = `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`;
             img.alt = 'Thumbnail';
             img.onerror = () => {
-                thumbDiv.replaceChildren(getFallbackSvg());
+                if (img.src.includes('i.ytimg.com')) {
+                    img.src = `https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
+                } else {
+                    thumbDiv.replaceChildren(getFallbackSvg());
+                }
             };
             thumbDiv.appendChild(img);
         } else {
@@ -257,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'download-card';
 
             // Thumbnail
-            const thumb = createThumbnailElement(item.video_id);
+            const thumb = createThumbnailElement(item.video_id, item.url || item.title);
             card.appendChild(thumb);
 
             // Body
@@ -390,7 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'download-card';
 
             // Thumbnail
-            const thumb = createThumbnailElement(item.video_id);
+            const thumb = createThumbnailElement(item.video_id, item.title || item.filename);
             card.appendChild(thumb);
 
             // Body

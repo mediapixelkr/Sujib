@@ -222,10 +222,17 @@ class DownloadQueueManager:
         def sync_download():
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=True)
-                return ydl.prepare_filename(info)
+                prepared_fn = ydl.prepare_filename(info)
+                vid = info.get('id', '') if isinstance(info, dict) else ''
+                vtitle = info.get('title', '') if isinstance(info, dict) else ''
+                return prepared_fn, vid, vtitle
 
         try:
-            final_filepath = await loop.run_in_executor(None, sync_download)
+            download_result = await loop.run_in_executor(None, sync_download)
+            if isinstance(download_result, tuple):
+                final_filepath, extracted_vid, extracted_title = download_result
+            else:
+                final_filepath, extracted_vid, extracted_title = download_result, '', ''
 
             if not os.path.exists(final_filepath):
                 # Try finding matched file in dir if extension changed during merge
@@ -250,9 +257,12 @@ class DownloadQueueManager:
             filesize = os.path.getsize(final_filepath) if os.path.exists(final_filepath) else 0
 
             # Store in downloaded database
+            final_vid = extracted_vid or task_info.get('video_id', '') or ''
+            final_title = task_info.get('title') or extracted_title or final_filename
+
             add_downloaded(
-                video_id=task_info.get('video_id', ''),
-                title=task_info.get('title', final_filename),
+                video_id=final_vid,
+                title=final_title,
                 resolution=profile.get('max_res', 'auto'),
                 format_info=profile.get('name', 'Custom'),
                 duration="--",

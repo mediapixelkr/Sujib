@@ -163,6 +163,14 @@ async def analyze_url_api(data: AnalyzeModel):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+import re
+
+def extract_youtube_id(url: str) -> str:
+    if not url:
+        return ""
+    m = re.search(r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})', str(url))
+    return m.group(1) if m else ""
+
 @app.post("/api/download")
 async def add_download_api(data: DownloadRequestModel):
     profiles = get_profiles(include_archived=True)
@@ -177,8 +185,10 @@ async def add_download_api(data: DownloadRequestModel):
     
     os.makedirs(dest, exist_ok=True)
 
+    extracted_id = data.video_id or extract_youtube_id(data.url) or "video"
+
     qid = add_to_queue(
-        video_id=data.video_id or "video",
+        video_id=extracted_id,
         title=data.title or "Vidéo YouTube",
         url=data.url,
         profile_id=selected_profile["id"],
@@ -188,7 +198,7 @@ async def add_download_api(data: DownloadRequestModel):
 
     task_info = {
         "url": data.url,
-        "video_id": data.video_id,
+        "video_id": extracted_id,
         "title": data.title,
         "profile": selected_profile,
         "dest_path": dest
