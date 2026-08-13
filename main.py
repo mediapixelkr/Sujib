@@ -238,8 +238,8 @@ async def remove_downloaded_api(item_id: int, delete_file: bool = False):
     return {"success": True}
 
 @app.delete("/api/downloaded")
-async def clear_downloaded_api():
-    clear_downloaded_history()
+async def clear_downloaded_api(delete_files: bool = False):
+    clear_downloaded_history(delete_files=delete_files)
     return {"success": True}
 
 @app.post("/api/update-ytdlp")

@@ -433,6 +433,31 @@
                 <button type="button" class="btn-primary" id="btn-confirm-playlist">Télécharger la sélection</button>
             </div>
         </div>
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div id="delete-confirm-modal" class="modal-overlay hidden">
+        <div class="modal-card glass" style="max-width:460px; padding:24px;">
+            <div class="modal-header" style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="delete-modal-heading" style="font-size:1.1rem; margin:0; display:flex; align-items:center; gap:8px;">
+                    🗑️ Option de suppression
+                </h3>
+                <button id="btn-close-delete-modal" class="btn-close-modal" type="button" style="background:none; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer;">✕</button>
+            </div>
+            <p id="delete-modal-title" style="font-size:0.92rem; color:var(--text-main); margin-bottom:12px; font-weight:500; word-break:break-word;"></p>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">
+                Souhaitez-vous également supprimer le fichier du disque dur ?
+            </p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button type="button" id="btn-delete-file-and-entry" class="btn-primary" style="background:#ef4444; border-color:#ef4444; text-align:center; padding:10px; cursor:pointer;">
+                    🗑️ Supprimer du disque + Retirer de la liste
+                </button>
+                <button type="button" id="btn-delete-entry-only" class="btn-outline" style="text-align:center; padding:10px; cursor:pointer;">
+                    📋 Retirer de la liste uniquement (conserver le fichier)
+                </button>
+                <button type="button" id="btn-cancel-delete" class="btn-secondary" style="text-align:center; padding:8px; cursor:pointer; margin-top:4px;">
+                    Annuler
+                </button>
+            </div>
+        </div>
     </div>
 
     <div id="toast-container" class="toast-container"></div>

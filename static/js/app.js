@@ -487,10 +487,20 @@ document.addEventListener('DOMContentLoaded', () => {
             btnDel.className = 'btn-sm btn-outline';
             btnDel.style.cssText = 'color:#ef4444;border-color:rgba(239,68,68,0.4);cursor:pointer;';
             btnDel.textContent = '🗑️ Supprimer';
-            btnDel.addEventListener('click', async () => {
-                await fetch(apiPath(`/downloaded/${item.id}?delete_file=true`), { method: 'DELETE' });
-                showToast('Fichier supprimé', 'success');
-                loadAllDownloads();
+            btnDel.addEventListener('click', () => {
+                openDeleteModal(
+                    `"${item.title || item.filename}"`,
+                    async () => {
+                        await fetch(apiPath(`/downloaded/${item.id}?delete_file=true`), { method: 'DELETE' });
+                        showToast('Fichier supprimé du disque et retiré de la liste', 'success');
+                        loadAllDownloads();
+                    },
+                    async () => {
+                        await fetch(apiPath(`/downloaded/${item.id}?delete_file=false`), { method: 'DELETE' });
+                        showToast('Téléchargement retiré de la liste (fichier conservé)', 'info');
+                        loadAllDownloads();
+                    }
+                );
             });
             actions.appendChild(btnDel);
 
@@ -1468,21 +1478,65 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    // ─── Delete Confirmation Modal Logic ────────────────────────────────────
+    const deleteModal           = document.getElementById('delete-confirm-modal');
+    const deleteModalTitle      = document.getElementById('delete-modal-title');
+    const btnCloseDeleteModal   = document.getElementById('btn-close-delete-modal');
+    const btnDeleteFileAndEntry = document.getElementById('btn-delete-file-and-entry');
+    const btnDeleteEntryOnly    = document.getElementById('btn-delete-entry-only');
+    const btnCancelDelete       = document.getElementById('btn-cancel-delete');
+
+    let pendingDeleteAction = null;
+
+    function openDeleteModal(titleText, onConfirmFileDelete, onConfirmEntryOnly) {
+        if (deleteModalTitle) deleteModalTitle.textContent = titleText;
+        pendingDeleteAction = { fileDelete: onConfirmFileDelete, entryOnly: onConfirmEntryOnly };
+        if (deleteModal) deleteModal.classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        if (deleteModal) deleteModal.classList.add('hidden');
+        pendingDeleteAction = null;
+    }
+
+    if (btnCloseDeleteModal) btnCloseDeleteModal.addEventListener('click', closeDeleteModal);
+    if (btnCancelDelete) btnCancelDelete.addEventListener('click', closeDeleteModal);
+
+    if (btnDeleteFileAndEntry) {
+        btnDeleteFileAndEntry.addEventListener('click', async () => {
+            if (pendingDeleteAction && pendingDeleteAction.fileDelete) {
+                await pendingDeleteAction.fileDelete();
+            }
+            closeDeleteModal();
+        });
+    }
+
+    if (btnDeleteEntryOnly) {
+        btnDeleteEntryOnly.addEventListener('click', async () => {
+            if (pendingDeleteAction && pendingDeleteAction.entryOnly) {
+                await pendingDeleteAction.entryOnly();
+            }
+            closeDeleteModal();
+        });
+    }
+
     // ─── Clear Completed Downloads History ───────────────────────────────────
     const btnClearHistory = document.getElementById('btn-clear-history');
     if (btnClearHistory) {
-        btnClearHistory.addEventListener('click', async () => {
-            if (confirm("Voulez-vous vider la liste des anciens téléchargements terminés ?")) {
-                try {
-                    const res = await fetch(apiPath('/downloaded'), { method: 'DELETE' });
-                    if (res.ok) {
-                        showToast('Liste des anciens téléchargements vidée', 'info');
-                        await loadAllDownloads();
-                    }
-                } catch (err) {
-                    showToast('Erreur lors du vidage de la liste', 'error');
+        btnClearHistory.addEventListener('click', () => {
+            openDeleteModal(
+                "Nettoyage de tous les téléchargements terminés",
+                async () => {
+                    await fetch(apiPath('/downloaded?delete_files=true'), { method: 'DELETE' });
+                    showToast('Tous les fichiers et l\'historique ont été supprimés', 'success');
+                    loadAllDownloads();
+                },
+                async () => {
+                    await fetch(apiPath('/downloaded?delete_files=false'), { method: 'DELETE' });
+                    showToast('Liste des téléchargements vidée (fichiers conservés)', 'info');
+                    loadAllDownloads();
                 }
-            }
+            );
         });
     }
 });

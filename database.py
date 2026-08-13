@@ -286,8 +286,21 @@ def update_preset_path(preset_id: int, label: str, path: str, icon: str = '📁'
     conn.commit()
     conn.close()
 
-def clear_downloaded_history():
+def clear_downloaded_history(delete_files: bool = False):
     conn = get_db_connection()
+    if delete_files:
+        rows = conn.execute("SELECT filepath FROM downloaded").fetchall()
+        options = get_options()
+        dl_dir = os.path.abspath(options.get("download_dir", ""))
+        for r in rows:
+            filepath = r[0]
+            if filepath and os.path.exists(filepath):
+                try:
+                    real_path = os.path.abspath(filepath)
+                    if real_path.startswith(dl_dir + os.sep) or real_path == dl_dir:
+                        os.remove(real_path)
+                except Exception:
+                    pass
     conn.execute("DELETE FROM downloaded")
     conn.commit()
     conn.close()
