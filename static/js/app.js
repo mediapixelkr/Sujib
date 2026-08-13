@@ -507,6 +507,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const actions = document.createElement('div');
             actions.className = 'download-actions';
+            actions.style.cssText = 'display:flex; gap:6px; align-items:center;';
+
+            const btnRename = document.createElement('button');
+            btnRename.className = 'btn-sm btn-outline';
+            btnRename.style.cssText = 'color:var(--primary);border-color:rgba(124,58,237,0.4);cursor:pointer;';
+            btnRename.textContent = '✏️ Renommer';
+            btnRename.addEventListener('click', () => {
+                openRenameModal(item);
+            });
 
             const btnDel = document.createElement('button');
             btnDel.className = 'btn-sm btn-outline';
@@ -527,6 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 );
             });
+            actions.appendChild(btnRename);
             actions.appendChild(btnDel);
 
             footerRow.appendChild(destInfo);
@@ -1542,6 +1552,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 await pendingDeleteAction.entryOnly();
             }
             closeDeleteModal();
+        });
+    }
+
+    // ─── Rename Modal Logic ──────────────────────────────────────────────────
+    const renameModal         = document.getElementById('rename-modal');
+    const renameForm          = document.getElementById('rename-form');
+    const renameItemIdInput   = document.getElementById('rename-item-id');
+    const renameFilenameInput = document.getElementById('rename-input-filename');
+    const btnCloseRenameModal = document.getElementById('btn-close-rename-modal');
+    const btnCancelRename     = document.getElementById('btn-cancel-rename');
+
+    function openRenameModal(item) {
+        if (renameItemIdInput) renameItemIdInput.value = item.id;
+        if (renameFilenameInput) renameFilenameInput.value = item.filename || item.title || '';
+        if (renameModal) renameModal.classList.remove('hidden');
+        if (renameFilenameInput) {
+            renameFilenameInput.focus();
+            renameFilenameInput.select();
+        }
+    }
+
+    function closeRenameModal() {
+        if (renameModal) renameModal.classList.add('hidden');
+    }
+
+    if (btnCloseRenameModal) btnCloseRenameModal.addEventListener('click', closeRenameModal);
+    if (btnCancelRename) btnCancelRename.addEventListener('click', closeRenameModal);
+
+    if (renameForm) {
+        renameForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const itemId = renameItemIdInput ? renameItemIdInput.value : '';
+            const newFilename = renameFilenameInput ? renameFilenameInput.value.trim() : '';
+
+            if (!itemId || !newFilename) return;
+
+            try {
+                const res = await fetch(apiPath(`/downloaded/${itemId}/rename`), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ new_filename: newFilename })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showToast(`Fichier renommé en "${data.data.filename}"`, 'success');
+                    closeRenameModal();
+                    await loadAllDownloads();
+                } else {
+                    showToast(`Erreur : ${data.detail || 'Impossible de renommer'}`, 'error');
+                }
+            } catch (err) {
+                showToast('Erreur réseau lors du nommage du fichier', 'error');
+            }
         });
     }
 

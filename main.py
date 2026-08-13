@@ -13,7 +13,7 @@ from database import (
     add_profile, delete_profile, toggle_profile_active,
     get_preset_paths, add_preset_path, update_preset_path, delete_preset_path,
     get_queue, add_to_queue, remove_queue_item,
-    get_downloaded, remove_downloaded, clear_downloaded_history
+    get_downloaded, remove_downloaded, clear_downloaded_history, rename_downloaded
 )
 from downloader import analyze_url, queue_manager, broadcaster
 from updater import get_ytdlp_version, update_ytdlp
@@ -60,10 +60,13 @@ class ProfileUpdateModel(BaseModel):
     audio_only: int = 0
     is_active: int = 1
 
-class PresetPathModel(BaseModel):
+class PresetPathUpdate(BaseModel):
     label: str
     path: str
-    icon: Optional[str] = "📁"
+    icon: Optional[str] = '📁'
+
+class RenameRequest(BaseModel):
+    new_filename: str
 
 class AnalyzeModel(BaseModel):
     url: str
@@ -241,6 +244,14 @@ async def remove_downloaded_api(item_id: int, delete_file: bool = False):
 async def clear_downloaded_api(delete_files: bool = False):
     clear_downloaded_history(delete_files=delete_files)
     return {"success": True}
+
+@app.post("/api/downloaded/{item_id}/rename")
+async def rename_downloaded_api(item_id: int, req: RenameRequest):
+    try:
+        res = rename_downloaded(item_id, req.new_filename)
+        return {"success": True, "data": res}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/update-ytdlp")
 async def update_ytdlp_api():

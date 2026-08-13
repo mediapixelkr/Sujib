@@ -462,6 +462,29 @@
         </div>
     </div>
 
+    <!-- RENAME MODAL -->
+    <div id="rename-modal" class="modal-overlay hidden">
+        <div class="modal-card glass" style="max-width:480px; padding:24px;">
+            <div class="modal-header" style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="font-size:1.1rem; margin:0; display:flex; align-items:center; gap:8px;">
+                    ✏️ Renommer le fichier
+                </h3>
+                <button id="btn-close-rename-modal" class="btn-close-modal" type="button" style="background:none; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer;">✕</button>
+            </div>
+            <form id="rename-form">
+                <input type="hidden" id="rename-item-id" value="">
+                <div style="margin-bottom:14px;">
+                    <label style="display:block; font-size:0.82rem; color:var(--text-muted); margin-bottom:6px;">Nouveau nom de fichier :</label>
+                    <input type="text" id="rename-input-filename" class="form-input" style="width:100%; box-sizing:border-box; font-size:0.95rem; padding:10px;" required>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                    <button type="button" id="btn-cancel-rename" class="btn-secondary" style="padding:8px 16px; cursor:pointer;">Annuler</button>
+                    <button type="submit" id="btn-confirm-rename" class="btn-primary" style="padding:8px 16px; cursor:pointer;">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="toast-container" class="toast-container"></div>
     <script src="static/js/app.js"></script>
 </body>

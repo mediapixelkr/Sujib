@@ -276,6 +276,48 @@ def remove_downloaded(item_id: int) -> Optional[str]:
     conn.close()
     return filepath
 
+def rename_downloaded(item_id: int, new_filename: str) -> Dict[str, Any]:
+    conn = get_db_connection()
+    row = conn.execute("SELECT * FROM downloaded WHERE id = ?", (item_id,)).fetchone()
+    if not row:
+        conn.close()
+        raise ValueError("Téléchargement introuvable")
+
+    old_filepath = row["filepath"]
+    if not old_filepath or not os.path.exists(old_filepath):
+        conn.close()
+        raise FileNotFoundError("Fichier introuvable sur le disque")
+
+    dl_dir = os.path.dirname(os.path.abspath(old_filepath))
+    safe_new_filename = os.path.basename(new_filename.strip())
+
+    old_ext = os.path.splitext(old_filepath)[1]
+    if not os.path.splitext(safe_new_filename)[1] and old_ext:
+        safe_new_filename += old_ext
+
+    new_filepath = os.path.join(dl_dir, safe_new_filename)
+
+    if os.path.exists(new_filepath) and os.path.abspath(new_filepath) != os.path.abspath(old_filepath):
+        conn.close()
+        raise FileExistsError("Un fichier portant ce nom existe déjà dans le dossier")
+
+    os.rename(old_filepath, new_filepath)
+
+    new_title = os.path.splitext(safe_new_filename)[0]
+    conn.execute(
+        "UPDATE downloaded SET filename = ?, filepath = ?, title = ? WHERE id = ?",
+        (safe_new_filename, new_filepath, new_title, item_id)
+    )
+    conn.commit()
+    conn.close()
+
+    return {
+        "id": item_id,
+        "filename": safe_new_filename,
+        "filepath": new_filepath,
+        "title": new_title
+    }
+
 def get_preset_paths() -> List[Dict[str, Any]]:
     conn = get_db_connection()
     rows = conn.execute("SELECT * FROM preset_paths ORDER BY id ASC").fetchall()
