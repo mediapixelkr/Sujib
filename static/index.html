@@ -208,11 +208,14 @@
 
             <!-- QUEUE & DOWNLOADED ITEMS (ALL TELECHARGEMENTS IN ONE SECTION) -->
             <section class="queue-section">
-                <div class="section-header">
+                <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
                     <div class="section-title-group">
                         <h2 class="section-title">Téléchargements</h2>
                         <span id="queue-count-badge" class="count-chip">0</span>
                     </div>
+                    <button type="button" id="btn-clear-history" class="btn-sm btn-outline" style="font-size:0.8rem; padding:4px 10px; cursor:pointer;" title="Vider la liste des anciens téléchargements terminés">
+                        🧹 Vider la liste
+                    </button>
                 </div>
                 <div id="queue-list" class="queue-list">
                     <div class="empty-state-card" id="queue-empty">

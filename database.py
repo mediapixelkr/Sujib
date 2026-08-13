@@ -286,6 +286,12 @@ def update_preset_path(preset_id: int, label: str, path: str, icon: str = '📁'
     conn.commit()
     conn.close()
 
+def clear_downloaded_history():
+    conn = get_db_connection()
+    conn.execute("DELETE FROM downloaded")
+    conn.commit()
+    conn.close()
+
 def delete_preset_path(preset_id: int):
     conn = get_db_connection()
     conn.execute("DELETE FROM preset_paths WHERE id = ?", (preset_id,))

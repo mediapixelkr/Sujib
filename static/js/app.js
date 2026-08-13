@@ -1468,4 +1468,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    // ─── Clear Completed Downloads History ───────────────────────────────────
+    const btnClearHistory = document.getElementById('btn-clear-history');
+    if (btnClearHistory) {
+        btnClearHistory.addEventListener('click', async () => {
+            if (confirm("Voulez-vous vider la liste des anciens téléchargements terminés ?")) {
+                try {
+                    const res = await fetch(apiPath('/downloaded'), { method: 'DELETE' });
+                    if (res.ok) {
+                        showToast('Liste des anciens téléchargements vidée', 'info');
+                        await loadAllDownloads();
+                    }
+                } catch (err) {
+                    showToast('Erreur lors du vidage de la liste', 'error');
+                }
+            }
+        });
+    }
 });

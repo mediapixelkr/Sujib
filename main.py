@@ -13,7 +13,7 @@ from database import (
     add_profile, delete_profile, toggle_profile_active,
     get_preset_paths, add_preset_path, update_preset_path, delete_preset_path,
     get_queue, add_to_queue, remove_queue_item,
-    get_downloaded, remove_downloaded
+    get_downloaded, remove_downloaded, clear_downloaded_history
 )
 from downloader import analyze_url, queue_manager, broadcaster
 from updater import get_ytdlp_version, update_ytdlp
@@ -235,6 +235,11 @@ async def remove_downloaded_api(item_id: int, delete_file: bool = False):
                 os.remove(real_path)
         except Exception as e:
             pass
+    return {"success": True}
+
+@app.delete("/api/downloaded")
+async def clear_downloaded_api():
+    clear_downloaded_history()
     return {"success": True}
 
 @app.post("/api/update-ytdlp")
