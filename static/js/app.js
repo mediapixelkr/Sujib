@@ -101,8 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadStatus();
         await loadProfiles();
         await loadPresetPaths();
-        await loadQueue();
-        await loadHistory();
+        await loadAllDownloads();
         setupSSE();
         setupEventListeners();
         setupAccordion();
@@ -255,21 +254,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ─── API: Downloads (Queue & Completed) ───────────────────────────────────
-    async function loadQueue() {
+    async function loadAllDownloads() {
         try {
-            const res = await fetch(apiPath('/queue'));
-            if (res.ok) { queueItems = await res.json(); renderQueue(); }
-        } catch (err) { console.error('loadQueue error', err); }
+            const [qRes, hRes] = await Promise.all([
+                fetch(apiPath('/queue')),
+                fetch(apiPath('/downloaded'))
+            ]);
+            if (qRes.ok) queueItems = await qRes.json();
+            if (hRes.ok) historyItems = await hRes.json();
+            renderDownloads();
+        } catch (err) { console.error('loadAllDownloads error', err); }
+    }
+
+    async function loadQueue() {
+        await loadAllDownloads();
     }
 
     async function loadHistory() {
-        try {
-            const res = await fetch(apiPath('/downloaded'));
-            if (res.ok) { historyItems = await res.json(); renderQueue(); }
-        } catch (err) { console.error('loadHistory error', err); }
+        await loadAllDownloads();
     }
 
-    function renderQueue() {
+    function renderDownloads() {
         queueList.replaceChildren();
 
         const activeItems = queueItems.filter(i => ['pending','downloading','processing'].includes(i.status));
@@ -280,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 1. Render active items in progress (at top)
+        // 1. Render active queue items (pending, downloading, processing)
         activeItems.forEach(item => {
             const card = document.createElement('div');
             card.className = 'download-card';
@@ -385,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnCancel.addEventListener('click', async () => {
                     await fetch(apiPath(`/queue/${item.id}`), { method: 'DELETE' });
                     showToast('Téléchargement annulé', 'info');
-                    loadQueue();
+                    loadAllDownloads();
                 });
                 actions.appendChild(btnCancel);
                 footerRow.appendChild(actions);
@@ -429,6 +434,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Chips Row
             const chipsRow = document.createElement('div');
             chipsRow.className = 'chips-row';
+
+            const sourceChip = document.createElement('span');
+            sourceChip.className = 'meta-chip';
+            sourceChip.textContent = 'YouTube';
+            chipsRow.appendChild(sourceChip);
 
             if (item.resolution) {
                 const resChip = document.createElement('span');
@@ -475,11 +485,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const btnDel = document.createElement('button');
             btnDel.className = 'btn-sm btn-outline';
-            btnDel.textContent = 'Supprimer';
+            btnDel.style.cssText = 'color:#ef4444;border-color:rgba(239,68,68,0.4);cursor:pointer;';
+            btnDel.textContent = '🗑️ Supprimer';
             btnDel.addEventListener('click', async () => {
                 await fetch(apiPath(`/downloaded/${item.id}?delete_file=true`), { method: 'DELETE' });
                 showToast('Fichier supprimé', 'success');
-                loadHistory();
+                loadAllDownloads();
             });
             actions.appendChild(btnDel);
 
@@ -499,8 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const data = JSON.parse(e.data);
                 if (['progress','completed','failed','cancelled'].includes(data.event)) {
-                    loadQueue();
-                    if (data.event === 'completed') loadHistory();
+                    loadAllDownloads();
                 }
             } catch (err) { console.error('SSE parse error', err); }
         };
