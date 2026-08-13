@@ -1523,20 +1523,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── Clear Completed Downloads History ───────────────────────────────────
     const btnClearHistory = document.getElementById('btn-clear-history');
     if (btnClearHistory) {
-        btnClearHistory.addEventListener('click', () => {
-            openDeleteModal(
-                "Nettoyage de tous les téléchargements terminés",
-                async () => {
-                    await fetch(apiPath('/downloaded?delete_files=true'), { method: 'DELETE' });
-                    showToast('Tous les fichiers et l\'historique ont été supprimés', 'success');
-                    loadAllDownloads();
-                },
-                async () => {
-                    await fetch(apiPath('/downloaded?delete_files=false'), { method: 'DELETE' });
-                    showToast('Liste des téléchargements vidée (fichiers conservés)', 'info');
-                    loadAllDownloads();
+        btnClearHistory.addEventListener('click', async () => {
+            if (confirm("Voulez-vous vider la liste des téléchargements terminés ?")) {
+                try {
+                    const res = await fetch(apiPath('/downloaded?delete_files=false'), { method: 'DELETE' });
+                    if (res.ok) {
+                        showToast('Liste des téléchargements vidée (fichiers conservés)', 'info');
+                        await loadAllDownloads();
+                    }
+                } catch (err) {
+                    showToast('Erreur lors du vidage de la liste', 'error');
                 }
-            );
+            }
         });
     }
 });
