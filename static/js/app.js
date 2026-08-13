@@ -1435,4 +1435,31 @@ document.addEventListener('DOMContentLoaded', () => {
             profEditFormat.value    = profile.format_spec || '';
         }
     }
+
+    // ─── Clear yt-dlp Cache ──────────────────────────────────────────────────
+    const btnClearCache = document.getElementById('btn-clear-cache');
+    if (btnClearCache) {
+        btnClearCache.addEventListener('click', async () => {
+            const statusSpan = document.getElementById('cache-clear-status');
+            btnClearCache.disabled = true;
+            if (statusSpan) statusSpan.textContent = 'Nettoyage...';
+            try {
+                const res = await fetch(apiPath('/clear-cache'), { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Cache yt-dlp vidé avec succès !', 'success');
+                    if (statusSpan) statusSpan.textContent = 'Cache nettoyé !';
+                } else {
+                    showToast(`Erreur : ${data.error || 'Impossible de vider le cache'}`, 'error');
+                    if (statusSpan) statusSpan.textContent = 'Erreur';
+                }
+            } catch (err) {
+                showToast('Erreur lors du nettoyage du cache', 'error');
+                if (statusSpan) statusSpan.textContent = '';
+            } finally {
+                btnClearCache.disabled = false;
+                setTimeout(() => { if (statusSpan) statusSpan.textContent = ''; }, 4000);
+            }
+        });
+    }
 });

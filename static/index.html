@@ -378,6 +378,15 @@
                                     <label for="opt-show-last">Historique affiché (nb) :</label>
                                     <input type="number" id="opt-show-last" class="form-input" min="5" max="200">
                                 </div>
+                                <div class="form-group" style="margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px;">
+                                    <label>Maintenance &amp; Cache :</label>
+                                    <div style="display:flex; gap:10px; margin-top:8px; align-items:center;">
+                                        <button type="button" id="btn-clear-cache" class="btn-sm btn-secondary">
+                                            🧹 Vider le cache yt-dlp
+                                        </button>
+                                        <span id="cache-clear-status" style="font-size:0.8rem; color:var(--text-muted);"></span>
+                                    </div>
+                                </div>
                                 <div style="margin-top:20px;text-align:right;">
                                     <button type="submit" class="btn-primary">Enregistrer les options</button>
                                 </div>

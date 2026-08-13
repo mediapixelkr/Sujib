@@ -242,6 +242,19 @@ async def update_ytdlp_api():
     res = await update_ytdlp()
     return res
 
+@app.post("/api/clear-cache")
+async def clear_cache_api():
+    try:
+        process = await asyncio.create_subprocess_exec(
+            "yt-dlp", "--rm-cache-dir",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
+        return {"success": True, "output": stdout.decode().strip() or "Cache yt-dlp vidé avec succès."}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 @app.get("/api/events")
 async def sse_events(request: Request):
     async def event_generator():
