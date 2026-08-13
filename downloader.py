@@ -45,7 +45,7 @@ def apply_rename_regex(filename: str, rules_text: str) -> str:
         pattern = parts[0].strip()
         replacement = parts[1] if len(parts) > 1 else ""
 
-        # Remove leading/trailing delimiters if provided in PHP style e.g. /pattern/flags
+        # Remove leading/trailing delimiters if provided in PHP/JS style e.g. /pattern/flags
         flags = 0
         if pattern.startswith("/") and pattern.rfind("/") > 0:
             last_slash = pattern.rfind("/")
@@ -54,8 +54,11 @@ def apply_rename_regex(filename: str, rules_text: str) -> str:
             if "i" in flag_str:
                 flags |= re.IGNORECASE
 
+        # Convert JS/PHP style $1, $2, $3... group references to Python \g<1>, \g<2>, \g<3>...
+        py_replacement = re.sub(r'\$(\d+)', r'\\g<\1>', replacement)
+
         try:
-            name = re.sub(pattern, replacement, name, flags=flags)
+            name = re.sub(pattern, py_replacement, name, flags=flags)
         except Exception as e:
             logger.warning(f"Regex replace error for pattern {pattern}: {e}")
 
