@@ -3,6 +3,7 @@ import os
 import re
 import logging
 import json
+import subprocess
 import yt_dlp
 from typing import Dict, Any, List, Callable, Optional
 from database import get_options, get_profiles, update_queue_status, add_downloaded, remove_queue_item
@@ -65,6 +66,92 @@ def apply_rename_regex(filename: str, rules_text: str) -> str:
     # Ensure filename is safe (prevent path traversal / invalid chars)
     name = os.path.basename(name.replace("/", "-").replace("\\", "-"))
     return f"{name}{ext}"
+
+def extract_media_specs(filepath: str, info_dict: dict = None) -> dict:
+    specs = {
+        'vcodec': '',
+        'acodec': '',
+        'bitrate': '',
+        'fps': '',
+        'format_info': '',
+        'resolution': '',
+        'duration': '--'
+    }
+
+    if isinstance(info_dict, dict):
+        vc = info_dict.get('vcodec', '')
+        ac = info_dict.get('acodec', '')
+        if vc and vc != 'none':
+            specs['vcodec'] = vc.split('.')[0].upper()
+        if ac and ac != 'none':
+            specs['acodec'] = ac.split('.')[0].upper()
+        
+        tbr = info_dict.get('tbr') or info_dict.get('vbr') or info_dict.get('abr')
+        if tbr:
+            specs['bitrate'] = f"{int(tbr)} kbps"
+            
+        fps = info_dict.get('fps')
+        if fps:
+            specs['fps'] = f"{int(fps)} fps"
+
+        height = info_dict.get('height')
+        if height:
+            specs['resolution'] = f"{height}p"
+
+        dur = info_dict.get('duration')
+        if dur:
+            m, s = divmod(int(dur), 60)
+            h, m = divmod(m, 60)
+            specs['duration'] = f"{h:02d}:{m:02d}:{s:02d}" if h else f"{m:02d}:{s:02d}"
+
+    if filepath and os.path.exists(filepath):
+        try:
+            cmd = ['ffprobe', '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', filepath]
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=5)
+            if res.returncode == 0:
+                data = json.loads(res.stdout)
+                fmt = data.get('format', {})
+                streams = data.get('streams', [])
+                
+                vstream = next((s for s in streams if s.get('codec_type') == 'video'), None)
+                astream = next((s for s in streams if s.get('codec_type') == 'audio'), None)
+
+                if vstream:
+                    v_name = vstream.get('codec_name', '').upper()
+                    if v_name: specs['vcodec'] = v_name
+                    h = vstream.get('height')
+                    if h: specs['resolution'] = f"{h}p"
+                    r_fps = vstream.get('r_frame_rate', '')
+                    if '/' in r_fps:
+                        num, den = map(float, r_fps.split('/'))
+                        if den > 0:
+                            fps_val = round(num / den)
+                            if fps_val > 0: specs['fps'] = f"{fps_val} fps"
+
+                if astream:
+                    a_name = astream.get('codec_name', '').upper()
+                    if a_name: specs['acodec'] = a_name
+
+                br = fmt.get('bit_rate')
+                if br and str(br).isdigit():
+                    kbps = int(br) // 1000
+                    if kbps > 0: specs['bitrate'] = f"{kbps} kbps"
+
+                dur_f = fmt.get('duration')
+                if dur_f:
+                    m, s = divmod(int(float(dur_f)), 60)
+                    h, m = divmod(m, 60)
+                    specs['duration'] = f"{h:02d}:{m:02d}:{s:02d}" if h else f"{m:02d}:{s:02d}"
+
+        except Exception as e:
+            logger.warning(f"ffprobe extraction failed for {filepath}: {e}")
+
+    codecs = [c for c in [specs['vcodec'], specs['acodec']] if c]
+    codec_str = ' / '.join(codecs) if codecs else ''
+    summary_parts = [p for p in [codec_str, specs['bitrate'], specs['fps']] if p]
+    specs['format_info'] = ' · '.join(summary_parts)
+
+    return specs
 
 def analyze_url(url: str) -> Dict[str, Any]:
     ydl_opts = {
@@ -228,26 +315,14 @@ class DownloadQueueManager:
                 prepared_fn = ydl.prepare_filename(info)
                 vid = info.get('id', '') if isinstance(info, dict) else ''
                 vtitle = info.get('title', '') if isinstance(info, dict) else ''
-
-                dur_sec = info.get('duration') if isinstance(info, dict) else None
-                if dur_sec:
-                    m, s = divmod(int(dur_sec), 60)
-                    h, m = divmod(m, 60)
-                    vduration = f"{h:02d}:{m:02d}:{s:02d}" if h else f"{m:02d}:{s:02d}"
-                else:
-                    vduration = "--"
-
-                height = info.get('height') if isinstance(info, dict) else None
-                vres = f"{height}p" if height else (profile.get('max_res', 'auto'))
-
-                return prepared_fn, vid, vtitle, vduration, vres
+                return prepared_fn, vid, vtitle, info
 
         try:
             download_result = await loop.run_in_executor(None, sync_download)
             if isinstance(download_result, tuple):
-                final_filepath, extracted_vid, extracted_title, extracted_duration, extracted_res = download_result
+                final_filepath, extracted_vid, extracted_title, raw_info = download_result
             else:
-                final_filepath, extracted_vid, extracted_title, extracted_duration, extracted_res = download_result, '', '', '--', profile.get('max_res', 'auto')
+                final_filepath, extracted_vid, extracted_title, raw_info = download_result, '', '', {}
 
             if not os.path.exists(final_filepath):
                 # Try finding matched file in dir if extension changed during merge
@@ -271,6 +346,9 @@ class DownloadQueueManager:
 
             filesize = os.path.getsize(final_filepath) if os.path.exists(final_filepath) else 0
 
+            # Extract detailed media technical specs (codecs, bitrate, fps, resolution, duration)
+            media_specs = extract_media_specs(final_filepath, raw_info)
+
             # Prioritize extracted real video title over generic fallback titles
             raw_req_title = task_info.get('title', '')
             if extracted_title and extracted_title.strip():
@@ -285,12 +363,16 @@ class DownloadQueueManager:
             add_downloaded(
                 video_id=final_vid,
                 title=final_title,
-                resolution=extracted_res or profile.get('max_res', 'auto'),
-                format_info=profile.get('name', 'Custom'),
-                duration=extracted_duration,
+                resolution=media_specs.get('resolution') or profile.get('max_res', 'auto'),
+                format_info=media_specs.get('format_info') or profile.get('name', 'Custom'),
+                duration=media_specs.get('duration') or '--',
                 filename=final_filename,
                 filepath=final_filepath,
-                filesize=filesize
+                filesize=filesize,
+                vcodec=media_specs.get('vcodec', ''),
+                acodec=media_specs.get('acodec', ''),
+                bitrate=media_specs.get('bitrate', ''),
+                fps=media_specs.get('fps', '')
             )
 
             update_queue_status(qid, status="completed", progress_pct=100.0, filename=final_filename, title=final_title)

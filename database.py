@@ -81,9 +81,19 @@ def init_db():
         filename TEXT NOT NULL,
         filepath TEXT NOT NULL,
         filesize INTEGER DEFAULT 0,
+        vcodec TEXT DEFAULT '',
+        acodec TEXT DEFAULT '',
+        bitrate TEXT DEFAULT '',
+        fps TEXT DEFAULT '',
         downloaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
+
+    for col in ["vcodec", "acodec", "bitrate", "fps"]:
+        try:
+            cursor.execute(f"ALTER TABLE downloaded ADD COLUMN {col} TEXT DEFAULT ''")
+        except Exception:
+            pass
 
     # Default options if missing
     cursor.execute("SELECT COUNT(*) FROM options")
@@ -235,11 +245,11 @@ def remove_queue_item(qid: int):
     conn.commit()
     conn.close()
 
-def add_downloaded(video_id: str, title: str, resolution: str, format_info: str, duration: str, filename: str, filepath: str, filesize: int):
+def add_downloaded(video_id: str, title: str, resolution: str, format_info: str, duration: str, filename: str, filepath: str, filesize: int, vcodec: str = "", acodec: str = "", bitrate: str = "", fps: str = ""):
     conn = get_db_connection()
     conn.execute(
-        "INSERT INTO downloaded (video_id, title, resolution, format_info, duration, filename, filepath, filesize) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        (video_id, title, resolution, format_info, duration, filename, filepath, filesize)
+        "INSERT INTO downloaded (video_id, title, resolution, format_info, duration, filename, filepath, filesize, vcodec, acodec, bitrate, fps) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (video_id, title, resolution, format_info, duration, filename, filepath, filesize, vcodec, acodec, bitrate, fps)
     )
     conn.commit()
     conn.close()

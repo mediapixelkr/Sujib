@@ -447,7 +447,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 chipsRow.appendChild(resChip);
             }
 
-            if (item.format_info) {
+            // Codecs chip (vcodec / acodec)
+            const codecs = [item.vcodec, item.acodec].filter(Boolean);
+            if (codecs.length > 0) {
+                const codecChip = document.createElement('span');
+                codecChip.className = 'meta-chip';
+                codecChip.textContent = codecs.join(' / ');
+                chipsRow.appendChild(codecChip);
+            }
+
+            // Bitrate chip
+            if (item.bitrate) {
+                const brChip = document.createElement('span');
+                brChip.className = 'meta-chip';
+                brChip.textContent = item.bitrate;
+                chipsRow.appendChild(brChip);
+            }
+
+            // FPS chip
+            if (item.fps) {
+                const fpsChip = document.createElement('span');
+                fpsChip.className = 'meta-chip';
+                fpsChip.textContent = item.fps;
+                chipsRow.appendChild(fpsChip);
+            }
+
+            if (item.format_info && !codecs.length) {
                 const fmtChip = document.createElement('span');
                 fmtChip.className = 'meta-chip';
                 fmtChip.textContent = item.format_info;
