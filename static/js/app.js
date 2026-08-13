@@ -37,13 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlForm   = document.getElementById('url-form');
     const urlInput  = document.getElementById('url-input');
 
-    // ─── DOM: Queue / History ─────────────────────────────────────────────────
+    // ─── DOM: Downloads Section ───────────────────────────────────────────────
     const queueList         = document.getElementById('queue-list');
     const queueEmpty        = document.getElementById('queue-empty');
     const queueCountBadge   = document.getElementById('queue-count-badge');
-    const historyList       = document.getElementById('history-list');
-    const historyEmpty      = document.getElementById('history-empty');
-    const historyCountBadge = document.getElementById('history-count-badge');
 
     // ─── DOM: Config Modal ────────────────────────────────────────────────────
     const optionsModal   = document.getElementById('options-modal');
@@ -257,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ─── API: Queue ───────────────────────────────────────────────────────────
+    // ─── API: Downloads (Queue & Completed) ───────────────────────────────────
     async function loadQueue() {
         try {
             const res = await fetch(apiPath('/queue'));
@@ -265,17 +262,26 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) { console.error('loadQueue error', err); }
     }
 
+    async function loadHistory() {
+        try {
+            const res = await fetch(apiPath('/downloaded'));
+            if (res.ok) { historyItems = await res.json(); renderQueue(); }
+        } catch (err) { console.error('loadHistory error', err); }
+    }
+
     function renderQueue() {
         queueList.replaceChildren();
-        const active = queueItems.filter(i => ['pending','downloading','processing'].includes(i.status));
-        queueCountBadge.textContent = active.length;
 
-        if (queueItems.length === 0) {
+        const activeItems = queueItems.filter(i => ['pending','downloading','processing'].includes(i.status));
+        queueCountBadge.textContent = activeItems.length + historyItems.length;
+
+        if (activeItems.length === 0 && historyItems.length === 0) {
             queueList.appendChild(queueEmpty);
             return;
         }
 
-        queueItems.forEach(item => {
+        // 1. Render active items in progress (at top)
+        activeItems.forEach(item => {
             const card = document.createElement('div');
             card.className = 'download-card';
 
@@ -389,25 +395,8 @@ document.addEventListener('DOMContentLoaded', () => {
             card.appendChild(body);
             queueList.appendChild(card);
         });
-    }
 
-    // ─── API: History ─────────────────────────────────────────────────────────
-    async function loadHistory() {
-        try {
-            const res = await fetch(apiPath('/downloaded'));
-            if (res.ok) { historyItems = await res.json(); renderHistory(); }
-        } catch (err) { console.error('loadHistory error', err); }
-    }
-
-    function renderHistory() {
-        historyList.replaceChildren();
-        historyCountBadge.textContent = historyItems.length;
-
-        if (historyItems.length === 0) {
-            historyList.appendChild(historyEmpty);
-            return;
-        }
-
+        // 2. Render completed items below active items
         historyItems.forEach(item => {
             const card = document.createElement('div');
             card.className = 'download-card';
@@ -499,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
             body.appendChild(footerRow);
 
             card.appendChild(body);
-            historyList.appendChild(card);
+            queueList.appendChild(card);
         });
     }
 
