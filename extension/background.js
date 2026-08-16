@@ -1,7 +1,11 @@
+function getMessage(key, fallback) {
+  return (typeof browser !== 'undefined' && browser.i18n && browser.i18n.getMessage(key)) || fallback || key;
+}
+
 browser.runtime.onInstalled.addListener(() => {
   browser.contextMenus.create({
     id: "sujib-download-link",
-    title: "Télécharger avec Sujib (수집)",
+    title: getMessage("contextMenuTitle", "Download with Sujib (수집)"),
     contexts: ["link", "selection", "page"]
   });
 });
@@ -34,7 +38,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         headers: headers,
         body: JSON.stringify({
           url: targetUrl.trim(),
-          title: 'Envoyé via menu contextuel Firefox',
+          title: 'YouTube video',
           profile_id: parseInt(settings.defaultProfile, 10) || 1,
           dest_path: settings.defaultDest || ''
         })
@@ -45,15 +49,15 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
           type: "basic",
           iconUrl: "icons/icon-48.png",
           title: "Sujib 2.0",
-          message: "Téléchargement envoyé au serveur avec succès !"
+          message: getMessage("notifSuccess", "Download sent to server successfully!")
         });
       } else {
         const errData = await res.json().catch(() => ({}));
         browser.notifications.create({
           type: "basic",
           iconUrl: "icons/icon-48.png",
-          title: "Sujib 2.0 — Erreur",
-          message: errData.detail || `Erreur serveur (${res.status})`
+          title: "Sujib 2.0",
+          message: errData.detail || getMessage("notifError", "Failed to send download to server.")
         });
       }
     } catch (err) {
@@ -61,8 +65,8 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
       browser.notifications.create({
         type: "basic",
         iconUrl: "icons/icon-48.png",
-        title: "Sujib 2.0 — Erreur réseau",
-        message: "Impossible de joindre le serveur Sujib (" + err.message + ")"
+        title: "Sujib 2.0",
+        message: `${getMessage("errorNetwork", "Cannot connect to Sujib server")}: ${err.message}`
       });
     }
   }

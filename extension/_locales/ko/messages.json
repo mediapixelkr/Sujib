@@ -1,0 +1,96 @@
+{
+  "extensionName": {
+    "message": "Sujib (수집) — YouTube 다운로더",
+    "description": "확장 프로그램 이름"
+  },
+  "extensionDescription": {
+    "message": "원클릭으로 유튜브 영상 및 재생목록을 Sujib 2.0 서버로 전송합니다.",
+    "description": "확장 프로그램 설명"
+  },
+  "actionTitle": {
+    "message": "Sujib으로 전송",
+    "description": "툴팁"
+  },
+  "contextMenuTitle": {
+    "message": "Sujib(수집)으로 다운로드",
+    "description": "컨텍스트 메뉴 제목"
+  },
+  "popupUrlLabel": {
+    "message": "YouTube 영상 / 재생목록 URL:"
+  },
+  "popupUrlPlaceholder": {
+    "message": "https://www.youtube.com/watch?v=..."
+  },
+  "popupProfileLabel": {
+    "message": "화질 프로필:"
+  },
+  "popupDestLabel": {
+    "message": "저장 폴더:"
+  },
+  "defaultDestOption": {
+    "message": "기본 폴더"
+  },
+  "btnDownload": {
+    "message": "Sujib으로 다운로드"
+  },
+  "btnOptions": {
+    "message": "설정"
+  },
+  "loading": {
+    "message": "로딩 중..."
+  },
+  "sending": {
+    "message": "서버로 전송 중..."
+  },
+  "successDownload": {
+    "message": "다운로드가 성공적으로 시작되었습니다!"
+  },
+  "errorInvalidUrl": {
+    "message": "올바른 YouTube URL을 입력해주세요"
+  },
+  "errorNetwork": {
+    "message": "Sujib 서버에 연결할 수 없습니다"
+  },
+  "optionsTitle": {
+    "message": "Sujib 확장 프로그램 설정"
+  },
+  "optionsServerUrl": {
+    "message": "Sujib 서버 URL:"
+  },
+  "optionsAuthUser": {
+    "message": "기본 인증 사용자명 (선택사항):"
+  },
+  "optionsAuthPass": {
+    "message": "기본 인증 비밀번호 (선택사항):"
+  },
+  "optionsDefaultProfile": {
+    "message": "기본 프로필:"
+  },
+  "optionsDefaultDest": {
+    "message": "기본 저장 폴더:"
+  },
+  "btnTest": {
+    "message": "연결 테스트"
+  },
+  "btnSave": {
+    "message": "저장"
+  },
+  "testTesting": {
+    "message": "연결 테스트 중..."
+  },
+  "testSuccess": {
+    "message": "연결 성공! Sujib 서버가 정상 작동 중입니다."
+  },
+  "testError": {
+    "message": "연결 오류: 상태 코드 "
+  },
+  "settingsSaved": {
+    "message": "설정이 성공적으로 저장되었습니다!"
+  },
+  "notifSuccess": {
+    "message": "다운로드가 서버로 전송되었습니다!"
+  },
+  "notifError": {
+    "message": "서버 전송에 실패했습니다."
+  }
+}

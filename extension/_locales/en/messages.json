@@ -1,0 +1,96 @@
+{
+  "extensionName": {
+    "message": "Sujib — YouTube Downloader",
+    "description": "The name of the extension."
+  },
+  "extensionDescription": {
+    "message": "Send any YouTube video or playlist to your Sujib server in one click.",
+    "description": "The description of the extension."
+  },
+  "actionTitle": {
+    "message": "Send to Sujib",
+    "description": "Tooltip for browser action button."
+  },
+  "contextMenuTitle": {
+    "message": "Download with Sujib (수집)",
+    "description": "Context menu title."
+  },
+  "popupUrlLabel": {
+    "message": "YouTube Video / Playlist URL:"
+  },
+  "popupUrlPlaceholder": {
+    "message": "https://www.youtube.com/watch?v=..."
+  },
+  "popupProfileLabel": {
+    "message": "Quality Profile:"
+  },
+  "popupDestLabel": {
+    "message": "Destination Folder:"
+  },
+  "defaultDestOption": {
+    "message": "Default Folder"
+  },
+  "btnDownload": {
+    "message": "Download with Sujib"
+  },
+  "btnOptions": {
+    "message": "Options"
+  },
+  "loading": {
+    "message": "Loading..."
+  },
+  "sending": {
+    "message": "Sending to server..."
+  },
+  "successDownload": {
+    "message": "Download started successfully!"
+  },
+  "errorInvalidUrl": {
+    "message": "Please enter a valid YouTube URL"
+  },
+  "errorNetwork": {
+    "message": "Cannot connect to Sujib server"
+  },
+  "optionsTitle": {
+    "message": "Sujib Extension Settings"
+  },
+  "optionsServerUrl": {
+    "message": "Sujib Server URL:"
+  },
+  "optionsAuthUser": {
+    "message": "Basic Auth Username (Optional):"
+  },
+  "optionsAuthPass": {
+    "message": "Basic Auth Password (Optional):"
+  },
+  "optionsDefaultProfile": {
+    "message": "Default Profile:"
+  },
+  "optionsDefaultDest": {
+    "message": "Default Destination Folder:"
+  },
+  "btnTest": {
+    "message": "Test Connection"
+  },
+  "btnSave": {
+    "message": "Save"
+  },
+  "testTesting": {
+    "message": "Testing connection..."
+  },
+  "testSuccess": {
+    "message": "Connection successful! Sujib is operational."
+  },
+  "testError": {
+    "message": "Connection error: Status "
+  },
+  "settingsSaved": {
+    "message": "Settings saved successfully!"
+  },
+  "notifSuccess": {
+    "message": "Download sent to server successfully!"
+  },
+  "notifError": {
+    "message": "Failed to send download to server."
+  }
+}

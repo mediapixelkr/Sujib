@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  // Apply i18n translations
+  applyI18n();
+
   const videoUrlInput = document.getElementById('video-url');
   const profileSelect = document.getElementById('profile-select');
   const destSelect = document.getElementById('dest-select');
@@ -50,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const profiles = await res.json();
         profileSelect.innerHTML = '';
         if (profiles.length === 0) {
-          profileSelect.innerHTML = '<option value="1">Aucun profil actif</option>';
+          profileSelect.innerHTML = `<option value="1">${getMessage('defaultProfile', 'Profile 1')}</option>`;
           return;
         }
         profiles.forEach(prof => {
@@ -82,11 +85,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function loadPresetPathsFromServer(baseUrl, reqHeaders, savedDest) {
     const endpoint = `${baseUrl.replace(/\/+$/, '')}/api/preset-paths`;
+    const defaultLabel = getMessage('defaultDestOption', 'Default Folder');
     try {
       const res = await fetch(endpoint, { headers: reqHeaders });
       if (res.ok) {
         const paths = await res.json();
-        destSelect.innerHTML = '<option value="">Dossier par défaut</option>';
+        destSelect.innerHTML = `<option value="">${defaultLabel}</option>`;
         paths.forEach(p => {
           const opt = document.createElement('option');
           opt.value = p.path;
@@ -103,13 +107,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.warn('Erreur synchro dossiers:', err);
     }
 
-    destSelect.innerHTML = '<option value="">Dossier par défaut</option>';
+    destSelect.innerHTML = `<option value="">${defaultLabel}</option>`;
   }
 
   btnSend.addEventListener('click', async () => {
     const url = videoUrlInput.value.trim();
     if (!url) {
-      showStatus('Veuillez saisir une URL YouTube valide', 'error');
+      showStatus(getMessage('errorInvalidUrl', 'Please enter a valid YouTube URL'), 'error');
       return;
     }
 
@@ -123,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     btnSend.disabled = true;
-    showStatus('Envoi en cours...', '');
+    showStatus(getMessage('sending', 'Sending to server...'), '');
 
     try {
       const res = await fetch(apiEndpoint, {
@@ -131,21 +135,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         headers: reqHeaders,
         body: JSON.stringify({
           url: url,
-          title: 'Vidéo envoyée via extension Firefox',
+          title: 'YouTube video',
           profile_id: profileId,
           dest_path: destPath
         })
       });
 
       if (res.ok) {
-        showStatus('Téléchargement lancé avec succès !', 'success');
+        showStatus(getMessage('successDownload', 'Download started successfully!'), 'success');
         setTimeout(() => window.close(), 1400);
       } else {
         const data = await res.json().catch(() => ({}));
-        showStatus(data.detail || `Erreur serveur (${res.status})`, 'error');
+        showStatus(data.detail || `Server error (${res.status})`, 'error');
       }
     } catch (err) {
-      showStatus('Erreur de connexion au serveur Sujib : ' + err.message, 'error');
+      showStatus(`${getMessage('errorNetwork', 'Cannot connect to server')}: ${err.message}`, 'error');
     } finally {
       btnSend.disabled = false;
     }
@@ -154,5 +158,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   function showStatus(msg, type) {
     statusDiv.textContent = msg;
     statusDiv.className = `status show ${type}`;
+  }
+
+  function getMessage(key, fallback) {
+    return (typeof browser !== 'undefined' && browser.i18n && browser.i18n.getMessage(key)) || fallback || key;
+  }
+
+  function applyI18n() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const msg = getMessage(key);
+      if (msg) el.textContent = msg;
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      const msg = getMessage(key);
+      if (msg) el.placeholder = msg;
+    });
   }
 });

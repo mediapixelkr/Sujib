@@ -1,8 +1,9 @@
 {
   "manifest_version": 2,
-  "name": "Sujib — YouTube Downloader",
+  "default_locale": "en",
+  "name": "__MSG_extensionName__",
   "version": "2.0.0",
-  "description": "Envoyez en un clic vos vidéos et playlists YouTube vers votre serveur Sujib 2.0.",
+  "description": "__MSG_extensionDescription__",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -20,7 +21,7 @@
   ],
   "browser_action": {
     "default_popup": "popup.html",
-    "default_title": "Envoyer à Sujib",
+    "default_title": "__MSG_actionTitle__",
     "default_icon": {
       "16": "icons/icon-16.png",
       "32": "icons/icon-32.png",

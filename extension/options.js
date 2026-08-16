@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  // Apply i18n
+  applyI18n();
+
   const serverUrlInput = document.getElementById('server-url');
   const authUserInput = document.getElementById('auth-user');
   const authPassInput = document.getElementById('auth-pass');
@@ -56,7 +59,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const res = await fetch(`${baseUrl}/api/preset-paths`, { headers });
       if (res.ok) {
         const paths = await res.json();
-        defaultDestSelect.innerHTML = '<option value="">Dossier global par défaut</option>';
+        const defaultLabel = getMessage('defaultDestOption', 'Default Folder');
+        defaultDestSelect.innerHTML = `<option value="">${defaultLabel}</option>`;
         paths.forEach(p => {
           const opt = document.createElement('option');
           opt.value = p.path;
@@ -78,11 +82,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const pass = authPassInput.value.trim();
 
     if (!url) {
-      showStatus('Veuillez saisir une URL de serveur', 'error');
+      showStatus(getMessage('errorInvalidUrl', 'Please enter a valid server URL'), 'error');
       return;
     }
 
-    showStatus('Test de connexion en cours...', '');
+    showStatus(getMessage('testTesting', 'Testing connection...'), '');
     const headers = {};
     if (user && pass) {
       headers['Authorization'] = 'Basic ' + btoa(`${user}:${pass}`);
@@ -92,13 +96,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const res = await fetch(`${url.replace(/\/+$/, '')}/api/status`, { headers });
       if (res.ok) {
         const data = await res.json();
-        showStatus(`Connexion réussie ! Sujib v${data.version || '2.0'} opérationnel.`, 'success');
+        showStatus(getMessage('testSuccess', 'Connection successful! Sujib operational.'), 'success');
         await syncServerOptions(url, user, pass, defaultProfileSelect.value, defaultDestSelect.value);
       } else {
-        showStatus(`Erreur de connexion : statut ${res.status}`, 'error');
+        showStatus(`${getMessage('testError', 'Connection error: Status ')}${res.status}`, 'error');
       }
     } catch (err) {
-      showStatus('Impossible de joindre le serveur : ' + err.message, 'error');
+      showStatus(`${getMessage('errorNetwork', 'Cannot connect to server')}: ${err.message}`, 'error');
     }
   });
 
@@ -110,7 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const defaultDest = defaultDestSelect.value;
 
     if (!serverUrl) {
-      showStatus('Veuillez entrer une URL valide', 'error');
+      showStatus(getMessage('errorInvalidUrl', 'Please enter a valid server URL'), 'error');
       return;
     }
 
@@ -122,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       defaultDest
     });
 
-    showStatus('Paramètres enregistrés avec succès !', 'success');
+    showStatus(getMessage('settingsSaved', 'Settings saved successfully!'), 'success');
     setTimeout(() => {
       statusDiv.className = 'status';
     }, 2500);
@@ -131,5 +135,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   function showStatus(msg, type) {
     statusDiv.textContent = msg;
     statusDiv.className = `status show ${type}`;
+  }
+
+  function getMessage(key, fallback) {
+    return (typeof browser !== 'undefined' && browser.i18n && browser.i18n.getMessage(key)) || fallback || key;
+  }
+
+  function applyI18n() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const msg = getMessage(key);
+      if (msg) el.textContent = msg;
+    });
   }
 });
