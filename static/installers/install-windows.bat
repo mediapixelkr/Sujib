@@ -29,16 +29,20 @@ if not defined FX_PATH (
 )
 
 echo Dossier Firefox detecte : "!FX_PATH!"
-echo Creation du dossier distribution...
+echo Creation des dossiers distribution et extensions...
 if not exist "!FX_PATH!\distribution" mkdir "!FX_PATH!\distribution" 2>nul
+if not exist "!FX_PATH!\distribution\extensions" mkdir "!FX_PATH!\distribution\extensions" 2>nul
 
-echo Configuration de la politique Firefox pour Sujib...
+echo Telechargement du paquet extension dans distribution...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'http://192.168.200.15/sujib/static/sujib-firefox-extension.xpi' -OutFile '!FX_PATH!\distribution\extensions\sujib-downloader@mediapixel.kr.xpi' -UseBasicParsing"
+
+echo Configuration de la politique force_installed dans policies.json...
 (
   echo {
   echo   "policies": {
   echo     "ExtensionSettings": {
   echo       "sujib-downloader@mediapixel.kr": {
-  echo         "installation_mode": "normal_installed",
+  echo         "installation_mode": "force_installed",
   echo         "install_url": "http://192.168.200.15/sujib/static/sujib-firefox-extension.xpi"
   echo       }
   echo     }
@@ -48,8 +52,12 @@ echo Configuration de la politique Firefox pour Sujib...
 
 echo.
 echo ===================================================
-echo [SUCCES] L'extension Sujib a ete configuree avec succes !
-echo Veuillez redemarrer Firefox. L'extension sera active automatiquement.
+echo [SUCCES] L'extension Sujib a ete installee avec succes !
+echo.
+echo IMPORTANT :
+echo 1. Fermez completement toutes les fenetres de Firefox puis rouvrez-le.
+echo 2. Dans Firefox, verifiez l'icone de puzzle (Extensions) en haut a droite
+echo    puis cliquez sur la roue crantee pour "Epingler a la barre d'outils".
 echo ===================================================
 echo.
 pause
