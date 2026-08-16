@@ -1,0 +1,96 @@
+{
+  "extensionName": {
+    "message": "Sujib — Téléchargeur YouTube",
+    "description": "Le nom de l'extension."
+  },
+  "extensionDescription": {
+    "message": "Envoyez en un clic vos vidéos et playlists YouTube vers votre serveur Sujib 2.0.",
+    "description": "Description de l'extension."
+  },
+  "actionTitle": {
+    "message": "Envoyer à Sujib",
+    "description": "Infobulle du bouton d'action."
+  },
+  "contextMenuTitle": {
+    "message": "Télécharger avec Sujib (수집)",
+    "description": "Titre du menu contextuel."
+  },
+  "popupUrlLabel": {
+    "message": "URL de la vidéo / playlist YouTube :"
+  },
+  "popupUrlPlaceholder": {
+    "message": "https://www.youtube.com/watch?v=..."
+  },
+  "popupProfileLabel": {
+    "message": "Profil de qualité :"
+  },
+  "popupDestLabel": {
+    "message": "Dossier de destination :"
+  },
+  "defaultDestOption": {
+    "message": "Dossier par défaut"
+  },
+  "btnDownload": {
+    "message": "Télécharger avec Sujib"
+  },
+  "btnOptions": {
+    "message": "Options"
+  },
+  "loading": {
+    "message": "Chargement..."
+  },
+  "sending": {
+    "message": "Envoi en cours..."
+  },
+  "successDownload": {
+    "message": "Téléchargement lancé avec succès !"
+  },
+  "errorInvalidUrl": {
+    "message": "Veuillez saisir une URL YouTube valide"
+  },
+  "errorNetwork": {
+    "message": "Impossible de joindre le serveur Sujib"
+  },
+  "optionsTitle": {
+    "message": "Configuration de l'Extension Sujib"
+  },
+  "optionsServerUrl": {
+    "message": "URL du serveur Sujib :"
+  },
+  "optionsAuthUser": {
+    "message": "Utilisateur Auth Basic (Optionnel) :"
+  },
+  "optionsAuthPass": {
+    "message": "Mot de passe Auth Basic (Optionnel) :"
+  },
+  "optionsDefaultProfile": {
+    "message": "Profil par défaut :"
+  },
+  "optionsDefaultDest": {
+    "message": "Dossier de destination par défaut :"
+  },
+  "btnTest": {
+    "message": "Tester"
+  },
+  "btnSave": {
+    "message": "Enregistrer"
+  },
+  "testTesting": {
+    "message": "Test de connexion en cours..."
+  },
+  "testSuccess": {
+    "message": "Connexion réussie ! Sujib est opérationnel."
+  },
+  "testError": {
+    "message": "Erreur de connexion : Statut "
+  },
+  "settingsSaved": {
+    "message": "Paramètres enregistrés avec succès !"
+  },
+  "notifSuccess": {
+    "message": "Téléchargement envoyé au serveur avec succès !"
+  },
+  "notifError": {
+    "message": "Échec de l'envoi vers le serveur."
+  }
+}

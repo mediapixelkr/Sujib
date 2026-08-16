@@ -110,19 +110,24 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ---
 
-## 🦊 Firefox Extension (v2.0)
+## 🌐 Browser Extensions (Firefox & Chrome v2.0)
 
-The Firefox extension allows you to send any YouTube video or playlist directly to your Sujib server with one click.
+Companion extensions allow you to send any YouTube video or playlist directly to your Sujib server with 1 click, multilingual support (English, Français, 한국어), and automatic profile & destination sync.
 
-### Installation:
-1. **Via `about:debugging` (Immediate Local Add-on)**:
-   - Download the archive **`static/sujib-firefox-extension.zip`** and extract it.
-   - In Firefox, navigate to `about:debugging#/runtime/this-firefox`.
-   - Click **"Load Temporary Add-on..."** and select `manifest.json`.
-2. **Configuration**:
-   - Click on the Sujib icon in the Firefox toolbar $\rightarrow$ **Options**.
-   - Set your server URL (e.g., `http://192.168.200.15/sujib`).
-   - Your profiles and custom destination paths are dynamically synchronized in real-time!
+### Firefox:
+1. Download **`static/sujib-firefox-extension.zip`** (or `.xpi`) and extract it.
+2. In Firefox, open `about:debugging#/runtime/this-firefox`.
+3. Click **"Load Temporary Add-on..."** and select `manifest.json`.
+
+### Chrome / Chromium / Edge / Brave:
+1. Download **`static/sujib-chrome-extension.zip`** and extract it to a folder.
+2. In Chrome, open `chrome://extensions/` and enable **"Developer mode"** in the top right.
+3. Click **"Load unpacked"** and select the extracted folder.
+
+### Configuration:
+- Click the Sujib icon in your browser toolbar $\rightarrow$ **Options / Settings**.
+- Enter your server URL (e.g. `http://192.168.200.15/sujib`).
+- Profiles and custom destination folders are dynamically loaded in real-time!
 
 ---
 

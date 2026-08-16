@@ -110,19 +110,24 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ---
 
-## 🦊 Extension Firefox (v2.0)
+## 🌐 Extensions Navigateur (Firefox & Chrome v2.0)
 
-L'extension Firefox vous permet de télécharger n'importe quelle vidéo ou playlist YouTube directement depuis votre navigateur.
+Les extensions officielles vous permettent d'envoyer n'importe quelle vidéo ou playlist YouTube directement vers votre serveur Sujib en 1 clic, avec support multilingue (Français, Anglais, 한국어) et synchronisation automatique des profils et dossiers.
 
-### Installation :
-1. **Via `about:debugging` (Installation locale immédiate)** :
-   - Téléchargez l'archive **`static/sujib-firefox-extension.zip`** et décompressez-la.
-   - Dans Firefox, ouvrez `about:debugging#/runtime/this-firefox`.
-   - Cliquez sur **« Charger un module temporaire... »** et sélectionnez `manifest.json`.
-2. **Configuration** :
-   - Cliquez sur l'icône Sujib dans la barre d'outils Firefox $\rightarrow$ **Options**.
-   - Indiquez l'URL de votre serveur (ex: `http://192.168.200.15/sujib`).
-   - Vos profils et dossiers personnalisés sont automatiquement synchronisés en temps réel !
+### Firefox :
+1. Téléchargez l'archive **`static/sujib-firefox-extension.zip`** (ou `.xpi`) et décompressez-la.
+2. Dans Firefox, ouvrez `about:debugging#/runtime/this-firefox`.
+3. Cliquez sur **« Charger un module temporaire... »** et sélectionnez `manifest.json`.
+
+### Chrome / Chromium / Edge / Brave :
+1. Téléchargez l'archive **`static/sujib-chrome-extension.zip`** et décompressez-la dans un dossier.
+2. Dans Chrome, ouvrez `chrome://extensions/` et activez le **« Mode développeur »** en haut à droite.
+3. Cliquez sur **« Charger le dossier décompressé »** et sélectionnez le dossier extrait.
+
+### Configuration :
+- Cliquez sur l'icône Sujib dans la barre d'outils $\rightarrow$ **Options**.
+- Indiquez l'URL de votre serveur (ex: `http://192.168.200.15/sujib`).
+- Vos profils et dossiers personnalisés sont automatiquement synchronisés en temps réel !
 
 ---
 

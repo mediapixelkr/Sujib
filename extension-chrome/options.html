@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sujib 2.0</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(18, 26, 43, 0.9);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #7c3aed;
+      --accent-grad: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 22px;
+      width: 400px;
+      font-size: 13px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .header img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .field {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    input, select {
+      padding: 8px 12px;
+      background: rgba(20, 30, 48, 0.95);
+      border: 1px solid var(--card-border);
+      border-radius: 7px;
+      color: white;
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      padding: 9px 14px;
+      border-radius: 7px;
+      font-weight: 600;
+      font-size: 0.86rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--accent-grad);
+      color: white;
+      flex: 2;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      flex: 1;
+    }
+
+    button:hover { opacity: 0.9; }
+
+    .status {
+      margin-top: 12px;
+      font-size: 0.82rem;
+      text-align: center;
+      padding: 8px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .status.show { display: block; }
+    .status.success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+    }
+    .status.error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #f87171;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="icons/icon-32.png" alt="Sujib logo">
+    <h2 data-i18n="optionsTitle">Configuration de l'Extension Sujib</h2>
+  </div>
+
+  <div class="field">
+    <label for="server-url" data-i18n="optionsServerUrl">URL du serveur Sujib :</label>
+    <input type="url" id="server-url" placeholder="http://192.168.200.15/sujib" required>
+  </div>
+
+  <div class="field">
+    <label for="auth-user" data-i18n="optionsAuthUser">Utilisateur Auth Basic (Optionnel) :</label>
+    <input type="text" id="auth-user" placeholder="ex: mick">
+  </div>
+
+  <div class="field">
+    <label for="auth-pass" data-i18n="optionsAuthPass">Mot de passe Auth Basic (Optionnel) :</label>
+    <input type="password" id="auth-pass">
+  </div>
+
+  <div class="field">
+    <label for="default-profile" data-i18n="optionsDefaultProfile">Profil par défaut :</label>
+    <select id="default-profile">
+      <option value="1" data-i18n="loading">Chargement...</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="default-dest" data-i18n="optionsDefaultDest">Dossier de destination par défaut :</label>
+    <select id="default-dest">
+      <option value="" data-i18n="defaultDestOption">Dossier global par défaut</option>
+    </select>
+  </div>
+
+  <div class="btn-row">
+    <button type="button" id="btn-test" class="btn-secondary" data-i18n="btnTest">Tester</button>
+    <button type="button" id="btn-save" class="btn-primary" data-i18n="btnSave">Enregistrer</button>
+  </div>
+
+  <div id="status" class="status"></div>
+
+  <script src="options.js"></script>
+</body>
+</html>
