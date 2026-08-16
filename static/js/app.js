@@ -168,19 +168,19 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.type = 'button';
         btn.className = 'btn-copy-url';
         btn.title = "Copier l'URL YouTube";
-        btn.innerHTML = `${ICONS.copy(12)} <span>Copier l'URL</span>`;
+        btn.innerHTML = ICONS.copy(13);
 
         btn.addEventListener('click', async (e) => {
             e.stopPropagation();
             try {
                 await navigator.clipboard.writeText(targetUrl);
-                btn.innerHTML = `${ICONS.check(12)} <span style="color:#34d399;">Copié !</span>`;
+                btn.innerHTML = ICONS.check(13);
                 btn.classList.add('copied');
                 showToast('URL YouTube copiée !', 'info');
                 setTimeout(() => {
-                    btn.innerHTML = `${ICONS.copy(12)} <span>Copier l'URL</span>`;
+                    btn.innerHTML = ICONS.copy(13);
                     btn.classList.remove('copied');
-                }, 2000);
+                }, 1500);
             } catch (err) {
                 console.error('Erreur copie presse-papier', err);
                 prompt('Copiez ce lien YouTube :', targetUrl);

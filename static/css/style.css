@@ -934,10 +934,9 @@ body {
 .download-title-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     min-width: 0;
     flex: 1;
-    flex-wrap: wrap;
 }
 
 .download-title {
@@ -948,28 +947,22 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: calc(100% - 110px);
+    display: inline-block;
 }
 
-@media (max-width: 768px) {
-    .download-title {
-        max-width: 100%;
-    }
-}
-
-/* Copy URL Button next to title */
+/* Compact Inline Copy URL Button */
 .btn-copy-url {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 20px;
-    padding: 3px 8px;
-    font-size: 0.72rem;
+    border-radius: 6px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
     color: var(--text-muted);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    white-space: nowrap;
+    justify-content: center;
     flex-shrink: 0;
     transition: all 0.15s ease;
     user-select: none;
@@ -977,14 +970,14 @@ body {
 }
 
 .btn-copy-url:hover {
-    background: rgba(59, 130, 246, 0.18);
+    background: rgba(59, 130, 246, 0.2);
     border-color: rgba(59, 130, 246, 0.4);
     color: #93c5fd;
     transform: translateY(-1px);
 }
 
 .btn-copy-url.copied {
-    background: rgba(16, 185, 129, 0.18);
+    background: rgba(16, 185, 129, 0.2);
     border-color: rgba(16, 185, 129, 0.45);
     color: #34d399;
 }
