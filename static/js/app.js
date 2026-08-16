@@ -251,10 +251,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createThumbnailElement(videoId, fallbackSource = '') {
-        const thumbDiv = document.createElement('div');
-        thumbDiv.className = 'download-thumb';
-
         let vid = extractYouTubeId(videoId) || extractYouTubeId(fallbackSource);
+        const targetUrl = vid ? `https://www.youtube.com/watch?v=${vid}` : (fallbackSource && fallbackSource.startsWith('http') ? fallbackSource : '');
+
+        const thumbEl = document.createElement(targetUrl ? 'a' : 'div');
+        thumbEl.className = 'download-thumb';
+
+        if (targetUrl) {
+            thumbEl.href = targetUrl;
+            thumbEl.target = '_blank';
+            thumbEl.rel = 'noopener noreferrer';
+            thumbEl.title = 'Ouvrir sur YouTube ↗';
+        }
 
         if (vid) {
             const img = document.createElement('img');
@@ -265,14 +273,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (img.src.includes('hqdefault.jpg')) {
                     img.src = `https://i.ytimg.com/vi/${vid}/mqdefault.jpg`;
                 } else {
-                    thumbDiv.replaceChildren(getFallbackSvg());
+                    thumbEl.replaceChildren(getFallbackSvg());
                 }
             };
-            thumbDiv.appendChild(img);
+            thumbEl.appendChild(img);
+
+            // Hover overlay with Play / External Link badge
+            const overlay = document.createElement('div');
+            overlay.className = 'download-thumb-overlay';
+            overlay.innerHTML = `
+                <div class="download-thumb-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span>Ouvrir</span>
+                </div>
+            `;
+            thumbEl.appendChild(overlay);
         } else {
-            thumbDiv.appendChild(getFallbackSvg());
+            thumbEl.appendChild(getFallbackSvg());
         }
-        return thumbDiv;
+        return thumbEl;
     }
 
     function getLocalizedStatusInfo(statusStr) {
