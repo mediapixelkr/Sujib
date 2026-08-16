@@ -1,6 +1,15 @@
 @echo off
 :: Sujib Firefox Extension 1-Click Installer for Windows
 title Installation Extension Sujib Firefox
+
+:: Check Administrator privileges
+net session >nul 2>&1
+if %errorLevel% neq 0 (
+    echo Demande d'elevation Administrateur pour configurer Firefox...
+    powershell -Command "Start-Process -FilePath '%~f0' -Verb RunAs"
+    exit /b
+)
+
 echo ===================================================
 echo   Installation Automatique Extension Sujib Firefox
 echo ===================================================
