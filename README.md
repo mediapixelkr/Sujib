@@ -1,90 +1,92 @@
 # Sujib (수집) — YouTube Video Download Manager v2.0
 
+[Version Française / Lire en Français](README-FR.md)
+
 <div align="center">
   <img src="docs/screenshot.png" alt="Sujib 2.0 Interface" width="100%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
   <br><br>
-  <p><strong>Gestionnaire de téléchargement YouTube moderne, performant et élégant propulsé par Python (FastAPI), yt-dlp et FFmpeg.</strong></p>
+  <p><strong>A modern, high-performance, and sleek web-based YouTube download manager powered by Python (FastAPI), yt-dlp, and FFmpeg.</strong></p>
 </div>
 
 ---
 
-## 🌟 Points Forts & Fonctionnalités (v2.0)
+## 🌟 Key Features (v2.0)
 
-- **⚡ Architecture Python Moderne** : Backend asynchrone haute performance propulsé par **FastAPI** et **uvicorn**, avec intégration directe de l'API interne `yt-dlp`.
-- **🎨 Interface Sombre & Épurée (Sujib 2.0)** : Design glassmorphism soigné avec typographies modernes, micro-animations et icônes vectorielles SVG sobres.
-- **🎯 Zone de Drag & Drop Intelligente** : Glissez-déposez n'importe quel lien YouTube ou playlist sur la zone de dépôt pour choisir le profil de qualité et le dossier de destination au survol.
-- **📁 Dossiers Prédéfinis Personnalisés** : Configurez vos dossiers de classement par catégorie (*Albums US, MV K-Pop, EDM, Documentaires...*) et envoyez vos téléchargements directement au bon endroit.
-- **🎛️ Profils de Qualité Personnalisables** : Créez et ajustez vos profils (4K, 1440p, 1080p, 720p, MP3 Audio-Only...) avec des formules de sélecteur `yt-dlp -f` sur mesure.
-- **📊 Métadonnées Techniques Complètes** : Détection et affichage des codecs vidéo/audio (`H264`, `VP9`, `AV1`, `AAC`, `Opus`), du bitrate, du framerate (`60 fps`), de la résolution et de la taille du fichier via `ffprobe`.
-- **✏️ Renommage Manuel & Nettoyage Regex** : Moteur de renommage automatique par expressions régulières (`motif||remplacement`) + bouton de renommage manuel direct avec mise à jour du fichier physique sur le disque.
-- **🗑️ Suppression Contrôlée** : Choix interactif lors de la suppression (supprimer le fichier physique du disque dur + retirer de la liste, ou retirer de l'historique uniquement).
-- **📋 Détection & Sélection de Playlists** : Modal interactif permettant de prévisualiser, sélectionner ou filtrer les vidéos d'une playlist avant de lancer le téléchargement.
-- **🔄 Mise à Jour 1-Clic de yt-dlp** : Vérification et mise à jour de `yt-dlp` en arrière-plan directement depuis la barre de navigation.
-- **🦊 Extension Firefox v2.0** : Module complémentaire permettant d'envoyer n'importe quelle vidéo ou sélection vers Sujib en 1 clic avec choix du profil et du dossier de destination.
+- **⚡ Modern Python Backend**: High-performance asynchronous backend powered by **FastAPI** and **uvicorn**, with native integration of the internal `yt-dlp` API and progress hooks.
+- **🎨 Sober & Sleek Dark UI (Sujib 2.0)**: Glassmorphism design with modern typography, subtle micro-animations, and sober vector SVG stroke icons (no cartoon emojis).
+- **🎯 Smart Drag & Drop Zone**: Drop any YouTube video or playlist link directly onto the drop zone to dynamically pick quality profiles and destination folders on hover.
+- **📁 Custom Destination Presets**: Define custom target directories (*US Albums, K-Pop MVs, EDM, Documentaries...*) and route downloads directly to the right disk location.
+- **🎛️ Dynamic Quality Profiles**: Create and customize quality profiles (4K, 1440p, 1080p, 720p, MP3 Audio-Only...) with tailored `yt-dlp -f` selector formulas.
+- **📊 Comprehensive Technical Media Specs**: Automatic extraction and chip display of video/audio codecs (`H264`, `VP9`, `AV1`, `AAC`, `Opus`), bitrate, framerate (`60 fps`), resolution, and file size via `ffprobe`.
+- **✏️ Manual Post-Download Renaming & Regex Engine**: Automatic title cleaning via regex replacement rules (`pattern||replacement`) + interactive manual rename button directly modifying physical files on disk and in database.
+- **🗑️ Controlled Deletion**: Interactive modal offering the choice to delete the physical file from disk + clear list, or remove entry from history only.
+- **📋 Playlist Inspector & Multi-Select**: Interactive modal to inspect, select, or filter individual videos inside YouTube playlists before queuing.
+- **🔄 1-Click yt-dlp Auto-Updater**: Check and update `yt-dlp` in background directly from the top navigation bar.
+- **🦊 Firefox WebExtension v2.0**: 1-click companion extension to send videos or playlists to your private Sujib server with instant profile & destination path selection.
 
 ---
 
-## 🏗️ Structure du Projet
+## 🏗️ Project Architecture
 
 ```text
 sujib/
-├── main.py                    # API REST FastAPI & flux d'événements SSE
-├── downloader.py              # Worker de téléchargement asynchrone & moteur yt-dlp/ffprobe
-├── database.py                # Schéma SQLite & gestion des téléchargements/profils
-├── updater.py                 # Gestionnaire de mise à jour automatique yt-dlp
-├── requirements.txt           # Dépendances Python (FastAPI, yt-dlp, uvicorn...)
-├── sujib.service              # Fichier de service Systemd pour exécution en tâche de fond
+├── main.py                    # FastAPI REST API & Server-Sent Events (SSE) stream
+├── downloader.py              # Async download queue worker & yt-dlp/ffprobe engine
+├── database.py                # SQLite schema, queries, and history management
+├── updater.py                 # In-app background yt-dlp update manager
+├── requirements.txt           # Python dependencies (FastAPI, yt-dlp, uvicorn...)
+├── sujib.service              # Systemd service unit configuration file
 ├── docs/
-│   └── screenshot.png         # Capture d'écran officielle v2.0
-├── extension/                 # Code source de l'extension Firefox v2.0
+│   └── screenshot.png         # Official v2.0 screenshot
+├── extension/                 # Firefox WebExtension v2.0 source files
 │   ├── manifest.json
 │   ├── background.js
 │   ├── popup.html / popup.js
 │   ├── options.html / options.js
 │   └── icons/
-└── static/                    # Interface Web Single-Page (SPA)
+└── static/                    # Single-Page Application (SPA) frontend
     ├── index.html
     ├── css/style.css
     ├── js/app.js
-    └── installers/            # Scripts d'installation automatisés
+    └── installers/            # Automated setup scripts
 ```
 
 ---
 
-## 🚀 Installation & Déploiement
+## 🚀 Installation & Deployment
 
-### 1. Prérequis Système
-- **Linux** (Debian, Ubuntu, Arch, Fedora...) ou Windows / macOS
+### 1. Prerequisites
+- **Linux** (Debian, Ubuntu, Arch, Fedora...) or Windows / macOS
 - **Python 3.10+**
-- **FFmpeg** & **FFprobe** installés (`sudo apt install ffmpeg`)
+- **FFmpeg** & **FFprobe** installed (`sudo apt install ffmpeg`)
 
-### 2. Installation de l'application
+### 2. Application Setup
 ```bash
-# Cloner le dépôt
+# Clone the repository
 git clone https://github.com/mediapixelkr/Sujib.git /var/www/html/sujib
 cd /var/www/html/sujib
 
-# Créer l'environnement virtuel Python
+# Create Python virtual environment
 python3 -m venv venv
 source venv/bin/activate
 
-# Installer les dépendances
+# Install dependencies
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 3. Configuration du Service Systemd (Linux)
-Pour que Sujib tourne en continu en arrière-plan :
+### 3. Systemd Service Setup (Linux)
+To run Sujib as a persistent background service:
 
 ```bash
-# Copier le service systemd
+# Copy systemd unit file
 sudo cp sujib.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now sujib.service
 ```
 
-### 4. Configuration Nginx (Reverse Proxy)
-Ajoutez ce bloc dans votre configuration de site Nginx (`/etc/nginx/sites-available/default`) :
+### 4. Nginx Reverse Proxy Configuration
+Add the following block to your Nginx site configuration (`/etc/nginx/sites-available/default`):
 
 ```nginx
 location /sujib/ {
@@ -101,39 +103,39 @@ location /sujib/ {
 }
 ```
 
-Rechargez Nginx :
+Reload Nginx:
 ```bash
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
 ---
 
-## 🦊 Extension Firefox (v2.0)
+## 🦊 Firefox Extension (v2.0)
 
-L'extension Firefox vous permet de télécharger n'importe quelle vidéo ou playlist YouTube directement depuis votre navigateur.
+The Firefox extension allows you to send any YouTube video or playlist directly to your Sujib server with one click.
 
-### Installation :
-1. **Via `about:debugging` (Installation locale immédiate)** :
-   - Téléchargez l'archive **`static/sujib-firefox-extension.zip`** et décompressez-la.
-   - Dans Firefox, ouvrez `about:debugging#/runtime/this-firefox`.
-   - Cliquez sur **« Charger un module temporaire... »** et sélectionnez `manifest.json`.
-2. **Configuration** :
-   - Cliquez sur l'icône Sujib dans la barre d'outils Firefox $\rightarrow$ **Options**.
-   - Indiquez l'URL de votre serveur (ex: `http://192.168.200.15/sujib`).
-   - Vos profils et dossiers personnalisés sont automatiquement synchronisés en temps réel !
-
----
-
-## ⚙️ Configuration & Personnalisation
-
-Dans l'interface web, cliquez sur le bouton **Configuration** en haut à droite :
-- **Dossiers Prédéfinis** : Ajoutez vos dossiers favoris avec libellé et chemin absolu.
-- **Profils de Qualité** : Modifiez les conteneurs (MKV, MP4, WebM, MP3) et les options `yt-dlp -f`.
-- **Règles de Renommage Regex** : Nettoyez automatiquement les titres pollués (ex: suppression de `[Official Video]`, normalisation des tirets et guillemets).
-- **Sous-titres** : Activez l'extraction automatique des sous-titres en `.srt` externe ou incrustés.
+### Installation:
+1. **Via `about:debugging` (Immediate Local Add-on)**:
+   - Download the archive **`static/sujib-firefox-extension.zip`** and extract it.
+   - In Firefox, navigate to `about:debugging#/runtime/this-firefox`.
+   - Click **"Load Temporary Add-on..."** and select `manifest.json`.
+2. **Configuration**:
+   - Click on the Sujib icon in the Firefox toolbar $\rightarrow$ **Options**.
+   - Set your server URL (e.g., `http://192.168.200.15/sujib`).
+   - Your profiles and custom destination paths are dynamically synchronized in real-time!
 
 ---
 
-## 📜 Licence
+## ⚙️ Configuration & Customization
 
-Distribué sous licence MIT. Développé avec passion pour une gestion simple, rapide et autonome de vos médias.
+Click on the **Configuration** button at the top right of the web interface:
+- **Preset Paths**: Add your favorite destination directories with a label and absolute path.
+- **Quality Profiles**: Customize containers (MKV, MP4, WebM, MP3) and `yt-dlp -f` format arguments.
+- **Regex Renaming Rules**: Automatically clean noisy video titles (e.g., stripping `[Official Video]`, standardizing hyphens and quotes).
+- **Subtitles**: Enable automatic subtitle downloading as external `.srt` or embedded inside video streams.
+
+---
+
+## 📜 License
+
+Distributed under the MIT License. Developed for simple, fast, and self-hosted media management.
