@@ -2,15 +2,51 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+env/
 venv/
-.env
+ENV/
+env.bak/
+venv.bak/
 
-# Database & Downloads
-db.sqlite
+# Secrets & Local Configurations
+.env
+.env.*
+*.pem
+*.key
+cookies.txt
+*.sqlite
+*.sqlite3
+*.db
+db.sqlite*
+
+# Node / Scratch
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+scratch/
+
+# Downloads & Temp
 downloads/
 cache/
 *.log
+*.tmp
+*.bak
 
-# IDE
+# OS & Editors
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 .idea/
 .vscode/
+*.swp
+*.swo
+
+# Path safety
+\\*

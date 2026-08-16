@@ -60,7 +60,7 @@ class ProfileUpdateModel(BaseModel):
     audio_only: int = 0
     is_active: int = 1
 
-class PresetPathUpdate(BaseModel):
+class PresetPathModel(BaseModel):
     label: str
     path: str
     icon: Optional[str] = '📁'
