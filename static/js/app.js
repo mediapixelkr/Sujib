@@ -154,8 +154,41 @@ document.addEventListener('DOMContentLoaded', () => {
         folder: (s = 14) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
         clock: (s = 12) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
         archive: (s = 13) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>`,
-        restore: (s = 13) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>`
+        restore: (s = 13) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>`,
+        copy: (s = 12) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`,
+        check: (s = 12) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`
     };
+
+    function createCopyUrlButton(videoId, fallbackUrl = '') {
+        let vid = extractYouTubeId(videoId) || extractYouTubeId(fallbackUrl);
+        const targetUrl = vid ? `https://www.youtube.com/watch?v=${vid}` : (fallbackUrl && fallbackUrl.startsWith('http') ? fallbackUrl : '');
+        if (!targetUrl) return null;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-copy-url';
+        btn.title = "Copier l'URL YouTube";
+        btn.innerHTML = `${ICONS.copy(12)} <span>Copier l'URL</span>`;
+
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            try {
+                await navigator.clipboard.writeText(targetUrl);
+                btn.innerHTML = `${ICONS.check(12)} <span style="color:#34d399;">Copié !</span>`;
+                btn.classList.add('copied');
+                showToast('URL YouTube copiée !', 'info');
+                setTimeout(() => {
+                    btn.innerHTML = `${ICONS.copy(12)} <span>Copier l'URL</span>`;
+                    btn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Erreur copie presse-papier', err);
+                prompt('Copiez ce lien YouTube :', targetUrl);
+            }
+        });
+
+        return btn;
+    }
 
     function renderPresetPathsList() {
         if (!presetPathsList) return;
@@ -308,21 +341,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const body = document.createElement('div');
             body.className = 'download-body';
 
-            // Header Row: Title & Status Pill
+            // Header Row: Title Group & Status Pill
             const headerRow = document.createElement('div');
             headerRow.className = 'download-header-row';
+
+            const titleGroup = document.createElement('div');
+            titleGroup.className = 'download-title-group';
 
             const title = document.createElement('div');
             title.className = 'download-title';
             title.textContent = item.title || item.url || 'Sans titre';
             title.title = item.title || item.url || '';
+            titleGroup.appendChild(title);
+
+            const copyBtn = createCopyUrlButton(item.video_id, item.url);
+            if (copyBtn) {
+                titleGroup.appendChild(copyBtn);
+            }
 
             const statusInfo = getLocalizedStatusInfo(item.status);
             const statusPill = document.createElement('span');
             statusPill.className = `status-pill ${statusInfo.class}`;
             statusPill.textContent = statusInfo.text;
 
-            headerRow.appendChild(title);
+            headerRow.appendChild(titleGroup);
             headerRow.appendChild(statusPill);
             body.appendChild(headerRow);
 
@@ -450,20 +492,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const body = document.createElement('div');
             body.className = 'download-body';
 
-            // Header Row: Title & Status Pill
+            // Header Row: Title Group & Status Pill
             const headerRow = document.createElement('div');
             headerRow.className = 'download-header-row';
+
+            const titleGroup = document.createElement('div');
+            titleGroup.className = 'download-title-group';
 
             const title = document.createElement('div');
             title.className = 'download-title';
             title.textContent = item.title || item.filename || 'Téléchargement';
             title.title = item.title || item.filename || '';
+            titleGroup.appendChild(title);
+
+            const copyBtn = createCopyUrlButton(item.video_id, item.title);
+            if (copyBtn) {
+                titleGroup.appendChild(copyBtn);
+            }
 
             const statusPill = document.createElement('span');
             statusPill.className = 'status-pill status-completed';
             statusPill.textContent = 'Terminé';
 
-            headerRow.appendChild(title);
+            headerRow.appendChild(titleGroup);
             headerRow.appendChild(statusPill);
             body.appendChild(headerRow);
 

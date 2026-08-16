@@ -931,6 +931,15 @@ body {
     gap: 12px;
 }
 
+.download-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
 .download-title {
     font-weight: 600;
     font-size: 0.96rem;
@@ -939,6 +948,45 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: calc(100% - 110px);
+}
+
+@media (max-width: 768px) {
+    .download-title {
+        max-width: 100%;
+    }
+}
+
+/* Copy URL Button next to title */
+.btn-copy-url {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+    user-select: none;
+    line-height: 1;
+}
+
+.btn-copy-url:hover {
+    background: rgba(59, 130, 246, 0.18);
+    border-color: rgba(59, 130, 246, 0.4);
+    color: #93c5fd;
+    transform: translateY(-1px);
+}
+
+.btn-copy-url.copied {
+    background: rgba(16, 185, 129, 0.18);
+    border-color: rgba(16, 185, 129, 0.45);
+    color: #34d399;
 }
 
 /* Metadata Chips Row */
