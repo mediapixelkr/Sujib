@@ -15,6 +15,18 @@
     "message": "Télécharger avec Sujib (수집)",
     "description": "Titre du menu contextuel."
   },
+  "setupTitle": {
+    "message": "Bienvenue sur Sujib"
+  },
+  "setupDesc": {
+    "message": "Indiquez l'adresse de votre serveur Sujib pour commencer :"
+  },
+  "btnSaveAndConnect": {
+    "message": "Enregistrer & Se connecter"
+  },
+  "optionalAuth": {
+    "message": "Authentification (Optionnel)"
+  },
   "popupUrlLabel": {
     "message": "URL de la vidéo / playlist YouTube :"
   },

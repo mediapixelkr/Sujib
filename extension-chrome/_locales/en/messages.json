@@ -15,6 +15,18 @@
     "message": "Download with Sujib (수집)",
     "description": "Context menu title."
   },
+  "setupTitle": {
+    "message": "Welcome to Sujib"
+  },
+  "setupDesc": {
+    "message": "Please enter your Sujib server address to get started:"
+  },
+  "btnSaveAndConnect": {
+    "message": "Save & Connect"
+  },
+  "optionalAuth": {
+    "message": "Authentication (Optional)"
+  },
   "popupUrlLabel": {
     "message": "YouTube Video / Playlist URL:"
   },
@@ -34,7 +46,7 @@
     "message": "Download with Sujib"
   },
   "btnOptions": {
-    "message": "Options"
+    "message": "Settings"
   },
   "loading": {
     "message": "Loading..."

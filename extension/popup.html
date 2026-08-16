@@ -123,7 +123,7 @@
       gap: 8px;
     }
 
-    button.btn-send {
+    button.btn-primary-action {
       background: var(--accent-grad);
       color: white;
       border: none;
@@ -142,15 +142,26 @@
       transition: opacity 0.15s ease, transform 0.1s ease;
     }
 
-    button.btn-send:hover {
+    button.btn-primary-action:hover {
       opacity: 0.95;
       transform: translateY(-1px);
     }
 
-    button.btn-send:disabled {
+    button.btn-primary-action:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       transform: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .setup-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.4;
     }
 
     .status {
@@ -182,43 +193,72 @@
       <span>SUJIB</span>
       <span class="brand-badge">2.0</span>
     </div>
-    <button id="btn-open-options" class="btn-options" title="Options">
+    <button id="btn-toggle-view" class="btn-options" title="Options">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"></circle>
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
       </svg>
-      <span data-i18n="btnOptions">Options</span>
+      <span id="btn-toggle-label" data-i18n="btnOptions">Options</span>
     </button>
   </div>
 
-  <div class="field">
-    <label for="video-url" data-i18n="popupUrlLabel">URL de la vidéo / playlist YouTube :</label>
-    <input type="url" id="video-url" placeholder="https://www.youtube.com/watch?v=..." data-i18n-placeholder="popupUrlPlaceholder" required autofocus>
+  <!-- VIEW 1: FIRST LAUNCH SETUP -->
+  <div id="view-setup" class="hidden">
+    <p class="setup-desc" data-i18n="setupDesc">Indiquez l'adresse de votre serveur Sujib pour commencer :</p>
+    
+    <div class="field">
+      <label for="setup-server-url" data-i18n="optionsServerUrl">URL du serveur Sujib :</label>
+      <input type="url" id="setup-server-url" placeholder="http://192.168.1.50/sujib ou http://localhost:8000" required>
+    </div>
+
+    <div class="row-2col">
+      <div class="field">
+        <label for="setup-auth-user" data-i18n="optionsAuthUser">Utilisateur (optionnel) :</label>
+        <input type="text" id="setup-auth-user" placeholder="admin">
+      </div>
+      <div class="field">
+        <label for="setup-auth-pass" data-i18n="optionsAuthPass">Mot de passe :</label>
+        <input type="password" id="setup-auth-pass">
+      </div>
+    </div>
+
+    <button id="btn-save-setup" class="btn-primary-action">
+      <span data-i18n="btnSaveAndConnect">Enregistrer &amp; Se connecter</span>
+    </button>
   </div>
 
-  <div class="row-2col">
+  <!-- VIEW 2: DOWNLOAD VIEW -->
+  <div id="view-download">
     <div class="field">
-      <label for="profile-select" data-i18n="popupProfileLabel">Profil de qualité :</label>
-      <select id="profile-select">
-        <option value="" data-i18n="loading">Chargement...</option>
-      </select>
+      <label for="video-url" data-i18n="popupUrlLabel">URL de la vidéo / playlist YouTube :</label>
+      <input type="url" id="video-url" placeholder="https://www.youtube.com/watch?v=..." data-i18n-placeholder="popupUrlPlaceholder" required autofocus>
     </div>
-    <div class="field">
-      <label for="dest-select" data-i18n="popupDestLabel">Dossier de destination :</label>
-      <select id="dest-select">
-        <option value="" data-i18n="defaultDestOption">Dossier par défaut</option>
-      </select>
+
+    <div class="row-2col">
+      <div class="field">
+        <label for="profile-select" data-i18n="popupProfileLabel">Profil de qualité :</label>
+        <select id="profile-select">
+          <option value="" data-i18n="loading">Chargement...</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="dest-select" data-i18n="popupDestLabel">Dossier de destination :</label>
+        <select id="dest-select">
+          <option value="" data-i18n="defaultDestOption">Dossier par défaut</option>
+        </select>
+      </div>
     </div>
+
+    <button id="btn-send" class="btn-primary-action">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      <span id="btn-send-text" data-i18n="btnDownload">Télécharger avec Sujib</span>
+    </button>
   </div>
 
-  <button id="btn-send" class="btn-send">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-      <polyline points="7 10 12 15 17 10"></polyline>
-      <line x1="12" y1="15" x2="12" y2="3"></line>
-    </svg>
-    <span id="btn-send-text" data-i18n="btnDownload">Télécharger avec Sujib</span>
-  </button>
   <div id="status" class="status"></div>
 
   <script src="popup.js"></script>

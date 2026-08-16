@@ -15,6 +15,18 @@
     "message": "Sujib(수집)으로 다운로드",
     "description": "컨텍스트 메뉴 제목"
   },
+  "setupTitle": {
+    "message": "Sujib 시작하기"
+  },
+  "setupDesc": {
+    "message": "시작하려면 Sujib 서버 주소를 입력해주세요:"
+  },
+  "btnSaveAndConnect": {
+    "message": "저장 및 연결"
+  },
+  "optionalAuth": {
+    "message": "인증 (선택사항)"
+  },
   "popupUrlLabel": {
     "message": "YouTube 영상 / 재생목록 URL:"
   },
