@@ -12,7 +12,7 @@ from database import (
     init_db, get_options, update_options, get_profiles, update_profile,
     add_profile, delete_profile, toggle_profile_active,
     get_preset_paths, add_preset_path, update_preset_path, delete_preset_path,
-    get_queue, add_to_queue, remove_queue_item,
+    get_queue, add_to_queue, remove_queue_item, update_queue_status, get_db_connection,
     get_downloaded, remove_downloaded, clear_downloaded_history, rename_downloaded
 )
 from downloader import analyze_url, queue_manager, broadcaster
@@ -213,6 +213,31 @@ async def add_download_api(data: DownloadRequestModel):
 @app.get("/api/queue")
 async def get_queue_api():
     return get_queue()
+
+@app.post("/api/queue/{qid}/retry")
+async def retry_queue_item_api(qid: int):
+    conn = get_db_connection()
+    row = conn.execute("SELECT * FROM queue WHERE id = ?", (qid,)).fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(status_code=404, detail="Élément de file introuvable")
+    
+    item = dict(row)
+    profiles = get_profiles(include_archived=True)
+    selected_profile = next((p for p in profiles if p["id"] == item["profile_id"]), None)
+    if not selected_profile:
+        selected_profile = profiles[0] if profiles else {"id": 1, "name": "Default", "format_spec": "bestvideo+bestaudio/best", "container": "mkv", "audio_only": 0}
+
+    update_queue_status(qid, status="pending", progress_pct=0.0, speed="En attente...", eta="--", error_msg="")
+    task_info = {
+        "url": item["url"],
+        "video_id": item["video_id"],
+        "title": item["title"],
+        "profile": selected_profile,
+        "dest_path": item["dest_path"]
+    }
+    await queue_manager.add_job(qid, task_info)
+    return {"success": True, "qid": qid}
 
 @app.delete("/api/queue/{qid}")
 async def cancel_queue_item_api(qid: int):

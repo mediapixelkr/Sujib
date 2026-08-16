@@ -159,6 +159,13 @@ def analyze_url(url: str) -> Dict[str, Any]:
         'extract_flat': 'in_playlist',
         'skip_download': True,
         'no_warnings': True,
+        'js_runtimes': {'node': {}},
+        'remote_components': ['ejs:github'],
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['web', 'web_embedded']
+            }
+        },
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -291,6 +298,16 @@ class DownloadQueueManager:
             'progress_hooks': [progress_hook],
             'quiet': True,
             'no_warnings': True,
+            'js_runtimes': {'node': {}},
+            'remote_components': ['ejs:github'],
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['web', 'web_embedded']
+                }
+            },
+            'http_chunk_size': 10485760,
+            'retries': 10,
+            'fragment_retries': 10,
         }
 
         # Subtitles option

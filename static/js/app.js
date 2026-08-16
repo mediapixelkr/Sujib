@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderDownloads() {
         queueList.replaceChildren();
 
-        const activeItems = queueItems.filter(i => ['pending','downloading','processing'].includes(i.status));
+        const activeItems = queueItems.filter(i => ['pending','downloading','processing','failed','error'].includes(i.status));
         queueCountBadge.textContent = activeItems.length + historyItems.length;
 
         if (activeItems.length === 0 && historyItems.length === 0) {
@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 1. Render active queue items (pending, downloading, processing)
+        // 1. Render active & failed queue items
         activeItems.forEach(item => {
             const card = document.createElement('div');
             card.className = 'download-card';
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             body.appendChild(chipsRow);
 
-            // Progress Bar (when downloading or pending)
+            // Progress Bar or Error Display
             if (['downloading', 'pending'].includes(item.status)) {
                 const progressContainer = document.createElement('div');
                 progressContainer.className = 'progress-bar-container';
@@ -376,6 +376,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 body.appendChild(progressContainer);
+            } else if (['failed', 'error'].includes(item.status)) {
+                const errorBox = document.createElement('div');
+                errorBox.style.cssText = 'background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:6px 10px;margin-top:6px;font-size:0.78rem;color:#f87171;word-break:break-word;';
+                errorBox.textContent = item.error_msg || 'Erreur lors du téléchargement.';
+                body.appendChild(errorBox);
             }
 
             // Footer Row: Destination & Actions
@@ -390,10 +395,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             footerRow.appendChild(destInfo);
 
-            if (['pending', 'downloading'].includes(item.status)) {
-                const actions = document.createElement('div');
-                actions.className = 'download-actions';
+            const actions = document.createElement('div');
+            actions.className = 'download-actions';
 
+            if (['pending', 'downloading'].includes(item.status)) {
                 const btnCancel = document.createElement('button');
                 btnCancel.className = 'btn-cancel-ghost';
                 btnCancel.textContent = 'Annuler';
@@ -403,9 +408,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     loadAllDownloads();
                 });
                 actions.appendChild(btnCancel);
-                footerRow.appendChild(actions);
+            } else if (['failed', 'error'].includes(item.status)) {
+                const btnRetry = document.createElement('button');
+                btnRetry.className = 'btn-sm btn-outline';
+                btnRetry.style.cssText = 'color:#60a5fa;border-color:rgba(96,165,250,0.4);display:inline-flex;align-items:center;gap:4px;';
+                btnRetry.innerHTML = `${ICONS.restore(12)} <span>Réessayer</span>`;
+                btnRetry.addEventListener('click', async () => {
+                    await fetch(apiPath(`/queue/${item.id}/retry`), { method: 'POST' });
+                    showToast('Téléchargement relancé', 'info');
+                    loadAllDownloads();
+                });
+                actions.appendChild(btnRetry);
+
+                const btnDel = document.createElement('button');
+                btnDel.className = 'btn-sm btn-outline';
+                btnDel.style.cssText = 'color:#ef4444;border-color:rgba(239,68,68,0.4);display:inline-flex;align-items:center;gap:4px;';
+                btnDel.innerHTML = `${ICONS.trash(12)} <span>Supprimer</span>`;
+                btnDel.addEventListener('click', async () => {
+                    await fetch(apiPath(`/queue/${item.id}`), { method: 'DELETE' });
+                    loadAllDownloads();
+                });
+                actions.appendChild(btnDel);
             }
 
+            footerRow.appendChild(actions);
             body.appendChild(footerRow);
             card.appendChild(body);
             queueList.appendChild(card);
