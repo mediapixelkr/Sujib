@@ -159,10 +159,40 @@ document.addEventListener('DOMContentLoaded', () => {
         check: (s = 12) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`
     };
 
+    function copyTextToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+        }
+        return new Promise((resolve, reject) => {
+            try {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-999999px';
+                textarea.style.top = '-999999px';
+                textarea.setAttribute('readonly', '');
+                document.body.appendChild(textarea);
+                textarea.select();
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                if (successful) {
+                    resolve();
+                } else {
+                    reject(new Error('execCommand copy failed'));
+                }
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
     function createCopyUrlButton(videoId, fallbackUrl = '') {
         let vid = extractYouTubeId(videoId) || extractYouTubeId(fallbackUrl);
         const targetUrl = vid ? `https://www.youtube.com/watch?v=${vid}` : (fallbackUrl && fallbackUrl.startsWith('http') ? fallbackUrl : '');
         if (!targetUrl) return null;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'copy-url-wrapper';
 
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -170,24 +200,35 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.title = "Copier l'URL YouTube";
         btn.innerHTML = ICONS.copy(13);
 
+        const tooltip = document.createElement('div');
+        tooltip.className = 'copy-url-tooltip';
+        tooltip.textContent = 'Lien copié !';
+
+        wrapper.appendChild(btn);
+        wrapper.appendChild(tooltip);
+
+        let tooltipTimer = null;
+
         btn.addEventListener('click', async (e) => {
             e.stopPropagation();
             try {
-                await navigator.clipboard.writeText(targetUrl);
+                await copyTextToClipboard(targetUrl);
                 btn.innerHTML = ICONS.check(13);
                 btn.classList.add('copied');
-                showToast('URL YouTube copiée !', 'info');
-                setTimeout(() => {
+                tooltip.classList.add('show');
+
+                if (tooltipTimer) clearTimeout(tooltipTimer);
+                tooltipTimer = setTimeout(() => {
                     btn.innerHTML = ICONS.copy(13);
                     btn.classList.remove('copied');
-                }, 1500);
+                    tooltip.classList.remove('show');
+                }, 1800);
             } catch (err) {
                 console.error('Erreur copie presse-papier', err);
-                prompt('Copiez ce lien YouTube :', targetUrl);
             }
         });
 
-        return btn;
+        return wrapper;
     }
 
     function renderPresetPathsList() {
