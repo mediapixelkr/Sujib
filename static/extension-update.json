@@ -3,8 +3,8 @@
     "sujib-downloader@mediapixel.kr": {
       "updates": [
         {
-          "version": "2.0.0",
-          "update_link": "http://192.168.200.15/sujib/static/sujib-firefox-extension.xpi"
+          "version": "2.0.1",
+          "update_link": "http://localhost/sujib/static/sujib-firefox-extension.xpi"
         }
       ]
     }

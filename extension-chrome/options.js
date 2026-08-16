@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load existing settings
   const settings = await extAPI.storage.sync.get({
-    serverUrl: 'http://192.168.200.15/sujib',
+    serverUrl: 'http://localhost:8000',
     authUser: '',
     authPass: '',
     defaultProfile: '1',

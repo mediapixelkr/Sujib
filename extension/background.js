@@ -19,7 +19,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
     }
 
     const settings = await browser.storage.sync.get({
-      serverUrl: 'http://192.168.200.15/sujib',
+      serverUrl: 'http://localhost:8000',
       authUser: '',
       authPass: '',
       defaultProfile: '1',
