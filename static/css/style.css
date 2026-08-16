@@ -878,26 +878,41 @@ body {
     box-shadow: 0 6px 25px rgba(0, 0, 0, 0.35);
 }
 
-/* Card Thumbnail */
+/* Card Thumbnail (Prominent 16:9 ratio) */
 .download-thumb {
-    width: 130px;
-    height: 73px; /* 16:9 ratio */
-    border-radius: 8px;
+    width: 196px;
+    height: 110px; /* 16:9 widescreen ratio */
+    border-radius: 10px;
     object-fit: cover;
     background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #60a5fa;
     overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.download-card:hover .download-thumb {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
 }
 
 .download-thumb img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+}
+
+@media (max-width: 640px) {
+    .download-thumb {
+        width: 130px;
+        height: 73px;
+        border-radius: 8px;
+    }
 }
 
 /* Card Details Body */

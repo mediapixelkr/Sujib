@@ -229,8 +229,8 @@ document.addEventListener('DOMContentLoaded', () => {
             img.src = `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`;
             img.alt = 'Thumbnail';
             img.onerror = () => {
-                if (img.src.includes('i.ytimg.com')) {
-                    img.src = `https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
+                if (img.src.includes('hqdefault.jpg')) {
+                    img.src = `https://i.ytimg.com/vi/${vid}/mqdefault.jpg`;
                 } else {
                     thumbDiv.replaceChildren(getFallbackSvg());
                 }
