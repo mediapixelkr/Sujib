@@ -214,7 +214,11 @@
                         <span id="queue-count-badge" class="count-chip">0</span>
                     </div>
                     <button type="button" id="btn-clear-history" class="btn-sm btn-outline" style="font-size:0.8rem; padding:4px 10px; cursor:pointer;" title="Vider la liste des anciens téléchargements terminés">
-                        🧹 Vider la liste
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        <span>Vider la liste</span>
                     </button>
                 </div>
                 <div id="queue-list" class="queue-list">
@@ -235,7 +239,10 @@
     <div id="options-modal" class="modal-overlay hidden">
         <div class="modal-card glass modal-xl">
             <div class="modal-header">
-                <h3>⚙️ Panneau de Configuration — Sujib 2.0</h3>
+                <h3 style="display:flex; align-items:center; gap:8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    <span>Panneau de Configuration — Sujib 2.0</span>
+                </h3>
                 <button class="btn-close" id="btn-close-options">&times;</button>
             </div>
 
@@ -244,7 +251,10 @@
                 <!-- 1. Preset Paths -->
                 <div class="accordion-item active" id="acc-paths">
                     <button class="accordion-header" type="button">
-                        <span>📁 1. Dossiers Prédéfinis (Albums US, MV K-Pop, EDM...)</span>
+                        <span style="display:flex; align-items:center; gap:8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                            <span>1. Dossiers Prédéfinis (Albums US, MV K-Pop, EDM...)</span>
+                        </span>
                         <span class="accordion-icon">▲</span>
                     </button>
                     <div class="accordion-content">
@@ -252,7 +262,10 @@
                         <div class="preset-add-form">
                             <input type="text" id="preset-new-label" placeholder="Libellé (ex: MV K-Pop)" class="form-input" style="flex:1;">
                             <input type="text" id="preset-new-path" placeholder="Chemin absolu (ex: /data/downloads/kpop)" class="form-input" style="flex:2;">
-                            <button id="btn-add-preset" class="btn-sm btn-primary" type="button">➕ Ajouter</button>
+                            <button id="btn-add-preset" class="btn-sm btn-primary" type="button">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>Ajouter</span>
+                            </button>
                         </div>
                         <div id="preset-paths-list" class="preset-paths-list"></div>
                     </div>
@@ -261,14 +274,20 @@
                 <!-- 2. Quality Profiles -->
                 <div class="accordion-item" id="acc-profiles">
                     <button class="accordion-header" type="button">
-                        <span>🎛️ 2. Profils de Qualité (4K, 1080p, MP3...)</span>
+                        <span style="display:flex; align-items:center; gap:8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+                            <span>2. Profils de Qualité (4K, 1080p, MP3...)</span>
+                        </span>
                         <span class="accordion-icon">▼</span>
                     </button>
                     <div class="accordion-content">
                         <!-- View: list -->
                         <div id="pm-view-list">
                             <div class="playlist-controls" style="margin-bottom:14px;">
-                                <button id="btn-new-profile" class="btn-sm btn-primary" type="button">➕ Créer un profil</button>
+                                <button id="btn-new-profile" class="btn-sm btn-primary" type="button">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    <span>Créer un profil</span>
+                                </button>
                                 <label class="selected-counter" style="display:flex;align-items:center;gap:6px;cursor:pointer;">
                                     <input type="checkbox" id="chk-show-archived"> Afficher profils archivés
                                 </label>
@@ -327,7 +346,10 @@
                 <!-- 3. System Options -->
                 <div class="accordion-item" id="acc-system">
                     <button class="accordion-header" type="button">
-                        <span>⚙️ 3. Règles de Renommage &amp; Options Système</span>
+                        <span style="display:flex; align-items:center; gap:8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <span>3. Règles de Renommage &amp; Options Système</span>
+                        </span>
                         <span class="accordion-icon">▼</span>
                     </button>
                     <div class="accordion-content">
@@ -365,7 +387,8 @@
                                     <label>Maintenance &amp; Cache :</label>
                                     <div style="display:flex; gap:10px; margin-top:8px; align-items:center;">
                                         <button type="button" id="btn-clear-cache" class="btn-sm btn-secondary">
-                                            🧹 Vider le cache yt-dlp
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                                            <span>Vider le cache yt-dlp</span>
                                         </button>
                                         <span id="cache-clear-status" style="font-size:0.8rem; color:var(--text-muted);"></span>
                                     </div>
@@ -381,7 +404,10 @@
                 <!-- 4. Firefox Extension -->
                 <div class="accordion-item" id="acc-firefox">
                     <button class="accordion-header" type="button">
-                        <span>🦊 4. Module Firefox &amp; Installateurs 1-Clic</span>
+                        <span style="display:flex; align-items:center; gap:8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            <span>4. Module Firefox &amp; Installateurs 1-Clic</span>
+                        </span>
                         <span class="accordion-icon">▼</span>
                     </button>
                     <div class="accordion-content">
@@ -389,15 +415,27 @@
                             <div style="flex:1;min-width:220px;">
                                 <strong>Extension Firefox :</strong>
                                 <div style="display:flex;gap:10px;margin-top:10px;">
-                                    <a href="static/sujib-firefox-extension.xpi" class="btn-sm btn-outline" style="text-decoration:none;" download>📦 .xpi</a>
-                                    <a href="static/sujib-firefox-extension.zip" class="btn-sm btn-outline" style="text-decoration:none;" download>📁 .zip</a>
+                                    <a href="static/sujib-firefox-extension.xpi" class="btn-sm btn-outline" style="text-decoration:none;" download>
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                                        <span>.xpi</span>
+                                    </a>
+                                    <a href="static/sujib-firefox-extension.zip" class="btn-sm btn-outline" style="text-decoration:none;" download>
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                        <span>.zip</span>
+                                    </a>
                                 </div>
                             </div>
                             <div style="flex:2;min-width:280px;">
                                 <strong>Installateurs 1-Clic :</strong>
                                 <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
-                                    <a href="static/installers/install-windows.bat" class="btn-sm btn-primary" style="text-decoration:none;" download>💻 Windows (.bat)</a>
-                                    <a href="static/installers/install-linux.sh" class="btn-sm btn-outline" style="text-decoration:none;" download>🐧 Linux (.sh)</a>
+                                    <a href="static/installers/install-windows.bat" class="btn-sm btn-primary" style="text-decoration:none;" download>
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                                        <span>Windows (.bat)</span>
+                                    </a>
+                                    <a href="static/installers/install-linux.sh" class="btn-sm btn-outline" style="text-decoration:none;" download>
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                                        <span>Linux (.sh)</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -440,7 +478,8 @@
         <div class="modal-card glass" style="max-width:460px; padding:24px;">
             <div class="modal-header" style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
                 <h3 id="delete-modal-heading" style="font-size:1.1rem; margin:0; display:flex; align-items:center; gap:8px;">
-                    🗑️ Option de suppression
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    <span>Option de suppression</span>
                 </h3>
                 <button id="btn-close-delete-modal" class="btn-close-modal" type="button" style="background:none; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer;">✕</button>
             </div>
@@ -449,11 +488,13 @@
                 Souhaitez-vous également supprimer le fichier du disque dur ?
             </p>
             <div style="display:flex; flex-direction:column; gap:10px;">
-                <button type="button" id="btn-delete-file-and-entry" class="btn-primary" style="background:#ef4444; border-color:#ef4444; text-align:center; padding:10px; cursor:pointer;">
-                    🗑️ Supprimer du disque + Retirer de la liste
+                <button type="button" id="btn-delete-file-and-entry" class="btn-primary" style="background:#ef4444; border-color:#ef4444; text-align:center; padding:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    <span>Supprimer du disque + Retirer de la liste</span>
                 </button>
-                <button type="button" id="btn-delete-entry-only" class="btn-outline" style="text-align:center; padding:10px; cursor:pointer;">
-                    📋 Retirer de la liste uniquement (conserver le fichier)
+                <button type="button" id="btn-delete-entry-only" class="btn-outline" style="text-align:center; padding:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    <span>Retirer de la liste uniquement (conserver le fichier)</span>
                 </button>
                 <button type="button" id="btn-cancel-delete" class="btn-secondary" style="text-align:center; padding:8px; cursor:pointer; margin-top:4px;">
                     Annuler
@@ -467,7 +508,8 @@
         <div class="modal-card glass" style="max-width:480px; padding:24px;">
             <div class="modal-header" style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
                 <h3 style="font-size:1.1rem; margin:0; display:flex; align-items:center; gap:8px;">
-                    ✏️ Renommer le fichier
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    <span>Renommer le fichier</span>
                 </h3>
                 <button id="btn-close-rename-modal" class="btn-close-modal" type="button" style="background:none; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer;">✕</button>
             </div>

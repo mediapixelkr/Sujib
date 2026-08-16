@@ -1,12 +1,20 @@
 {
   "manifest_version": 3,
-  "name": "Sujib - YouTube Downloader",
-  "version": "1.0.0",
-  "description": "Envoyez en un clic n'importe quelle vidéo YouTube vers votre serveur Sujib.",
+  "name": "Sujib — YouTube Downloader",
+  "version": "2.0.0",
+  "description": "Envoyez en un clic vos vidéos et playlists YouTube vers votre serveur Sujib 2.0.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "64": "icons/icon-64.png",
+    "128": "icons/icon-128.png"
+  },
   "permissions": [
     "contextMenus",
     "activeTab",
-    "storage"
+    "storage",
+    "notifications"
   ],
   "host_permissions": [
     "http://*/*",
@@ -14,7 +22,13 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Envoyer à Sujib"
+    "default_title": "Envoyer à Sujib",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "64": "icons/icon-64.png"
+    }
   },
   "background": {
     "scripts": ["background.js"]

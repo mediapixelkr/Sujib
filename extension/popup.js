@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const videoUrlInput = document.getElementById('video-url');
   const profileSelect = document.getElementById('profile-select');
+  const destSelect = document.getElementById('dest-select');
   const btnSend = document.getElementById('btn-send');
   const btnOptions = document.getElementById('btn-open-options');
   const statusDiv = document.getElementById('status');
@@ -10,7 +11,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     serverUrl: 'http://192.168.200.15/sujib',
     authUser: '',
     authPass: '',
-    defaultProfile: '1'
+    defaultProfile: '1',
+    defaultDest: ''
   });
 
   const headers = {};
@@ -18,15 +20,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     headers['Authorization'] = 'Basic ' + btoa(`${settings.authUser}:${settings.authPass}`);
   }
 
-  // Synchronize profiles dynamically from Sujib server API
-  await loadProfilesFromServer(settings.serverUrl, headers, settings.defaultProfile);
+  // Load profiles and preset paths from Sujib server
+  await Promise.all([
+    loadProfilesFromServer(settings.serverUrl, headers, settings.defaultProfile),
+    loadPresetPathsFromServer(settings.serverUrl, headers, settings.defaultDest)
+  ]);
 
   // Auto-detect active YouTube tab URL
-  const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-  if (tabs && tabs[0] && tabs[0].url) {
-    if (tabs[0].url.includes('youtube.com') || tabs[0].url.includes('youtu.be')) {
-      videoUrlInput.value = tabs[0].url;
+  try {
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    if (tabs && tabs[0] && tabs[0].url) {
+      if (tabs[0].url.includes('youtube.com') || tabs[0].url.includes('youtu.be')) {
+        videoUrlInput.value = tabs[0].url;
+      }
     }
+  } catch (e) {
+    console.warn('Tab detection error:', e);
   }
 
   btnOptions.addEventListener('click', () => {
@@ -47,8 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         profiles.forEach(prof => {
           const opt = document.createElement('option');
           opt.value = prof.id;
-          const destText = prof.dest_path ? ` 📁 ${prof.dest_path.split('/').pop()}` : '';
-          opt.textContent = `${prof.name} (${prof.container.toUpperCase()})${destText}`;
+          opt.textContent = `${prof.name} (${prof.container.toUpperCase()})`;
           profileSelect.appendChild(opt);
         });
 
@@ -58,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
     } catch (err) {
-      console.warn('Erreur de synchro profils Sujib:', err);
+      console.warn('Erreur synchro profils:', err);
     }
 
     // Fallback if server unreachable
@@ -72,51 +80,79 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }
 
+  async function loadPresetPathsFromServer(baseUrl, reqHeaders, savedDest) {
+    const endpoint = `${baseUrl.replace(/\/+$/, '')}/api/preset-paths`;
+    try {
+      const res = await fetch(endpoint, { headers: reqHeaders });
+      if (res.ok) {
+        const paths = await res.json();
+        destSelect.innerHTML = '<option value="">Dossier par défaut</option>';
+        paths.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.path;
+          opt.textContent = p.label;
+          destSelect.appendChild(opt);
+        });
+
+        if (savedDest && destSelect.querySelector(`option[value="${savedDest}"]`)) {
+          destSelect.value = savedDest;
+        }
+        return;
+      }
+    } catch (err) {
+      console.warn('Erreur synchro dossiers:', err);
+    }
+
+    destSelect.innerHTML = '<option value="">Dossier par défaut</option>';
+  }
+
   btnSend.addEventListener('click', async () => {
     const url = videoUrlInput.value.trim();
     if (!url) {
-      statusDiv.textContent = 'Veuillez saisir une URL valide';
-      statusDiv.className = 'status error';
+      showStatus('Veuillez saisir une URL YouTube valide', 'error');
       return;
     }
 
-    const profileId = parseInt(profileSelect.value, 10);
+    const profileId = parseInt(profileSelect.value, 10) || 1;
+    const destPath = destSelect.value || '';
     const apiEndpoint = `${settings.serverUrl.replace(/\/+$/, '')}/api/download`;
 
-    const headers = { 'Content-Type': 'application/json' };
+    const reqHeaders = { 'Content-Type': 'application/json' };
     if (settings.authUser && settings.authPass) {
-      headers['Authorization'] = 'Basic ' + btoa(`${settings.authUser}:${settings.authPass}`);
+      reqHeaders['Authorization'] = 'Basic ' + btoa(`${settings.authUser}:${settings.authPass}`);
     }
 
     btnSend.disabled = true;
-    statusDiv.textContent = 'Envoi en cours...';
-    statusDiv.className = 'status';
+    showStatus('Envoi en cours...', '');
 
     try {
       const res = await fetch(apiEndpoint, {
         method: 'POST',
-        headers: headers,
+        headers: reqHeaders,
         body: JSON.stringify({
           url: url,
           title: 'Vidéo envoyée via extension Firefox',
-          profile_id: profileId
+          profile_id: profileId,
+          dest_path: destPath
         })
       });
 
       if (res.ok) {
-        statusDiv.textContent = 'Téléchargement lancé avec succès !';
-        statusDiv.className = 'status success';
-        setTimeout(() => window.close(), 1500);
+        showStatus('Téléchargement lancé avec succès !', 'success');
+        setTimeout(() => window.close(), 1400);
       } else {
         const data = await res.json().catch(() => ({}));
-        statusDiv.textContent = data.detail || `Erreur serveur (${res.status})`;
-        statusDiv.className = 'status error';
+        showStatus(data.detail || `Erreur serveur (${res.status})`, 'error');
       }
     } catch (err) {
-      statusDiv.textContent = 'Erreur réseau : ' + err.message;
-      statusDiv.className = 'status error';
+      showStatus('Erreur de connexion au serveur Sujib : ' + err.message, 'error');
     } finally {
       btnSend.disabled = false;
     }
   });
+
+  function showStatus(msg, type) {
+    statusDiv.textContent = msg;
+    statusDiv.className = `status show ${type}`;
+  }
 });

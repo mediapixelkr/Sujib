@@ -147,6 +147,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) { console.error('loadPresetPaths error', err); }
     }
 
+    // ─── Sober SVG Icons Helpers ─────────────────────────────────────────────
+    const ICONS = {
+        trash: (s = 13) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
+        edit: (s = 13) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
+        folder: (s = 14) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
+        clock: (s = 12) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+        archive: (s = 13) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>`,
+        restore: (s = 13) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>`
+    };
+
     function renderPresetPathsList() {
         if (!presetPathsList) return;
         presetPathsList.replaceChildren();
@@ -160,12 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const info = document.createElement('div');
             info.style.cssText = 'display:flex;flex-direction:column;gap:2px;';
-            info.innerHTML = `<strong>${item.icon || '📁'} ${item.label}</strong><span style="font-size:0.8rem;color:var(--text-muted);">${item.path || '— Dossier par défaut (global)'}</span>`;
+            info.innerHTML = `<strong style="display:flex;align-items:center;gap:6px;">${ICONS.folder(14)} <span>${item.label}</span></strong><span style="font-size:0.8rem;color:var(--text-muted);">${item.path || '— Dossier par défaut (global)'}</span>`;
 
             const btnDel = document.createElement('button');
             btnDel.className = 'btn-sm btn-outline';
-            btnDel.style.cssText = 'color:#ef4444;border-color:rgba(239,68,68,0.4);white-space:nowrap;';
-            btnDel.textContent = '🗑️ Supprimer';
+            btnDel.style.cssText = 'color:#ef4444;border-color:rgba(239,68,68,0.4);white-space:nowrap;display:inline-flex;align-items:center;gap:6px;';
+            btnDel.innerHTML = `${ICONS.trash(13)} <span>Supprimer</span>`;
             btnDel.addEventListener('click', async () => {
                 if (!confirm(`Supprimer « ${item.label} » ?`)) return;
                 await fetch(apiPath(`/preset-paths/${item.id}`), { method: 'DELETE' });
@@ -375,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const destInfo = document.createElement('div');
             destInfo.className = 'download-dest-info';
             const destPath = item.dest_path ? item.dest_path : 'Dossier par défaut';
-            destInfo.innerHTML = `<span>📁</span> <span>${destPath}</span>`;
+            destInfo.innerHTML = `<span>${ICONS.folder(13)}</span> <span>${destPath}</span>`;
             destInfo.title = destPath;
 
             footerRow.appendChild(destInfo);
@@ -482,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (item.duration && item.duration !== '--') {
                 const durChip = document.createElement('span');
                 durChip.className = 'meta-chip';
-                durChip.textContent = `⏱️ ${item.duration}`;
+                durChip.innerHTML = `${ICONS.clock(12)} <span>${item.duration}</span>`;
                 chipsRow.appendChild(durChip);
             }
 
@@ -502,7 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const destInfo = document.createElement('div');
             destInfo.className = 'download-dest-info';
             const filepath = item.filepath || item.filename || 'Stockage local';
-            destInfo.innerHTML = `<span>📁</span> <span>${filepath}</span>`;
+            destInfo.innerHTML = `<span>${ICONS.folder(13)}</span> <span>${filepath}</span>`;
             destInfo.title = filepath;
 
             const actions = document.createElement('div');
@@ -511,16 +521,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const btnRename = document.createElement('button');
             btnRename.className = 'btn-sm btn-outline';
-            btnRename.style.cssText = 'color:var(--primary);border-color:rgba(124,58,237,0.4);cursor:pointer;';
-            btnRename.textContent = '✏️ Renommer';
+            btnRename.style.cssText = 'color:var(--primary);border-color:rgba(124,58,237,0.4);cursor:pointer;display:inline-flex;align-items:center;gap:6px;';
+            btnRename.innerHTML = `${ICONS.edit(13)} <span>Renommer</span>`;
             btnRename.addEventListener('click', () => {
                 openRenameModal(item);
             });
 
             const btnDel = document.createElement('button');
             btnDel.className = 'btn-sm btn-outline';
-            btnDel.style.cssText = 'color:#ef4444;border-color:rgba(239,68,68,0.4);cursor:pointer;';
-            btnDel.textContent = '🗑️ Supprimer';
+            btnDel.style.cssText = 'color:#ef4444;border-color:rgba(239,68,68,0.4);cursor:pointer;display:inline-flex;align-items:center;gap:6px;';
+            btnDel.innerHTML = `${ICONS.trash(13)} <span>Supprimer</span>`;
             btnDel.addEventListener('click', () => {
                 openDeleteModal(
                     `"${item.title || item.filename}"`,
@@ -1411,7 +1421,7 @@ document.addEventListener('DOMContentLoaded', () => {
             specInfo.innerHTML = `<strong>${prof.container.toUpperCase()}</strong> · ${prof.max_res || 'Auto'}`;
             const pathPill = document.createElement('div');
             pathPill.className = 'pm-path-pill';
-            pathPill.textContent = prof.dest_path ? `📁 ${prof.dest_path}` : '📁 Dossier global';
+            pathPill.innerHTML = `<span style="display:inline-flex;align-items:center;gap:5px;">${ICONS.folder(13)} <span>${prof.dest_path || 'Dossier global'}</span></span>`;
             details.appendChild(specInfo);
             details.appendChild(pathPill);
 
@@ -1420,7 +1430,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const btnEdit = document.createElement('button');
             btnEdit.className = 'btn-sm btn-outline';
-            btnEdit.textContent = '✏️ Éditer';
+            btnEdit.style.cssText = 'display:inline-flex;align-items:center;gap:6px;';
+            btnEdit.innerHTML = `${ICONS.edit(13)} <span>Éditer</span>`;
             btnEdit.addEventListener('click', () => {
                 // Open profiles accordion if not already open
                 const accProfiles = document.getElementById('acc-profiles');
@@ -1439,7 +1450,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const btnToggle = document.createElement('button');
             btnToggle.className = 'btn-sm btn-outline';
-            btnToggle.textContent = prof.is_active === 1 ? '📦 Archiver' : '🔄 Restaurer';
+            btnToggle.style.cssText = 'display:inline-flex;align-items:center;gap:6px;';
+            btnToggle.innerHTML = prof.is_active === 1 
+                ? `${ICONS.archive(13)} <span>Archiver</span>` 
+                : `${ICONS.restore(13)} <span>Restaurer</span>`;
             btnToggle.addEventListener('click', async () => {
                 const newActive = prof.is_active === 1 ? 0 : 1;
                 await fetch(apiPath(`/profiles/${prof.id}/toggle-active?is_active=${newActive}`), { method: 'POST' });
@@ -1450,8 +1464,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const btnDelete = document.createElement('button');
             btnDelete.className = 'btn-sm btn-outline';
-            btnDelete.style.cssText = 'color:#ef4444;border-color:rgba(239,68,68,0.4);';
-            btnDelete.textContent = '🗑️ Supprimer';
+            btnDelete.style.cssText = 'color:#ef4444;border-color:rgba(239,68,68,0.4);display:inline-flex;align-items:center;gap:6px;';
+            btnDelete.innerHTML = `${ICONS.trash(13)} <span>Supprimer</span>`;
             btnDelete.addEventListener('click', async () => {
                 if (confirm(`Supprimer le profil "${prof.name}" ?`)) {
                     await fetch(apiPath(`/profiles/${prof.id}`), { method: 'DELETE' });
