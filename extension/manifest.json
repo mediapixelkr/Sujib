@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Sujib — YouTube Downloader",
   "version": "2.0.0",
   "description": "Envoyez en un clic vos vidéos et playlists YouTube vers votre serveur Sujib 2.0.",
@@ -14,13 +14,11 @@
     "contextMenus",
     "activeTab",
     "storage",
-    "notifications"
-  ],
-  "host_permissions": [
+    "notifications",
     "http://*/*",
     "https://*/*"
   ],
-  "action": {
+  "browser_action": {
     "default_popup": "popup.html",
     "default_title": "Envoyer à Sujib",
     "default_icon": {
@@ -40,7 +38,12 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "sujib-downloader@mediapixel.kr",
-      "update_url": "http://192.168.200.15/sujib/static/extension-update.json"
+      "strict_min_version": "57.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
     }
   }
 }
